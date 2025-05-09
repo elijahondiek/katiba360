@@ -74,6 +74,7 @@ export default function AskPage() {
   const [showFeedbackForm, setShowFeedbackForm] = useState<string | null>(null)
   const [feedbackComment, setFeedbackComment] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [questionToUse, setQuestionToUse] = useState<string | null>(null)
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
@@ -83,6 +84,13 @@ export default function AskPage() {
   useEffect(() => {
     scrollToBottom()
   }, [conversation])
+
+  useEffect(() => {
+    if (questionToUse) {
+      setInputValue(questionToUse)
+      setQuestionToUse(null) // Reset the question
+    }
+  }, [questionToUse])
 
   // Handle message submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -142,9 +150,9 @@ export default function AskPage() {
   // Use a suggested question
   const useQuestion = useCallback(
     (question: string) => {
-      setInputValue(question)
+      setQuestionToUse(question)
     },
-    [setInputValue],
+    [setQuestionToUse],
   )
 
   // Mock response generation (would be replaced with actual AI in production)
