@@ -8,6 +8,7 @@
   "nav.about": "About",
   "auth.signin": "Sign In",
   "auth.signup": "Sign Up",
+  "auth.logout": "Logout",
   "search.placeholder": "Search the constitution or ask a question...",
   "home.explore": "Explore the Constitution",
   "home.viewAllChapters": "View All Chapters",

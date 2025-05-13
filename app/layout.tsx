@@ -6,6 +6,7 @@ import { LanguageProvider } from "@/contexts/language-context"
 import { AccessibilityProvider } from "@/contexts/accessibility-context"
 import { OfflineProvider } from "@/contexts/offline-context"
 import { LearningProvider } from "@/contexts/learning-context"
+import { AuthProvider } from "@/contexts/AuthContext"
 import { AccessibilityButton } from "@/components/accessibility-button"
 import { OfflineIndicator } from "@/components/offline-indicator"
 
@@ -29,9 +30,11 @@ export default function RootLayout({
           <LanguageProvider>
             <OfflineProvider>
               <LearningProvider>
-                {children}
-                <AccessibilityButton />
-                <OfflineIndicator />
+                <AuthProvider>
+                  {children}
+                  <AccessibilityButton />
+                  <OfflineIndicator />
+                </AuthProvider>
               </LearningProvider>
             </OfflineProvider>
           </LanguageProvider>

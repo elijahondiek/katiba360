@@ -79,9 +79,13 @@ const chapterContent = {
   // Other chapters would be defined similarly
 }
 
+import React from 'react'
+
 export default function ChapterDetailPage({ params }: { params: { slug: string } }) {
   const { t } = useLanguage()
-  const chapter = chapterContent[params.slug as keyof typeof chapterContent]
+  // Unwrap params with React.use()
+  const resolvedParams = React.use(params)
+  const chapter = chapterContent[resolvedParams.slug as keyof typeof chapterContent]
   const [isSimplified, setIsSimplified] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)

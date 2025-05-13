@@ -7,9 +7,12 @@ import Link from "next/link"
 import Image from "next/image"
 import { LanguageSelector } from "@/components/language-selector"
 import { useLanguage } from "@/contexts/language-context"
+import { useAuth } from "@/contexts/AuthContext";
+import { LogoutLink } from "@/components/auth/logout-link";
 
 export default function HomePage() {
   const { t } = useLanguage()
+  const { authState } = useAuth();
 
   return (
     <div className="min-h-screen bg-white">
@@ -38,10 +41,24 @@ export default function HomePage() {
             </nav>
 
             <div className="flex items-center gap-2">
-              <Button variant="ghost" className="text-[#374151] hover:text-[#0A7B24] hover:bg-[#F3F4F6]">
-                {t("auth.signin")}
-              </Button>
-              <Button className="bg-[#1EB53A] hover:bg-[#0A7B24] text-white">{t("auth.signup")}</Button>
+              {!authState.isAuthenticated ? (
+                <>
+                  <Link href="/login" passHref legacyBehavior>
+                    <Button variant="ghost" className="text-[#374151] hover:text-[#0A7B24] hover:bg-[#F3F4F6]">
+                      {t("auth.signin")}
+                    </Button>
+                  </Link>
+                  <Link href="/signup" passHref legacyBehavior>
+                    <Button className="bg-[#1EB53A] hover:bg-[#0A7B24] text-white">
+                      {t("auth.signup")}
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <LogoutLink className="text-base font-medium text-[#374151] hover:text-[#0A7B24] hover:bg-[#F3F4F6]">
+                  {t("auth.logout")}
+                </LogoutLink>
+              )}
             </div>
           </div>
 
@@ -61,7 +78,7 @@ export default function HomePage() {
               <p className="text-lg md:text-xl text-[#4B5563] mb-8">{t("app.description")}</p>
 
               {/* Language Selector */}
-              <div className="mb-8">
+              <div className="mb-8 flex justify-center">
                 <LanguageSelector />
               </div>
 

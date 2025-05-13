@@ -1,6 +1,14 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from "react"
+
+// Import translation files
+import enTranslations from "@/translations/en.json"
+import swTranslations from "@/translations/sw.json"
+import kikTranslations from "@/translations/kik.json"
+import luoTranslations from "@/translations/luo.json"
+import kalTranslations from "@/translations/kal.json"
+import kamTranslations from "@/translations/kam.json"
 
 // Define available languages
 export type Language = "en" | "sw" | "kik" | "luo" | "kal" | "kam"
@@ -12,99 +20,14 @@ interface Translations {
   }
 }
 
-// Sample translations (in a real app, these would be more extensive)
+// Load translations from imported JSON files
 const translations: Translations = {
-  en: {
-    "app.title": "Katiba360",
-    "nav.chapters": "Chapters",
-    "nav.rights": "Rights",
-    "nav.learn": "Learn",
-    "nav.community": "Community",
-    "footer.copyright": "All rights reserved.",
-    "search.placeholder": "Search the constitution...",
-    "language.english": "English",
-    "language.kiswahili": "Kiswahili",
-    "language.kikuyu": "Kikuyu",
-    "language.luo": "Luo",
-    "language.kalenjin": "Kalenjin",
-    "language.kamba": "Kamba",
-  },
-  sw: {
-    "app.title": "Katiba360",
-    "nav.chapters": "Sura",
-    "nav.rights": "Haki",
-    "nav.learn": "Jifunze",
-    "nav.community": "Jamii",
-    "footer.copyright": "Haki zote zimehifadhiwa.",
-    "search.placeholder": "Tafuta katiba...",
-    "language.english": "Kiingereza",
-    "language.kiswahili": "Kiswahili",
-    "language.kikuyu": "Kikuyu",
-    "language.luo": "Luo",
-    "language.kalenjin": "Kalenjin",
-    "language.kamba": "Kamba",
-  },
-  kik: {
-    "app.title": "Katiba360",
-    "nav.chapters": "Icigo",
-    "nav.rights": "Kihooto",
-    "nav.learn": "Thoma",
-    "nav.community": "Mugwatanio",
-    "footer.copyright": "Kihooto ciothe ni cia muene.",
-    "search.placeholder": "Caria katiba...",
-    "language.english": "Githungu",
-    "language.kiswahili": "Kiswahili",
-    "language.kikuyu": "Gikuyu",
-    "language.luo": "Luo",
-    "language.kalenjin": "Kalenjin",
-    "language.kamba": "Kamba",
-  },
-  // Add other languages as needed
-  luo: {
-    "app.title": "Katiba360",
-    "nav.chapters": "Chapters",
-    "nav.rights": "Rights",
-    "nav.learn": "Learn",
-    "nav.community": "Community",
-    "footer.copyright": "All rights reserved.",
-    "search.placeholder": "Search the constitution...",
-    "language.english": "English",
-    "language.kiswahili": "Kiswahili",
-    "language.kikuyu": "Kikuyu",
-    "language.luo": "Luo",
-    "language.kalenjin": "Kalenjin",
-    "language.kamba": "Kamba",
-  },
-  kal: {
-    "app.title": "Katiba360",
-    "nav.chapters": "Chapters",
-    "nav.rights": "Rights",
-    "nav.learn": "Learn",
-    "nav.community": "Community",
-    "footer.copyright": "All rights reserved.",
-    "search.placeholder": "Search the constitution...",
-    "language.english": "English",
-    "language.kiswahili": "Kiswahili",
-    "language.kikuyu": "Kikuyu",
-    "language.luo": "Luo",
-    "language.kalenjin": "Kalenjin",
-    "language.kamba": "Kamba",
-  },
-  kam: {
-    "app.title": "Katiba360",
-    "nav.chapters": "Chapters",
-    "nav.rights": "Rights",
-    "nav.learn": "Learn",
-    "nav.community": "Community",
-    "footer.copyright": "All rights reserved.",
-    "search.placeholder": "Search the constitution...",
-    "language.english": "English",
-    "language.kiswahili": "Kiswahili",
-    "language.kikuyu": "Kikuyu",
-    "language.luo": "Luo",
-    "language.kalenjin": "Kalenjin",
-    "language.kamba": "Kamba",
-  },
+  en: enTranslations,
+  sw: swTranslations,
+  kik: kikTranslations,
+  luo: luoTranslations,
+  kal: kalTranslations,
+  kam: kamTranslations
 }
 
 // Define the context interface
@@ -120,8 +43,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 // Define props for the provider
 interface LanguageProviderProps {
-  children: ReactNode
-  initialLanguage?: Language
+  readonly children: ReactNode
+  readonly initialLanguage?: Language
 }
 
 // Create the provider component
@@ -143,11 +66,11 @@ export function LanguageProvider({ children, initialLanguage = "en" }: LanguageP
 
   // Translation function
   const t = (key: string): string => {
-    if (translations[language] && translations[language][key]) {
+    if (translations[language]?.[key]) {
       return translations[language][key]
     }
     // Fallback to English if translation not found
-    if (translations.en && translations.en[key]) {
+    if (translations.en?.[key]) {
       return translations.en[key]
     }
     // Return the key if no translation found
@@ -164,8 +87,13 @@ export function LanguageProvider({ children, initialLanguage = "en" }: LanguageP
     { code: "kam", name: "Kamba" },
   ]
 
+  const contextValue = useMemo(
+    () => ({ language, setLanguage, t, availableLanguages }),
+    [language, setLanguage, t, availableLanguages]
+  );
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, availableLanguages }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   )

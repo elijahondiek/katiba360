@@ -1,0 +1,34 @@
+Global Design Guidelines for All Chunks Color Palette
+
+Primary Green: 
+#1EB53A (vibrant Kenyan flag green) Secondary Green: 
+#0A7B24 (deeper green for contrast and emphasis) Accent Red: 
+#CE1126 (Kenyan flag red for alerts, actions, and highlights) Black: 
+#000000 (for text and structural elements) White: 
+#FFFFFF (for backgrounds and contrast) Supporting neutrals: 
+#F3F4F6, 
+#E5E7EB, 
+#D1D5DB (light grays for backgrounds) Supporting neutrals: 
+#6B7280, 
+#4B5563, 
+#374151 (dark grays for secondary text)
+
+Typography
+
+Headings: Montserrat (bold weight for prominence) Body: Open Sans (excellent readability across screen sizes) Monospace elements: Ubuntu Mono (for code examples in API documentation) Ensure minimum 16px font size for body text Maintain 1.5 line height minimum for readability
+
+Iconography
+
+Use consistent line weight (2px) for all interface icons Icons should be simple, recognizable silhouettes Include tooltip explanations for all non-standard icons Ensure all icons have appropriate ARIA labels Use animation sparingly and purposefully in interactive icons
+
+Accessibility
+
+Maintain WCAG 2.1 AA compliance minimum across all interfaces Ensure color is never the only indicator of meaning Provide text alternatives for all non-text content Design for keyboard navigation with visible focus states Test all interfaces with screen readers before implementation
+
+Responsive Behavior
+
+Design mobile-first with progressive enhancement Create specific optimizations for feature phones common in rural Kenya Ensure touch targets minimum 44×44px on mobile Simplify navigation on smaller screens without removing functionality Test on low-end devices to ensure performance
+
+Animation Guidelines
+
+Keep animations subtle and purposeful Ensure all animations can be disabled via reduced motion settings Use transition durations of 200-300ms for UI elements Reserve longer animations (500ms) for celebratory moments Maintain consistent easing functions across similar interactions
