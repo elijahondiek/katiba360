@@ -9,6 +9,9 @@ import { LearningProvider } from "@/contexts/learning-context"
 import { AuthProvider } from "@/contexts/AuthContext"
 import { AccessibilityButton } from "@/components/accessibility-button"
 import { OfflineIndicator } from "@/components/offline-indicator"
+import Footer from "@/components/Footer"
+import Header from "@/components/layouts/Header"
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,15 +28,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className + " min-h-screen flex flex-col"}>
         <AccessibilityProvider>
           <LanguageProvider>
             <OfflineProvider>
               <LearningProvider>
                 <AuthProvider>
-                  {children}
-                  <AccessibilityButton />
-                  <OfflineIndicator />
+                  <div className="flex flex-col min-h-screen">
+                    <Header />
+                    <main className="flex-grow flex flex-col">
+                      {children}
+                    </main>
+                    <AccessibilityButton />
+                    <OfflineIndicator />
+                    <Footer />
+                    <Toaster />
+                  </div>
                 </AuthProvider>
               </LearningProvider>
             </OfflineProvider>

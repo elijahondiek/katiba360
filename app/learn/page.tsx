@@ -37,41 +37,6 @@ export default function LearnPage() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <div className="flex items-center gap-2">
-                <Image src="/logo.svg" alt="Katiba360 Logo" width={40} height={40} className="h-10 w-auto" />
-                <span className="text-xl font-bold text-[#0A7B24]">{t("app.title")}</span>
-              </div>
-            </Link>
-          </div>
-
-          <div className="hidden md:flex items-center gap-6">
-            <nav className="flex gap-6">
-              <Link href="/chapters" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                {t("nav.chapters")}
-              </Link>
-              <Link href="/rights" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                {t("nav.rights")}
-              </Link>
-              <Link href="/learn" className="text-[#0A7B24] font-medium">
-                {t("nav.learn")}
-              </Link>
-              <Link href="/community" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                Community
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <LanguageSelector />
-          </div>
-        </div>
-      </header>
-
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Hero Section */}

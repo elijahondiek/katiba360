@@ -92,3 +92,33 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Search result highlight effects */
+@keyframes highlight-pulse {
+  0% {
+    background-color: rgba(30, 181, 58, 0.1);
+    box-shadow: 0 0 0 2px rgba(30, 181, 58, 0.2);
+  }
+  50% {
+    background-color: rgba(30, 181, 58, 0.2);
+    box-shadow: 0 0 0 4px rgba(30, 181, 58, 0.3);
+  }
+  100% {
+    background-color: rgba(30, 181, 58, 0.1);
+    box-shadow: 0 0 0 2px rgba(30, 181, 58, 0.2);
+  }
+}
+
+.highlight-section {
+  animation: highlight-pulse 2s ease-in-out;
+  border-radius: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+/* Style for highlighted text in search results */
+mark {
+  background-color: rgba(30, 181, 58, 0.2);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+}

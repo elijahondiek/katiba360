@@ -13,6 +13,8 @@ export interface User {
   first_name: string;
   last_name: string;
   profile_image_url?: string;
+  avatar_url?: string;
+  display_name?: string;
   auth_provider: string;
   is_active: boolean;
   created_at: string;

@@ -3,11 +3,22 @@ import type { NextRequest } from 'next/server';
 
 // Define public paths that don't require authentication
 const PUBLIC_PATHS = [
+  '/',
   '/login',
   '/auth/callback',
   '/api/auth/google',
   '/api/auth/google/callback',
   '/api/auth/logout',
+  '/chapters',
+  '/scenarios',
+  '/search',
+  '/rights',
+  '/onboarding',
+  '/about',
+  '/about/mission',
+  '/about/team',
+  '/about/partners',
+  '/about/contact',
 ];
 
 // Check if the path is public
