@@ -1,29 +1,23 @@
 import type React from "react"
-import "@/app/globals.css"
-import { Montserrat, Open_Sans, Ubuntu_Mono } from "next/font/google"
-import { cn } from "@/lib/utils"
-import { ThemeProvider } from "@/components/theme-provider"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
 import { LanguageProvider } from "@/contexts/language-context"
+import { AccessibilityProvider } from "@/contexts/accessibility-context"
+import { OfflineProvider } from "@/contexts/offline-context"
+import { LearningProvider } from "@/contexts/learning-context"
+import { AuthProvider } from "@/contexts/AuthContext"
+import { AccessibilityButton } from "@/components/accessibility-button"
+import { OfflineIndicator } from "@/components/offline-indicator"
+import Footer from "@/components/Footer"
+import Header from "@/components/layouts/Header"
+import { Toaster } from "@/components/ui/toaster"
 
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-montserrat",
-})
+const inter = Inter({ subsets: ["latin"] })
 
-const openSans = Open_Sans({
-  subsets: ["latin"],
-  variable: "--font-open-sans",
-})
-
-const ubuntuMono = Ubuntu_Mono({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-ubuntu-mono",
-})
-
-export const metadata = {
-  title: "Katiba360 - Kenya's Constitution, Made Simple",
-  description: "Explore, understand, and engage with Kenya's constitution in a way that's accessible to everyone.",
+export const metadata: Metadata = {
+  title: "Katiba360",
+  description: "Kenya's Constitution at your fingertips",
     generator: 'v0.dev'
 }
 
@@ -33,18 +27,28 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={cn(
-          "min-h-screen bg-white font-sans antialiased",
-          montserrat.variable,
-          openSans.variable,
-          ubuntuMono.variable,
-        )}
-      >
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <LanguageProvider>{children}</LanguageProvider>
-        </ThemeProvider>
+    <html lang="en">
+      <body className={inter.className + " min-h-screen flex flex-col"}>
+        <AccessibilityProvider>
+          <LanguageProvider>
+            <OfflineProvider>
+              <LearningProvider>
+                <AuthProvider>
+                  <div className="flex flex-col min-h-screen">
+                    <Header />
+                    <main className="flex-grow flex flex-col">
+                      {children}
+                    </main>
+                    <AccessibilityButton />
+                    <OfflineIndicator />
+                    <Footer />
+                    <Toaster />
+                  </div>
+                </AuthProvider>
+              </LearningProvider>
+            </OfflineProvider>
+          </LanguageProvider>
+        </AccessibilityProvider>
       </body>
     </html>
   )

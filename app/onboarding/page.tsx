@@ -84,8 +84,11 @@ export default function OnboardingPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Image src="/logo.svg" alt="Katiba360 Logo" width={32} height={32} className="h-8 w-auto" />
-              <span className="font-bold text-[#0A7B24]">Katiba360</span>
+              <div className="font-bold text-2xl">
+                <span className="text-[#0A7B24]">Katiba</span>
+                <span className="text-[#1EB53A]">360</span>
+                <span className="text-[#CE1126] text-sm align-text-top ml-0.5">°</span>
+              </div>
             </div>
             <span className="text-sm text-[#6B7280]">
               Step {currentStep + 1} of {STEPS.length}
@@ -100,9 +103,13 @@ export default function OnboardingPage() {
           {/* Welcome Step */}
           {currentStep === 0 && (
             <div className="text-center space-y-6 animate-in fade-in-50 duration-500">
-              <div className="mx-auto w-24 h-24 relative mb-4">
-                <Image src="/logo.svg" alt="Katiba360 Logo" width={96} height={96} className="w-full h-full" />
-                <div className="absolute inset-0 bg-[#1EB53A]/10 rounded-full animate-pulse"></div>
+              <div className="mx-auto relative mb-4 flex justify-center items-center">
+                <div className="font-bold text-5xl">
+                  <span className="text-[#0A7B24]">Katiba</span>
+                  <span className="text-[#1EB53A]">360</span>
+                  <span className="text-[#CE1126] text-2xl align-text-top ml-0.5">°</span>
+                </div>
+                <div className="absolute inset-0 bg-[#1EB53A]/10 rounded-full animate-pulse -z-10"></div>
               </div>
 
               <h1 className="text-3xl font-bold text-[#0A7B24]">Welcome to Katiba360!</h1>

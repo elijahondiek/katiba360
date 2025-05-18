@@ -21,14 +21,17 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useLanguage } from "@/contexts/language-context"
+import { useAuth } from "@/contexts/AuthContext"
 import { LanguageSelector } from "@/components/language-selector"
 import { ProfileHeader } from "@/components/profile/profile-header"
 import { SavedContentLibrary } from "@/components/profile/saved-content-library"
 import { ReadingStats } from "@/components/profile/reading-stats"
 import { Achievements } from "@/components/profile/achievements"
+import { LogoutButton } from "@/components/auth/logout-button"
 
 export default function ProfilePage() {
   const { t } = useLanguage()
+  const { authState, logout } = useAuth()
   const [activeTab, setActiveTab] = useState("overview")
 
   return (
@@ -140,7 +143,10 @@ export default function ProfilePage() {
 
                 <hr className="my-2 border-gray-200" />
 
-                <button className="flex items-center gap-3 px-4 py-3 text-[#CE1126] hover:bg-red-50 transition-colors">
+                <button 
+                  onClick={() => logout()}
+                  className="flex items-center gap-3 px-4 py-3 text-[#CE1126] hover:bg-red-50 transition-colors"
+                >
                   <LogOut className="h-5 w-5" />
                   <span>Sign Out</span>
                 </button>
@@ -314,17 +320,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-[#0A7B24] text-white py-8 mt-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <p>
-              &copy; {new Date().getFullYear()} Katiba360. {t("footer.copyright")}
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

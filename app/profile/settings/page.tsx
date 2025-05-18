@@ -496,16 +496,6 @@ export default function SettingsPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-[#0A7B24] text-white py-8 mt-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <p>
-              &copy; {new Date().getFullYear()} Katiba360. {t("footer.copyright")}
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

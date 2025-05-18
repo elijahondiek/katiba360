@@ -143,13 +143,18 @@ const rightsDetailsTranslations = {
   // Other languages
 }
 
+import React from 'react'
+
 export default function RightDetailPage({ params }: { params: { id: string } }) {
   const { language, t } = useLanguage()
+
+  // Unwrap params with React.use()
+  const resolvedParams = React.use(params)
 
   // Get the appropriate content based on the current language
   const translatedRightsDetails =
     rightsDetailsTranslations[language as keyof typeof rightsDetailsTranslations] || rightsDetails
-  const right = translatedRightsDetails[params.id as keyof typeof translatedRightsDetails]
+  const right = translatedRightsDetails[resolvedParams.id as keyof typeof translatedRightsDetails]
 
   if (!right) {
     return (
