@@ -2,7 +2,7 @@
  * API utilities for making requests to the backend
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 /**
  * Make a request to the backend API

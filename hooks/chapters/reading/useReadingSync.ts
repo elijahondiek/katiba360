@@ -209,7 +209,7 @@ export function useReadingSync(
           const blob = new Blob([data], { type: 'application/json' });
           
           // Use the correct API endpoint format with API_PREFIX
-          const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/constitution/user/${userId}/progress`;
+          const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/constitution/user/${userId}/progress`;
           
           // Try to use sendBeacon for async request that works during page unload
           if (navigator.sendBeacon) {
