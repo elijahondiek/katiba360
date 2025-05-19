@@ -195,9 +195,9 @@ export async function removeBookmark(
   userId: string,
   bookmarkId: string
 ): Promise<any> {
-  console.log(`Removing bookmark: userId=${userId}, bookmarkId=${bookmarkId}`);
+  // console.log(`Removing bookmark: userId=${userId}, bookmarkId=${bookmarkId}`);
   const url = `/api/v1/constitution/user/${userId}/bookmarks/${bookmarkId}`;
-  console.log(`DELETE request to: ${url}`);
+  // console.log(`DELETE request to: ${url}`);
   
   return fetchAPI(
     url,

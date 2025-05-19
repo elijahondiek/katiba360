@@ -104,10 +104,10 @@ export default function ChaptersPage() {
   const { bookmarkedChapters, bookmarkIdMap, bookmarksLoading, refreshBookmarks } = 
     useChapterBookmarks(authState.user?.id);
 
-  // Debug current bookmark state
-  useEffect(() => {
-    console.log("Current bookmarkedChapters state:", bookmarkedChapters);
-  }, [bookmarkedChapters]);
+  // // Debug current bookmark state
+  // useEffect(() => {
+  //   console.log("Current bookmarkedChapters state:", bookmarkedChapters);
+  // }, [bookmarkedChapters]);
 
   // Filter and search logic using API data
   const filteredChapters = chapters.filter((chapter: any) => {

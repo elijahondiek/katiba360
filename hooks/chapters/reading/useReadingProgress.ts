@@ -159,7 +159,7 @@ export function useReadingProgress(
         
         lastSaveTimeRef.current = now;
         saveProgress(sessionTracker.readTimeMinutes);
-        DEBUG_MODE && console.log('Auto-saved reading progress:', sessionTracker.readTimeMinutes);
+        // DEBUG_MODE && console.log('Auto-saved reading progress:', sessionTracker.readTimeMinutes);
       }
     }, 60000); // Every minute
     

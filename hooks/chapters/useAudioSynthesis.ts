@@ -123,7 +123,7 @@ export function useAudioSynthesis(
         if (progressIntervalRef.current) {
           clearInterval(progressIntervalRef.current);
           progressIntervalRef.current = null;
-          console.log("[AUDIO] Cleared interval at end");
+          // console.log("[AUDIO] Cleared interval at end");
         }
         setIsPlaying(false);
         setAudioProgress(100);
@@ -132,7 +132,7 @@ export function useAudioSynthesis(
       }
     }, 100);
     
-    console.log("[AUDIO] Progress interval running");
+    // console.log("[AUDIO] Progress interval running");
   };
 
   // --- TEXT & DURATION ESTIMATION ---
@@ -180,7 +180,7 @@ export function useAudioSynthesis(
     // Calculate a better duration estimate based on actual speech rate
     // Average reading speed is about 150-180 words per minute for normal speech
     const wordCount = textContent.split(/\s+/).length;
-    console.log("Word count for speech:", wordCount);
+    // console.log("Word count for speech:", wordCount);
 
     // Get a more accurate estimate based on content length and browser speech rate
     // Different browsers have different speech rates, so we need to be conservative
@@ -214,7 +214,7 @@ export function useAudioSynthesis(
 
     // Get available voices
     const voices = window.speechSynthesis.getVoices();
-    console.log("Available voices:", voices.length);
+    // console.log("Available voices:", voices.length);
 
     return true;
   };
@@ -271,7 +271,7 @@ export function useAudioSynthesis(
       alert("No content available to read.");
       return;
     }
-    console.log(`[AUDIO] Text length: ${text.length}, Estimated duration: ${estimatedDuration}s, Clamped: ${clampedDuration}s`);
+    // console.log(`[AUDIO] Text length: ${text.length}, Estimated duration: ${estimatedDuration}s, Clamped: ${clampedDuration}s`);
     // Cancel any ongoing speech
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
@@ -295,7 +295,7 @@ export function useAudioSynthesis(
     window.speechSynthesis.speak(utterance);
     startProgressInterval();
     isPausedRef.current = false;
-    console.log("[AUDIO] Started interval for timer");
+    // console.log("[AUDIO] Started interval for timer");
   };
 
   // --- SLIDER DRAG ---

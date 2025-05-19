@@ -92,15 +92,15 @@ export default function NewContributionPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // In a real app, this would submit the contribution to the server
-    console.log("Submitting contribution:", {
-      type: selectedType,
-      title: contributionTitle,
-      content: contributionContent,
-      originalText,
-      translatedText,
-      targetLanguage,
-      category,
-    })
+    // console.log("Submitting contribution:", {
+    //   type: selectedType,
+    //   title: contributionTitle,
+    //   content: contributionContent,
+    //   originalText,
+    //   translatedText,
+    //   targetLanguage,
+    //   category,
+    // })
     // Move to confirmation step
     setStep(3)
   }
