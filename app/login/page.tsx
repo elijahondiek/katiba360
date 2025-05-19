@@ -56,16 +56,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Left Side - Visual Element with improved readability */}
-      <div className="md:w-1/2 bg-[#F0FFF4] relative overflow-hidden">
-        {/* Softer gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0A7B24]/80 via-[#1EB53A]/70 to-[#0A7B24]/80"></div>
-        <div className="absolute inset-0 bg-pattern opacity-5"></div>
-
-        {/* Kenya-inspired decorative elements with reduced opacity */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#CE1126]/15 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#000000]/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
-
-        <div className="relative z-10 h-full flex flex-col justify-center px-8 py-12 md:py-0 text-white">
+      <div className="md:w-1/2 bg-[#0A7B24] overflow-hidden">
+        <div className="h-full flex flex-col justify-center px-8 py-12 md:py-0 text-white">
           <div className="max-w-md mx-auto md:mx-0 md:ml-auto">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-sm">
               Katiba<span className="text-white">360</span>

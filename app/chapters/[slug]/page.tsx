@@ -328,6 +328,8 @@ export default function ChapterDetailPage() {
               onArticleClick={scrollHandling.scrollToArticle}
               onBookmarkToggle={toggleBookmark}
               onSimplifiedChange={handleSimplifiedChange}
+              chapterNumber={chapterNumber}
+              chapterTitle={chapterTitle}
             />
           </div>
 

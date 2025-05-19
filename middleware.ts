@@ -19,6 +19,8 @@ const PUBLIC_PATHS = [
   '/about/team',
   '/about/partners',
   '/about/contact',
+  '/privacy',
+  '/terms',
 ];
 
 // Check if the path is public

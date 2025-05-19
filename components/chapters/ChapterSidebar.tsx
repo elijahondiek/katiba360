@@ -35,6 +35,14 @@ export function ChapterSidebar({
   chapterNumber = 0,
   chapterTitle = "Chapter",
 }: ChapterSidebarProps) {
+  // Extract base URL logic for ShareDialog
+  let baseUrl = '';
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_CORS_ORIGINS) {
+    baseUrl = process.env.NEXT_PUBLIC_CORS_ORIGINS;
+  } else if (typeof window !== 'undefined') {
+    baseUrl = window.location.origin;
+  }
+  const chapterUrl = `${baseUrl}/chapters/${chapterNumber}`;
   return (
     <div className="bg-[#F3F4F6] rounded-xl p-6 sticky top-28 max-h-[calc(100vh-120px)] overflow-y-auto">
       <div className="flex items-center gap-2 mb-4">
@@ -76,6 +84,7 @@ export function ChapterSidebar({
           <ShareDialog
             title={`Chapter ${chapterNumber}: ${chapterTitle} - Katiba360`}
             description={`Learn about ${chapterTitle} in the Kenyan Constitution`}
+            url={chapterUrl}
             triggerButton={
               <Button variant="outline" className="w-full justify-start text-[#4B5563]">
                 <Share2 className="h-4 w-4 mr-2" />
