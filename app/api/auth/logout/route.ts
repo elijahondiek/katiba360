@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     if (accessToken) {
       try {
         // Call the backend logout endpoint
-        await fetchAPI('/auth/logout', {
+        await fetchAPI('/api/v1/auth/logout', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${accessToken}`,

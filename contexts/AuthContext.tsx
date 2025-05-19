@@ -226,7 +226,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error('No refresh token available');
       }
       
-      const response = await fetchAPI('/auth/refresh-token', {
+      const response = await fetchAPI('/api/v1/auth/refresh-token', {
         method: 'POST',
         body: JSON.stringify({
           refresh_token: authState.refreshToken,
