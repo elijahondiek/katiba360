@@ -38,10 +38,8 @@ export function useScrollHandling(contentRef: React.RefObject<HTMLDivElement>, a
       if (activeArticleId && activeArticleId !== activeSection) {
         setActiveSection(activeArticleId);
         
-        // Update URL hash without scrolling (for bookmarking/sharing)
-        if (typeof history !== 'undefined') {
-          history.replaceState(null, '', `#${activeArticleId}`);
-        }
+        // Removed URL hash update to prevent unwanted scrolling
+        // We'll only update the URL when explicitly navigating to a section
       }
     };
     
@@ -88,17 +86,23 @@ export function useScrollHandling(contentRef: React.RefObject<HTMLDivElement>, a
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const articleTop = rect.top + scrollTop;
       
-      // Scroll to the article with a small offset from the top
-      window.scrollTo({
-        top: articleTop - 100, // 100px offset to account for sticky header
-        behavior: 'smooth'
-      });
-      
-      // Update active section
+      // First update the active section
       setActiveSection(articleId);
       
-      // Update URL hash
-      history.pushState(null, '', `#${articleId}`);
+      // Then update URL hash without scrolling
+      if (typeof history !== 'undefined') {
+        // Use replaceState instead of pushState to avoid adding to browser history
+        history.replaceState(null, '', `#${articleId}`);
+      }
+      
+      // Finally scroll to the article with a small offset from the top
+      // Use a small timeout to ensure the hash change doesn't interfere
+      setTimeout(() => {
+        window.scrollTo({
+          top: articleTop - 100, // 100px offset to account for sticky header
+          behavior: 'smooth'
+        });
+      }, 10);
     }
   }, [contentRef]);
 

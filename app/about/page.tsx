@@ -119,8 +119,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Minimal footer accent */}
-      <div className="h-2 bg-gradient-to-r from-[#0A7B24] via-[#1EB53A] to-[#CE1126]"></div>
+
     </div>
   )
 }

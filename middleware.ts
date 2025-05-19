@@ -6,9 +6,9 @@ const PUBLIC_PATHS = [
   '/',
   '/login',
   '/auth/callback',
-  '/api/auth/google',
+  '/auth/google',
   '/api/auth/google/callback',
-  '/api/auth/logout',
+  '/api/v1/auth/logout',
   '/chapters',
   '/scenarios',
   '/search',
@@ -19,6 +19,8 @@ const PUBLIC_PATHS = [
   '/about/team',
   '/about/partners',
   '/about/contact',
+  '/privacy',
+  '/terms',
 ];
 
 // Check if the path is public

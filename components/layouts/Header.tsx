@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import Image from "next/image"
 import { useLanguage } from "@/contexts/language-context"
 import { useAuth } from "@/contexts/AuthContext"
 import { LogoutLink } from "@/components/auth/logout-link"
@@ -18,27 +17,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Menu, X, User, LogOut, ChevronDown, Settings } from "lucide-react"
-
-
-// ComingSoonChip component for reuse
-const ComingSoonChip = ({
-  className = "",
-  variant = "default",
-}: { className?: string; variant?: "default" | "footer" }) => {
-  // Use green for header (default) and white for footer
-  const baseClasses =
-    "inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full relative -top-1"
-
-  // Different styles based on variant
-  const variantClasses = variant === "footer" ? "bg-white/20 text-white" : "bg-[#1EB53A]/10 text-[#0A7B24]"
-
-  return (
-    <span className={`${baseClasses} ${variantClasses} ${className}`} aria-label="Coming Soon">
-      Coming Soon
-    </span>
-  )
-}
+import { Menu, X, User, LogOut, ChevronDown } from "lucide-react"
+import Portal from "../Portal"
 
 // Online status indicator component
 const OnlineStatusIndicator = () => {
@@ -106,6 +86,9 @@ export default function Header() {
       }
     }
 
+    // Check scroll position on initial load
+    handleScroll()
+    
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
@@ -126,8 +109,10 @@ export default function Header() {
 
   return (
     <header
-      className={`border-b border-gray-200 sticky top-0 bg-white z-10 transition-shadow duration-300 ${
-        scrolled ? "shadow-sm" : ""
+      className={`border-b sticky top-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? "border-gray-200 bg-white/95 backdrop-blur-sm shadow-md" 
+          : "border-transparent bg-transparent"
       }`}
     >
       {/* Main Header */}
@@ -153,12 +138,12 @@ export default function Header() {
             <Link href="/search" className={getNavItemClass("/search")}>
               {t("nav.search")}
             </Link>
-            <div className="relative inline-flex items-center">
+            {/* <div className="relative inline-flex items-center">
               <span className="text-[#9CA3AF] cursor-not-allowed opacity-70" aria-disabled="true">
                 {t("nav.learn")}
               </span>
-              <ComingSoonChip className="ml-1" />
-            </div>
+              <ComingSoonChip className="ml-1" compact={true} />
+            </div> */}
             <div className="relative group">
               <Link href="/about" className={`${getNavItemClass("/about")} flex items-center gap-1`}>
                 {t("nav.about")}
@@ -213,9 +198,9 @@ export default function Header() {
                   {t("auth.signin")}
                 </Button>
               </Link>
-              <Link href="/onboarding" passHref legacyBehavior>
+              {/* <Link href="/onboarding" passHref legacyBehavior>
                 <Button className="bg-[#1EB53A] hover:bg-[#0A7B24] text-white">{t("auth.signup")}</Button>
-              </Link>
+              </Link> */}
             </div>
           ) : (
             <div className="hidden md:flex items-center gap-3">
@@ -273,7 +258,7 @@ export default function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className={`md:hidden ${!mobileMenuOpen ? 'bg-white' : ''}`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"
@@ -286,12 +271,13 @@ export default function Header() {
 
       {/* Full-screen Mobile Menu */}
       {mobileMenuOpen && (
-        <div
-          id="mobile-menu"
-          className="fixed inset-0 z-50 bg-white overflow-y-auto"
-          role="navigation"
-          aria-label="Mobile navigation"
-        >
+        <Portal>
+          <div
+            id="mobile-menu"
+            className="fixed inset-0 z-[9999] bg-white overflow-y-auto"
+            role="navigation"
+            aria-label="Mobile navigation"
+          >
           <div className="container mx-auto px-6 py-8">
             {/* Mobile Menu Header */}
             <div className="flex items-center justify-between mb-8">
@@ -339,13 +325,13 @@ export default function Header() {
                 <div className="mt-4 flex space-x-3">
                   <Link
                     href="/profile"
-                    className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-[#374151] bg-white hover:bg-[#F3F4F6]"
+                    className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-[#374151] bg-white hover:bg-[#F3F4F6] cursor-pointer"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <User className="h-4 w-4 mr-2" />
                     Profile
                   </Link>
-                  <LogoutLink className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-[#CE1126] bg-white hover:bg-red-50">
+                  <LogoutLink className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-[#CE1126] bg-white hover:bg-red-50 cursor-pointer">
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                   </LogoutLink>
@@ -357,7 +343,7 @@ export default function Header() {
             <nav className="flex flex-col space-y-8">
               <Link
                 href="/chapters"
-                className={`text-xl ${
+                className={`text-xl cursor-pointer ${
                   pathname.startsWith("/chapters") ? "text-[#0A7B24] font-medium" : "text-[#374151]"
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -367,7 +353,7 @@ export default function Header() {
 
               <Link
                 href="/rights"
-                className={`text-xl ${
+                className={`text-xl cursor-pointer ${
                   pathname.startsWith("/rights") ? "text-[#0A7B24] font-medium" : "text-[#374151]"
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -377,7 +363,7 @@ export default function Header() {
 
               <Link
                 href="/search"
-                className={`text-xl ${
+                className={`text-xl cursor-pointer ${
                   pathname.startsWith("/search") ? "text-[#0A7B24] font-medium" : "text-[#374151]"
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -385,16 +371,16 @@ export default function Header() {
                 {t("nav.search")}
               </Link>
 
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <span className="text-xl text-[#9CA3AF] cursor-not-allowed opacity-70">{t("nav.learn")}</span>
-                <ComingSoonChip className="ml-2" />
-              </div>
+                <ComingSoonChip className="ml-2" compact={true} />
+              </div> */}
 
               {/* About Section with Dropdown */}
               <div className="space-y-4">
                 <Link
                   href="/about"
-                  className={`text-xl ${pathname === "/about" ? "text-[#0A7B24] font-medium" : "text-[#374151]"}`}
+                  className={`text-xl cursor-pointer ${pathname === "/about" ? "text-[#0A7B24] font-medium" : "text-[#374151]"}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {t("nav.about")}
@@ -403,7 +389,7 @@ export default function Header() {
                 <div className="pl-4 space-y-4 border-l-2 border-gray-200 mt-2">
                   <Link
                     href="/about/mission"
-                    className={`block ${
+                    className={`block cursor-pointer ${
                       pathname === "/about/mission" ? "text-[#0A7B24] font-medium" : "text-[#374151]"
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
@@ -413,7 +399,9 @@ export default function Header() {
 
                   <Link
                     href="/about/team"
-                    className={`block ${pathname === "/about/team" ? "text-[#0A7B24] font-medium" : "text-[#374151]"}`}
+                    className={`block cursor-pointer ${
+                      pathname === "/about/team" ? "text-[#0A7B24] font-medium" : "text-[#374151]"
+                    }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Team
@@ -421,7 +409,7 @@ export default function Header() {
 
                   <Link
                     href="/about/partners"
-                    className={`block ${
+                    className={`block cursor-pointer ${
                       pathname === "/about/partners" ? "text-[#0A7B24] font-medium" : "text-[#374151]"
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
@@ -431,7 +419,7 @@ export default function Header() {
 
                   <Link
                     href="/about/contact"
-                    className={`block ${
+                    className={`block cursor-pointer ${
                       pathname === "/about/contact" ? "text-[#0A7B24] font-medium" : "text-[#374151]"
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
@@ -455,17 +443,18 @@ export default function Header() {
                         {t("auth.signin")}
                       </Button>
                     </Link>
-                    <Link href="/onboarding" onClick={() => setMobileMenuOpen(false)}>
+                    {/* <Link href="/onboarding" onClick={() => setMobileMenuOpen(false)}>
                       <Button className="w-full bg-[#1EB53A] hover:bg-[#0A7B24] text-white py-6 text-lg">
                         {t("auth.signup")}
                       </Button>
-                    </Link>
+                    </Link> */}
                   </div>
                 </div>
               )}
             </nav>
           </div>
         </div>
+        </Portal>
       )}
     </header>
   )

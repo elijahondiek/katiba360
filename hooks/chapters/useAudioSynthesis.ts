@@ -35,6 +35,9 @@ export function useAudioSynthesis(
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const pausedTimeRef = useRef<number>(0);
   const isPausedRef = useRef<boolean>(false);
+  // Additional refs to track progress without causing re-renders
+  const currentProgressRef = useRef<number>(0);
+  const currentTimeRef = useRef<number>(0);
 
   // Initialize audio duration when component mounts
   // --- CLEANUP ---
@@ -74,29 +77,61 @@ export function useAudioSynthesis(
   const startProgressInterval = () => {
     if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     startTimeRef.current = Date.now() - currentTime * 1000;
+    
+    // Initialize progress tracking refs with current values
+    currentProgressRef.current = audioProgress;
+    currentTimeRef.current = currentTime;
+    
+    // Rather than updating state directly in the interval, we'll batch updates
+    let pendingTimeUpdate: number | null = null;
+    let pendingProgressUpdate: number | null = null;
+    
     progressIntervalRef.current = setInterval(() => {
-    // Use functional state update to avoid stale closure
-    setCurrentTime((prevTime) => {
-      if (!isPlayingRef.current) return prevTime;
+      // Only process if still playing
+      if (!isPlayingRef.current) return;
+      
+      // Calculate new time values
       const elapsed = (Date.now() - startTimeRef.current) / 1000;
       const duration = audioDurationRef.current;
       const newTime = Math.min(elapsed, duration);
-      setAudioProgress(
-        duration > 0 ? (newTime / duration) * 100 : 0
-      );
+      const newProgress = duration > 0 ? (newTime / duration) * 100 : 0;
+      
+      // Update refs without triggering state changes
+      currentTimeRef.current = newTime;
+      currentProgressRef.current = newProgress;
+      
+      // Schedule updates to happen outside the interval
+      pendingTimeUpdate = newTime;
+      pendingProgressUpdate = newProgress;
+      
+      // Use requestAnimationFrame to batch updates outside of the interval
+      if (typeof window !== 'undefined') {
+        requestAnimationFrame(() => {
+          if (pendingTimeUpdate !== null) {
+            setCurrentTime(pendingTimeUpdate);
+            pendingTimeUpdate = null;
+          }
+          if (pendingProgressUpdate !== null) {
+            setAudioProgress(pendingProgressUpdate);
+            pendingProgressUpdate = null;
+          }
+        });
+      }
+      
+      // Handle completion separately
       if (newTime >= duration) {
-        setIsPlaying(false);
-        setAudioProgress(100);
         if (progressIntervalRef.current) {
           clearInterval(progressIntervalRef.current);
           progressIntervalRef.current = null;
           console.log("[AUDIO] Cleared interval at end");
         }
+        setIsPlaying(false);
+        setAudioProgress(100);
+        setCurrentTime(duration);
         if (window.speechSynthesis) window.speechSynthesis.cancel();
       }
-      return newTime;
-    });
-  }, 100);
+    }, 100);
+    
     console.log("[AUDIO] Progress interval running");
   };
 

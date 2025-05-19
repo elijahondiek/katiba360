@@ -13,10 +13,32 @@ export function RightOfDaySection() {
   const { t } = useLanguage();
   const { navigateToSection } = useScrollToSection();
 
+  // Force update at midnight and when articles change
   useEffect(() => {
-    if (articles && articles.length > 0) {
-      setRight(getRightOfTheDay(articles));
-    }
+    // Function to update the right of the day
+    const updateRightOfDay = () => {
+      if (articles && articles.length > 0) {
+        // Create a new Date object each time to get the current date
+        const currentDate = new Date();
+        setRight(getRightOfTheDay(articles, currentDate));
+      }
+    };
+    
+    // Update immediately
+    updateRightOfDay();
+    
+    // Calculate time until next midnight
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    const timeUntilMidnight = tomorrow.getTime() - now.getTime();
+    
+    // Set a timeout to update at midnight
+    const midnightTimeout = setTimeout(updateRightOfDay, timeUntilMidnight);
+    
+    // Clean up timeout on unmount
+    return () => clearTimeout(midnightTimeout);
   }, [articles]);
 
   // Show loading state or error

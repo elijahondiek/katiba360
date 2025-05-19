@@ -24,7 +24,7 @@ export default function PartnersPage() {
   // Partner profile data
   const partnerProfiles = [
     {
-      name: "0chibo_",
+      name: "0chibo",
       role: "Lead Developer & Technical Architect",
       bio: "Leads the development of Katiba360, ensuring it's accessible, user-friendly, and impactful across platforms.",
       socialLink: process.env.NEXT_PUBLIC_TEAM_PROFILE_URL || "https://x.com/0chibo_",
@@ -319,9 +319,6 @@ export default function PartnersPage() {
           </div>
         </div>
       </section>
-
-      {/* Minimal footer accent */}
-      <div className="h-2 bg-gradient-to-r from-[#0A7B24] via-[#1EB53A] to-[#CE1126]"></div>
     </div>
   )
 }

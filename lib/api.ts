@@ -2,7 +2,7 @@
  * API utilities for making requests to the backend
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
 /**
  * Make a request to the backend API
@@ -50,7 +50,7 @@ export async function exchangeGoogleCode(
   redirectUri: string,
   state?: string
 ): Promise<any> {
-  return fetchAPI('/auth/google', {
+  return fetchAPI('/api/v1/auth/google', {
     method: 'POST',
     body: JSON.stringify({
       code,
@@ -64,14 +64,14 @@ export async function exchangeGoogleCode(
  * Get the current user's profile
  */
 export async function getUserProfile(): Promise<any> {
-  return fetchAPI('/users/profile');
+  return fetchAPI('/api/v1/users/profile');
 }
 
 /**
  * Get the constitution overview
  */
 export async function getConstitutionOverview(): Promise<any> {
-  return fetchAPI('/constitution');
+  return fetchAPI('/api/v1/constitution');
 }
 
 /**
@@ -80,7 +80,7 @@ export async function getConstitutionOverview(): Promise<any> {
  * @param offset Offset for pagination
  */
 export async function getChapters(limit: number = 10, offset: number = 0): Promise<any> {
-  return fetchAPI(`/constitution/chapters?limit=${limit}&offset=${offset}`);
+  return fetchAPI(`/api/v1/constitution/chapters?limit=${limit}&offset=${offset}`);
 }
 
 /**
@@ -88,7 +88,7 @@ export async function getChapters(limit: number = 10, offset: number = 0): Promi
  * @param chapterNumber Chapter number
  */
 export async function getChapterByNumber(chapterNumber: number): Promise<any> {
-  return fetchAPI(`/constitution/chapters/${chapterNumber}`);
+  return fetchAPI(`/api/v1/constitution/chapters/${chapterNumber}`);
 }
 
 /**
@@ -100,7 +100,7 @@ export async function getArticleByChapterAndArticle(
   chapterNumber: number,
   articleNumber: number
 ): Promise<any> {
-  return fetchAPI(`/constitution/chapters/${chapterNumber}/articles/${articleNumber}`);
+  return fetchAPI(`/api/v1/constitution/chapters/${chapterNumber}/articles/${articleNumber}`);
 }
 
 /**
@@ -125,7 +125,7 @@ export async function searchConstitution(params: {
     highlight = false,
     no_cache = false,
   } = params;
-  const url = `/constitution/search?query=${encodeURIComponent(query)}${
+  const url = `/api/v1/constitution/search?query=${encodeURIComponent(query)}${
     chapter !== undefined ? `&chapter=${chapter}` : ''
   }${article !== undefined ? `&article=${article}` : ''}&limit=${limit}&offset=${offset}&highlight=${highlight}&no_cache=${no_cache}`;
   return fetchAPI(url);
@@ -136,7 +136,7 @@ export async function searchConstitution(params: {
  * @param reference Reference string (e.g., '1.2')
  */
 export async function getRelatedArticles(reference: string): Promise<any> {
-  return fetchAPI(`/constitution/related/${reference}`);
+  return fetchAPI(`/api/v1/constitution/related/${reference}`);
 }
 
 /**
@@ -144,7 +144,7 @@ export async function getRelatedArticles(reference: string): Promise<any> {
  * @param timeframe Timeframe string (e.g., 'week', 'month')
  */
 export async function getPopularSections(timeframe: string = 'week'): Promise<any> {
-  return fetchAPI(`/constitution/popular?timeframe=${timeframe}`);
+  return fetchAPI(`/api/v1/constitution/popular?timeframe=${timeframe}`);
 }
 
 /**
@@ -166,7 +166,7 @@ export async function saveBookmark({
   title: string;
 }): Promise<any> {
   return fetchAPI(
-    `/constitution/user/${userId}/bookmarks`,
+    `/api/v1/constitution/user/${userId}/bookmarks`,
     {
       method: 'POST',
       body: JSON.stringify({
@@ -183,7 +183,7 @@ export async function saveBookmark({
  * @param userId User's UUID
  */
 export async function getUserBookmarks(userId: string): Promise<any> {
-  return fetchAPI(`/constitution/user/${userId}/bookmarks`);
+  return fetchAPI(`/api/v1/constitution/user/${userId}/bookmarks`);
 }
 
 /**
@@ -196,7 +196,7 @@ export async function removeBookmark(
   bookmarkId: string
 ): Promise<any> {
   console.log(`Removing bookmark: userId=${userId}, bookmarkId=${bookmarkId}`);
-  const url = `/constitution/user/${userId}/bookmarks/${bookmarkId}`;
+  const url = `/api/v1/constitution/user/${userId}/bookmarks/${bookmarkId}`;
   console.log(`DELETE request to: ${url}`);
   
   return fetchAPI(
@@ -205,4 +205,50 @@ export async function removeBookmark(
       method: 'DELETE',
     }
   );
+}
+
+/**
+ * Update reading progress for the user
+ * @param userId User's UUID
+ * @param itemType Type of item (e.g., 'chapter', 'article')
+ * @param reference Reference string (e.g., '1', '1.2')
+ * @param readTimeMinutes Time spent reading in minutes
+ */
+export async function updateReadingProgress({
+  userId,
+  itemType,
+  reference,
+  readTimeMinutes,
+}: {
+  userId: string;
+  itemType: 'chapter' | 'article';
+  reference: string;
+  readTimeMinutes: number;
+}) {
+  try {
+    const response = await fetchAPI(
+      `/api/v1/constitution/user/${userId}/progress`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          item_type: itemType,
+          reference,
+          read_time_minutes: readTimeMinutes,
+        }),
+      }
+    );
+    
+    return response;
+  } catch (error) {
+    console.error('Error updating reading progress:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get reading progress for a user
+ * @param userId User's UUID
+ */
+export async function getUserReadingProgress(userId: string): Promise<any> {
+  return fetchAPI(`/api/v1/constitution/user/${userId}/progress`);
 }

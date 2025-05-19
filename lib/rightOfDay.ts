@@ -27,12 +27,18 @@ export function getRightOfTheDay(
 ): Article {
   if (!articles || articles.length === 0) throw new Error("No articles provided");
 
-  // Always use UTC for consistency
-  const todayUTC = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-  const startUTC = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
-  const daysSinceStart = Math.floor((todayUTC - startUTC) / (1000 * 60 * 60 * 24));
-
+  // Force a new date object to ensure we're using the current date
+  const currentDate = new Date(date.getTime());
+  
+  // Use local date components to ensure consistency with user's view
+  const today = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+  const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  
+  // Calculate days between dates
+  const daysSinceStart = Math.floor((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  
   // Positive modulo for cycling
   const idx = ((daysSinceStart % articles.length) + articles.length) % articles.length;
+  
   return articles[idx];
 }

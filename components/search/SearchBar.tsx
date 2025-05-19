@@ -27,7 +27,7 @@ export function SearchBar({ className, placeholder }: SearchBarProps) {
     changePage,
     resetSearch
   } = useSearch({
-    debounceMs: 400,
+    debounceMs: 2000,
     resultsPerPage: 10,
     highlight: true,
   });

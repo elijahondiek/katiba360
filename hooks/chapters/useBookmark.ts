@@ -6,7 +6,22 @@ interface User {
   id: string;
 }
 
-export function useBookmark(userId: string | undefined, chapterNumber: number, chapterTitle: string) {
+interface Bookmark {
+  bookmark_id: string;
+  reference: string;
+  type: string;
+  bookmark_type: string;
+  title: string;
+}
+
+type BookmarksChangeCallback = (bookmarks: Bookmark[]) => void;
+
+export function useBookmark(
+  userId: string | undefined, 
+  chapterNumber: number, 
+  chapterTitle: string,
+  onBookmarksChange?: BookmarksChangeCallback
+) {
   // Ensure chapterNumber is always handled as a string for consistency
   const chapterNumberStr = String(chapterNumber);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -16,7 +31,7 @@ export function useBookmark(userId: string | undefined, chapterNumber: number, c
 
   // Fetch bookmarks function that can be called multiple times
   const fetchBookmarks = useCallback(async () => {
-    if (!userId || !chapterNumberStr) return;
+    if (!userId) return;
     
     setIsLoading(true);
     try {
@@ -24,25 +39,33 @@ export function useBookmark(userId: string | undefined, chapterNumber: number, c
       if (response?.body?.bookmarks) {
         console.log('All bookmarks:', response.body.bookmarks);
         
-        // Find this chapter's bookmark if it exists
-        const chapterBookmark = response.body.bookmarks.find(
-          (bookmark: any) => 
-            (bookmark.type === 'chapter' || bookmark.bookmark_type === 'chapter') && 
-            bookmark.reference === chapterNumberStr
-        );
+        // Call the callback with all bookmarks if provided
+        if (onBookmarksChange) {
+          onBookmarksChange(response.body.bookmarks);
+        }
         
-        console.log(`Bookmark for chapter ${chapterNumberStr}:`, chapterBookmark);
-        
-        // Update bookmark state
-        const isChapterBookmarked = !!chapterBookmark;
-        setIsBookmarked(isChapterBookmarked);
-        
-        // Store the bookmark ID if found
-        if (chapterBookmark) {
-          console.log('Setting bookmark ID:', chapterBookmark.bookmark_id);
-          setBookmarkId(chapterBookmark.bookmark_id);
-        } else {
-          setBookmarkId(null);
+        // If we have a chapter number, find this chapter's bookmark
+        if (chapterNumberStr) {
+          // Find this chapter's bookmark if it exists
+          const chapterBookmark = response.body.bookmarks.find(
+            (bookmark: any) => 
+              (bookmark.type === 'chapter' || bookmark.bookmark_type === 'chapter') && 
+              bookmark.reference === chapterNumberStr
+          );
+          
+          console.log(`Bookmark for chapter ${chapterNumberStr}:`, chapterBookmark);
+          
+          // Update bookmark state
+          const isChapterBookmarked = !!chapterBookmark;
+          setIsBookmarked(isChapterBookmarked);
+          
+          // Store the bookmark ID if found
+          if (chapterBookmark) {
+            console.log('Setting bookmark ID:', chapterBookmark.bookmark_id);
+            setBookmarkId(chapterBookmark.bookmark_id);
+          } else {
+            setBookmarkId(null);
+          }
         }
       }
     } catch (error) {
@@ -95,10 +118,11 @@ export function useBookmark(userId: string | undefined, chapterNumber: number, c
           try {
             await removeBookmark(userId, bookmarkId);
             
-            // Use a default toast without success styling for removal
+            // Use info variant for bookmark removal
             toast({
               title: "Bookmark Removed",
               description: `${chapterTitle} removed from bookmarks`,
+              variant: "info",
             });
           } catch (error) {
             console.error('Error removing bookmark:', error);
@@ -135,8 +159,8 @@ export function useBookmark(userId: string | undefined, chapterNumber: number, c
 
   return {
     isBookmarked,
-    toggleBookmark,
     isLoading,
-    refetchBookmarks: fetchBookmarks
+    toggleBookmark,
+    fetchBookmarks,
   };
 }

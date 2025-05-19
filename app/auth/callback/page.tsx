@@ -40,7 +40,7 @@ export default function AuthCallbackPage() {
 
         // Construct the redirect URI that matches what was sent to Google
         const redirectUri =
-          process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI ?? "http://localhost:3000/api/auth/google/callback"
+          process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
 
         console.log("Starting authentication with code:", code.substring(0, 5) + "...")
 

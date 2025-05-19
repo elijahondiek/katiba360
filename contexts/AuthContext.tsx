@@ -118,7 +118,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
       
       console.log('Exchanging code for tokens...');
-      const response = await fetchAPI('/auth/google', {
+      const response = await fetchAPI('/api/v1/auth/google', {
         method: 'POST',
         body: JSON.stringify({
           code,

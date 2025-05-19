@@ -404,49 +404,6 @@ export default function TeamPage() {
             {/* Updated Team Distribution with invitation to join */}
             <div className="mt-16 max-w-3xl mx-auto">
               <div className="bg-[#F9FAFB] rounded-lg p-6 border-l-4 border-[#1EB53A]">
-                <h3 className="text-xl font-bold text-[#0A7B24] mb-4">
-                  Team Distribution
-                </h3>
-
-                {/* Developer section with invitation to join */}
-                <div className="flex items-center mb-4">
-                  <div className="w-full bg-gray-200 rounded-full h-8 mr-2 relative overflow-hidden">
-                    <div
-                      className="bg-[#1EB53A] h-8 rounded-l-full"
-                      style={{ width: "0.000002%" }}
-                    ></div>
-
-                    {/* "You could be next" indicator */}
-                    <div className="absolute top-0 left-[0.000002%] bottom-0 flex items-center">
-                      <div className="bg-[#1EB53A]/20 h-8 w-8 rounded-full flex items-center justify-center border-2 border-[#1EB53A] animate-pulse">
-                        <Plus className="h-4 w-4 text-[#0A7B24]" />
-                      </div>
-                    </div>
-
-                    <div className="absolute top-0 left-[calc(0.000002%+32px)] h-8 flex items-center">
-                      <div className="bg-white px-2 py-1 rounded text-xs font-medium text-[#0A7B24] shadow-sm">
-                        You could be next!
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-sm text-[#6B7280] whitespace-nowrap">
-                    Developers
-                  </span>
-                </div>
-
-                {/* Kenyan people section */}
-                <div className="flex items-center">
-                  <div className="w-full bg-gray-200 rounded-full h-8 mr-2">
-                    <div
-                      className="bg-[#0A7B24] h-8 rounded-full"
-                      style={{ width: "99.999998%" }}
-                    ></div>
-                  </div>
-                  <span className="text-sm text-[#6B7280] whitespace-nowrap">
-                    47M+ Kenyans
-                  </span>
-                </div>
-
                 <p className="mt-4 text-sm text-[#4B5563] italic">
                   "It takes a nation to build a constitution, and a community of
                   developers to build this platform."
@@ -473,9 +430,6 @@ export default function TeamPage() {
           </div>
         </div>
       </section>
-
-      {/* Minimal footer accent */}
-      <div className="h-2 bg-gradient-to-r from-[#0A7B24] via-[#1EB53A] to-[#CE1126]"></div>
     </div>
   );
 }
