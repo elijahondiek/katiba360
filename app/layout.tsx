@@ -19,7 +19,35 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Katiba360",
   description: "Kenya's Constitution at your fingertips",
-    generator: 'v0.dev'
+  generator: 'WebShrewd',
+  openGraph: {
+    title: "Katiba360",
+    description: "Kenya's Constitution at your fingertips",
+    url: "https://katiba360.com/",
+    siteName: "Katiba360",
+    images: [
+      {
+        url: "/Katiba360-seo-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Rural Kenyan landscape with people reading the constitution"
+      }
+    ],
+    locale: "en_KE",
+    type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Katiba360",
+    description: "Kenya's Constitution at your fingertips",
+    images: ["/Katiba360-seo-image.png"],
+    creator: "@WebShrewd"
+  },
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png"
+  }
 }
 
 export default function RootLayout({
