@@ -149,45 +149,7 @@ export default function ChapterDetailPage() {
     chapter?.articles || []
   )
   
-  // Handle URL hash fragment for automatic scrolling to article sections - only once on initial load
-  useEffect(() => {
-    // Only run in browser environment and only once on initial load
-    if (typeof window !== 'undefined') {
-      // Create a flag in sessionStorage to track if we've already scrolled for this URL
-      const currentUrl = `${window.location.pathname}${window.location.hash}`;
-      const hasScrolledKey = `katiba360_scrolled_to_${currentUrl}`;
-      const hasScrolled = sessionStorage.getItem(hasScrolledKey);
-      
-      // Only scroll if we haven't already scrolled for this URL
-      if (!hasScrolled) {
-        // Get the hash fragment from the URL
-        const hash = window.location.hash;
-        
-        if (hash && hash.startsWith('#article-')) {
-          // Extract article number from hash (e.g., #article-42 -> 42)
-          const articleId = hash.replace('#article-', '');
-          const articleNumber = parseInt(articleId, 10);
-          
-          if (!isNaN(articleNumber)) {
-            // Add a small delay to ensure the DOM is fully rendered
-            // This is especially important for client-side navigation
-            setTimeout(() => {
-              scrollHandling.scrollToArticle(articleNumber);
-              
-              // Mark that we've scrolled for this URL
-              sessionStorage.setItem(hasScrolledKey, 'true');
-              
-              // Remove the hash from the URL without triggering a page reload
-              // This prevents the browser from automatically scrolling to the hash on refresh
-              if (history.replaceState) {
-                history.replaceState(null, document.title, window.location.pathname);
-              }
-            }, 300);
-          }
-        }
-      }
-    }
-  }, [scrollHandling])
+
   
   // Set up user activity tracking for reading progress
   useEffect(() => {

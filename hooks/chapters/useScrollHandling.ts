@@ -5,6 +5,39 @@ interface Article {
 }
 
 export function useScrollHandling(contentRef: React.RefObject<HTMLDivElement>, articles: Article[]) {
+  // Handle hash-based scroll on mount and hashchange
+  useEffect(() => {
+    const scrollToHash = () => {
+      if (typeof window === "undefined") return;
+      const hash = window.location.hash;
+      if (hash && hash.startsWith("#article-")) {
+        const articleId = hash.substring(1);
+        // Only scroll if not already active
+        if (articleId !== activeSection) {
+          const articleElement = document.getElementById(articleId);
+          if (articleElement) {
+            const rect = articleElement.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const articleTop = rect.top + scrollTop;
+            setTimeout(() => {
+              window.scrollTo({
+                top: articleTop - 100, // offset for sticky header
+                behavior: 'smooth',
+              });
+            }, 10);
+            setActiveSection(articleId);
+          }
+        }
+      }
+    };
+    // On mount
+    scrollToHash();
+    // On hashchange
+    window.addEventListener('hashchange', scrollToHash);
+    return () => window.removeEventListener('hashchange', scrollToHash);
+    // Only run on mount/unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [activeSection, setActiveSection] = useState("article-1");
   const [showScrollTop, setShowScrollTop] = useState(false);
 
