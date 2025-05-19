@@ -11,7 +11,7 @@
   "auth.signup": "Sign Up",
   "auth.logout": "Logout",
   "auth.profile": "Profile",
-  "search.placeholder": "Search the constitution or ask a question...",
+  "search.placeholder": "Search the constitution",
   "search.results": "Search Results for",
   "search.loading": "Searching...",
   "search.noResults": "No results found. Try different keywords.",
