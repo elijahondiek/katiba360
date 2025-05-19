@@ -95,7 +95,7 @@ export default function TeamPage() {
                     <div>{"}"}</div>
                   </div>
                 </div>
-                
+
                 {/* Developer icon - positioned separately */}
                 <div className="flex justify-center -mt-16 mb-4">
                   <div className="relative">
@@ -149,22 +149,6 @@ export default function TeamPage() {
                       * Available for your next technical project | Get in touch
                     </p>
                   </div>
-
-                  {/* Buy Me a Coffee Button */}
-                  <div className="mt-6 flex justify-center">
-                    <a
-                      href={
-                        process.env.NEXT_PUBLIC_BUY_ME_A_COFFEE_URL ||
-                        "https://www.buymeacoffee.com/username"
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-[#FFDD00] text-[#000000] rounded-lg hover:bg-[#FFDD00]/90 transition-colors duration-300 font-medium text-sm"
-                    >
-                      <Coffee className="h-4 w-4 mr-2" />
-                      Buy me a coffee
-                    </a>
-                  </div>
                 </div>
               </div>
 
@@ -187,10 +171,8 @@ export default function TeamPage() {
                       />
                     </svg>
                   </div>
-                  
-                  
                 </div>
-                
+
                 {/* People icon - positioned separately */}
                 <div className="flex justify-center -mt-20 mb-4">
                   <div className="relative">
@@ -342,11 +324,8 @@ export default function TeamPage() {
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-[#0A7B24]">
-                        Support Financially
+                      Bankroll the app
                       </h3>
-                      <p className="text-[#6B7280]">
-                        Help keep Katiba360 running
-                      </p>
                     </div>
                   </div>
 
@@ -356,45 +335,17 @@ export default function TeamPage() {
                     constitution accessible to everyone.
                   </p>
 
-                  <div className="bg-[#F9FAFB] rounded-lg p-6 mb-6">
-                    <p className="text-[#4B5563] mb-4">
-                      Even a small contribution can make a big difference. Your
-                      support helps us:
-                    </p>
-                    <ul className="space-y-2">
-                      <li className="flex items-start">
-                        <div className="mr-2 mt-1 text-[#1EB53A]">•</div>
-                        <span className="text-[#4B5563]">
-                          Keep our servers running
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <div className="mr-2 mt-1 text-[#1EB53A]">•</div>
-                        <span className="text-[#4B5563]">
-                          Develop new features
-                        </span>
-                      </li>
-                      <li className="flex items-start">
-                        <div className="mr-2 mt-1 text-[#1EB53A]">•</div>
-                        <span className="text-[#4B5563]">
-                          Translate content into more languages
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-
                   <div className="flex justify-center">
                     <a
                       href={
-                        process.env.NEXT_PUBLIC_BUY_ME_A_COFFEE_URL ||
-                        "https://www.buymeacoffee.com/username"
+                        process.env.NEXT_PUBLIC_BUY_ME_A_COFFEE_URL
                       }
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center px-6 py-3 bg-[#FFDD00] text-[#000000] rounded-lg hover:bg-[#FFDD00]/90 transition-colors duration-300 font-medium"
                     >
                       <Coffee className="h-5 w-5 mr-2" />
-                      Buy me a coffee
+                      Coffee App
                     </a>
                   </div>
                 </div>
