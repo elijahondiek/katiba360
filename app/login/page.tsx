@@ -48,8 +48,7 @@ export default function LoginPage() {
     setIsConnecting(true);
     // Construct the Google OAuth URL
     const googleAuthUrl = process.env.NEXT_PUBLIC_API_URL
-      ? `${process.env.NEXT_PUBLIC_API_URL}/auth/google`
-      : "http://localhost:8000/api/v1/auth/google";
+      && `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`
     // Redirect to the Google OAuth URL
     window.location.href = googleAuthUrl;
   };

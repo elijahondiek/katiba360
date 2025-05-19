@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import Image from "next/image";
@@ -27,31 +27,82 @@ import { cn } from "@/lib/utils";
 import { chapterIconMap } from "./chapterIconMap";
 
 import { useChapters } from "@/hooks/useChapters";
+import { useBookmark } from "@/hooks/chapters/useBookmark";
+import { saveBookmark, removeBookmark } from "@/lib/api";
 
 import { chapterCategoryMap, chapterCategories } from "./chapterCategoryMap";
-import { saveBookmark, getUserBookmarks, removeBookmark } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import Loading from "./loading";
+
+// Custom hook to manage bookmarks for the chapters page
+function useChapterBookmarks(userId: string | undefined) {
+  const [bookmarkedChapters, setBookmarkedChapters] = useState<string[]>([]);
+  const [bookmarkIdMap, setBookmarkIdMap] = useState<Record<string, string>>({});
+  const [bookmarksLoading, setBookmarksLoading] = useState(false);
+  
+  // Create a global bookmark hook without specific chapter
+  const { fetchBookmarks } = useBookmark(
+    userId,
+    0, // Not tied to a specific chapter
+    "", // No specific title
+    (bookmarks) => {
+      // Process bookmarks when they change
+      const chapterBookmarksData = bookmarks
+        .filter((bookmark: any) => bookmark.type === "chapter" || bookmark.bookmark_type === "chapter");
+      
+      // Extract just the references for the bookmarkedChapters state
+      const chapterReferences: string[] = [];
+      const idMap: Record<string, string> = {};
+      
+      // Build both the references array and ID map in a single loop
+      chapterBookmarksData.forEach((bookmark: any) => {
+        if (bookmark.reference && bookmark.bookmark_id) {
+          // Add to ID map
+          idMap[bookmark.reference] = bookmark.bookmark_id;
+          // Add to references array (no duplicates)
+          if (!chapterReferences.includes(bookmark.reference)) {
+            chapterReferences.push(bookmark.reference);
+          }
+        }
+      });
+      
+      setBookmarkedChapters(chapterReferences);
+      setBookmarkIdMap(idMap);
+      setBookmarksLoading(false);
+    }
+  );
+  
+  // Fetch bookmarks when userId changes
+  useEffect(() => {
+    if (userId) {
+      setBookmarksLoading(true);
+      fetchBookmarks();
+    } else {
+      setBookmarkedChapters([]);
+      setBookmarkIdMap({});
+    }
+  }, [userId, fetchBookmarks]);
+  
+  return {
+    bookmarkedChapters,
+    bookmarkIdMap,
+    bookmarksLoading,
+    refreshBookmarks: fetchBookmarks
+  };
+}
 
 export default function ChaptersPage() {
   const { chapters, isLoading, error } = useChapters();
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
-  // State for bookmarks
-  const [bookmarkedChapters, setBookmarkedChapters] = useState<string[]>([]);
-  // Store bookmark IDs mapped to chapter numbers for removal
-  const [bookmarkIdMap, setBookmarkIdMap] = useState<Record<string, string>>({});
-  const [bookmarksLoading, setBookmarksLoading] = useState(false);
-  // Get auth state for user ID
+  const { language } = useLanguage();
   const { authState } = useAuth();
   // Get toast functionality
   const { toast } = useToast();
-
-  // Fetch user's bookmarks when component mounts or user changes
-  useEffect(() => {
-    // Call the fetchUserBookmarks function when the component mounts or user changes
-    fetchUserBookmarks();
-  }, [authState.user?.id]);
+  
+  // Use our custom hook to manage bookmarks
+  const { bookmarkedChapters, bookmarkIdMap, bookmarksLoading, refreshBookmarks } = 
+    useChapterBookmarks(authState.user?.id);
 
   // Debug current bookmark state
   useEffect(() => {
@@ -72,66 +123,9 @@ export default function ChaptersPage() {
 
 
   
-  // Fetch user bookmarks function that can be reused
-  async function fetchUserBookmarks() {
-    if (authState.user?.id) {
-      try {
-        setBookmarksLoading(true);
-        const response = await getUserBookmarks(authState.user.id);
-        console.log("Bookmarks API response:", response);
-
-        if (response?.body?.bookmarks) {
-          // Get only chapter bookmarks
-          const chapterBookmarksData = response.body.bookmarks
-            .filter((bookmark: any) => bookmark.type === "chapter");
-          
-          console.log("Chapter bookmarks data:", chapterBookmarksData);
-          
-          // Log the first bookmark to inspect its structure
-          if (chapterBookmarksData.length > 0) {
-            console.log("First bookmark structure:", JSON.stringify(chapterBookmarksData[0], null, 2));
-          }
-          
-          // Extract just the references for the bookmarkedChapters state
-          const chapterReferences: string[] = [];
-          const idMap: Record<string, string> = {};
-          
-          // Build both the references array and ID map in a single loop
-          chapterBookmarksData.forEach((bookmark: any) => {
-            if (bookmark.reference && bookmark.bookmark_id) {
-              // Add to ID map
-              idMap[bookmark.reference] = bookmark.bookmark_id;
-              // Add to references array (no duplicates)
-              if (!chapterReferences.includes(bookmark.reference)) {
-                chapterReferences.push(bookmark.reference);
-              }
-            } else {
-              console.error(`No bookmark_id found for bookmark:`, bookmark);
-            }
-          });
-
-          console.log('Chapter references:', chapterReferences);
-          console.log('Bookmark ID Map:', idMap);
-          
-          setBookmarkedChapters(chapterReferences);
-          setBookmarkIdMap(idMap);
-        } else {
-          // Reset states if no bookmarks found
-          setBookmarkedChapters([]);
-          setBookmarkIdMap({});
-        }
-      } catch (error) {
-        console.error("Error fetching bookmarks:", error);
-      } finally {
-        setBookmarksLoading(false);
-      }
-    }
-  }
-
-  // Toggle bookmark state and call API
-  async function toggleBookmark(chapterNumber: string, chapterTitle: string) {
-    const userId = authState.user?.id;
-    if (!userId) {
+  // Create a function to handle toggling bookmarks for chapters in the list
+  const handleToggleBookmark = async (chapterNumber: string, chapterTitle: string) => {
+    if (!authState.user?.id) {
       toast({
         title: "Authentication Required",
         description: "You must be logged in to save bookmarks.",
@@ -139,29 +133,15 @@ export default function ChaptersPage() {
       });
       return;
     }
-
-    // Check if this chapter is already bookmarked
-    // Ensure we're comparing strings with strings
+    
     const chapterNumberStr = String(chapterNumber);
-    const isBookmarked = bookmarkedChapters.includes(chapterNumberStr);
-    console.log(`Chapter ${chapterNumberStr} isBookmarked:`, isBookmarked);
-    console.log('Current bookmarkedChapters:', bookmarkedChapters);
+    const isCurrentlyBookmarked = bookmarkedChapters.includes(chapterNumberStr);
     
     try {
-      // Optimistically update UI
-      setBookmarkedChapters((prev) =>
-        isBookmarked
-          ? prev.filter((id) => id !== chapterNumberStr)
-          : [...prev, chapterNumberStr]
-      );
-
-      console.log(`Toggle bookmark for chapter ${chapterNumberStr}, currently bookmarked: ${isBookmarked}`);
-      
-      if (!isBookmarked) {
-        // NOT already bookmarked, so add a new bookmark
-        console.log(`Adding bookmark for chapter ${chapterNumberStr}`);
+      if (!isCurrentlyBookmarked) {
+        // Add bookmark
         await saveBookmark({
-          userId,
+          userId: authState.user.id,
           bookmark_type: "chapter",
           reference: chapterNumberStr,
           title: chapterTitle,
@@ -173,15 +153,10 @@ export default function ChaptersPage() {
           variant: "success",
         });
       } else {
-        // Already bookmarked, so remove it
-        console.log(`Removing bookmark for chapter ${chapterNumberStr}`);
-        
-        // Get the bookmark ID for this chapter
+        // Remove bookmark
         const bookmarkId = bookmarkIdMap[chapterNumberStr];
-        console.log(`Bookmark ID for chapter ${chapterNumberStr}:`, bookmarkId);
         
         if (!bookmarkId) {
-          console.error(`No bookmark ID found for chapter ${chapterNumberStr}`);
           toast({
             title: "Error",
             description: "Could not find bookmark to remove",
@@ -190,36 +165,26 @@ export default function ChaptersPage() {
           return;
         }
         
-        // Remove bookmark using the correct ID
-        console.log(`Calling removeBookmark with userId=${userId}, bookmarkId=${bookmarkId}`);
-        try {
-          const response = await removeBookmark(userId, bookmarkId);
-          console.log('Remove bookmark response:', response);
-        } catch (error) {
-          console.error('Error removing bookmark:', error);
-        }
+        await removeBookmark(authState.user.id, bookmarkId);
         
         toast({
           title: "Bookmark Removed",
           description: `${chapterTitle} removed from bookmarks`,
+          variant: "info",
         });
       }
       
-      // Refetch bookmarks to ensure UI is in sync with backend
-      await fetchUserBookmarks();
-      
-    } catch (e) {
-      // Revert optimistic update on error
-      await fetchUserBookmarks();
-      
+      // Refresh the bookmarks list to update the UI
+      refreshBookmarks();
+    } catch (error) {
+      console.error("Error toggling bookmark:", error);
       toast({
         title: "Error",
         description: "Failed to update bookmark.",
         variant: "destructive",
       });
-      console.error(e);
     }
-  }
+  };
 
   const { t } = useLanguage();
 
@@ -297,7 +262,7 @@ export default function ChaptersPage() {
                 <button
                   onClick={(e) => {
                     e.preventDefault();
-                    toggleBookmark(
+                    handleToggleBookmark(
                       chapter.chapter_number,
                       chapter.chapter_title
                     );

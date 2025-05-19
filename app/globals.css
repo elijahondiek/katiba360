@@ -122,3 +122,40 @@ mark {
   padding: 0 2px;
   border-radius: 2px;
 }
+
+/* Custom styles for audio progress slider thumb */
+.audio-progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default appearance */
+  appearance: none;
+  width: 16px; /* Set a specific slider handle width */
+  height: 16px; /* Slider handle height */
+  background: #10B981; /* Emerald-500 / Green color */
+  border-radius: 50%; /* Circular thumb */
+  cursor: pointer; /* Cursor on hover */
+  margin-top: -3px; /* Adjust vertical position. Move thumb further down for better centering. */
+}
+
+.audio-progress-slider::-moz-range-thumb {
+  width: 16px; /* Set a specific slider handle width */
+  height: 16px; /* Slider handle height */
+  background: #10B981; /* Emerald-500 / Green color */
+  border-radius: 50%; /* Circular thumb */
+  cursor: pointer; /* Cursor on hover */
+  border: none; /* Remove default border in Firefox */
+  margin-top: -3px; /* Move thumb further down for better centering in Firefox. */
+}
+
+/* Optional: Style the track itself if needed */
+/*
+.audio-progress-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: #D1D5DB; 
+  border-radius: 3px;
+}
+
+.audio-progress-slider::-moz-range-track {
+  height: 4px;
+  background: #D1D5DB; 
+  border-radius: 3px;
+}
+*/

@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { BookOpen, Bookmark, BookmarkCheck, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -49,7 +50,7 @@ export function ChapterSidebar({
               data-article-id={`article-${article.article_number}`}
               className={cn(
                 "block w-full text-left p-2 rounded text-[#4B5563] hover:text-[#0A7B24] transition-colors",
-                activeSection === article.article_number.toString()
+                activeSection === `article-${article.article_number}` || activeSection === article.article_number.toString()
                   ? "bg-[#E5E7EB] text-[#0A7B24] font-medium"
                   : "hover:bg-[#E5E7EB]",
               )}
@@ -85,11 +86,16 @@ export function ChapterSidebar({
 
           <div className="flex items-center justify-between px-2 py-1">
             <span className="text-sm text-[#4B5563]">Simplified Text</span>
-            <Switch
-              checked={isSimplified}
-              onCheckedChange={onSimplifiedChange}
-              className="data-[state=checked]:bg-[#1EB53A]"
-            />
+            <button
+              onClick={() => onSimplifiedChange(!isSimplified)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isSimplified ? 'bg-[#1EB53A]' : 'bg-gray-200'}`}
+              aria-pressed={isSimplified}
+              type="button"
+            >
+              <span 
+                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${isSimplified ? 'translate-x-5' : 'translate-x-1'}`} 
+              />
+            </button>
           </div>
         </div>
       </div>

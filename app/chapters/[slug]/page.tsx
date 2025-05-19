@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useRef, useState, useEffect } from "react"
+import React, { useRef, useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/contexts/language-context"
 import { useAuth } from '@/contexts/AuthContext'
@@ -20,6 +20,7 @@ import { useChapter } from "@/hooks/chapters/useChapter"
 import { useBookmark } from "@/hooks/chapters/useBookmark"
 import { useAudioSynthesis } from "@/hooks/chapters/useAudioSynthesis"
 import { useScrollHandling } from "@/hooks/chapters/useScrollHandling"
+import { useReadingProgress } from "@/hooks/chapters/useReadingProgress"
 
 // Import utilities
 import { processContent } from "@/lib/processContent"
@@ -46,9 +47,28 @@ export default function ChapterDetailPage() {
   
   // Other UI states
   const [isSimplified, setIsSimplified] = useState(false)
-  const [activeSection, setActiveSection] = useState<string | null>(null)
-  const [showScrollTop, setShowScrollTop] = useState(false)
-  const contentRef = useRef<HTMLDivElement | null>(null)
+  // Using React.RefObject<HTMLDivElement> type to match the useScrollHandling hook's expected type
+  const contentRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>
+  
+  // Handler for simplified text toggle - using a simple function instead of useCallback
+  const handleSimplifiedChange = (value: boolean) => {
+    setIsSimplified(value)
+  }
+  
+  // Initialize reading progress tracking
+  const { 
+    startReading, 
+    pauseReading, 
+    updateActivity,
+    readTimeMinutes,
+    isReading,
+    syncProgress,
+    manualSync
+  } = useReadingProgress(
+    authState.user?.id,
+    'chapter',
+    String(chapterNumber)
+  )
   
   // Fetch chapter data
   const { 
@@ -121,88 +141,129 @@ export default function ChapterDetailPage() {
     handleVolumeChange
   } = useAudioSynthesis(contentRef, { onEnd: handleAudioEnd })
   
-  // Scroll to top handler
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  // Scroll to article handler
-  const scrollToArticle = (articleNumber: number) => {
-    const articleElement = document.getElementById(`article-${articleNumber}`)
-    if (articleElement) {
-      // Calculate position with offset for header
-      const headerOffset = 120
-      const elementPosition = articleElement.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
-      
-      // Scroll to the element with offset
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      })
-      
-      // Update active section
-      setActiveSection(articleNumber.toString())
-    }
-  }
-
-  // Handle URL hash fragment for automatic scrolling to article sections
+  // We'll use scrollToTop and scrollToArticle from the scrollHandling hook
+  
+  // Get scroll handling functions from custom hook
+  const scrollHandling = useScrollHandling(
+    contentRef,
+    chapter?.articles || []
+  )
+  
+  // Handle URL hash fragment for automatic scrolling to article sections - only once on initial load
   useEffect(() => {
-    // Only run in browser environment
+    // Only run in browser environment and only once on initial load
     if (typeof window !== 'undefined') {
-      // Get the hash fragment from the URL
-      const hash = window.location.hash;
+      // Create a flag in sessionStorage to track if we've already scrolled for this URL
+      const currentUrl = `${window.location.pathname}${window.location.hash}`;
+      const hasScrolledKey = `katiba360_scrolled_to_${currentUrl}`;
+      const hasScrolled = sessionStorage.getItem(hasScrolledKey);
       
-      if (hash && hash.startsWith('#article-')) {
-        // Extract article number from hash (e.g., #article-42 -> 42)
-        const articleId = hash.replace('#article-', '');
-        const articleNumber = parseInt(articleId, 10);
+      // Only scroll if we haven't already scrolled for this URL
+      if (!hasScrolled) {
+        // Get the hash fragment from the URL
+        const hash = window.location.hash;
         
-        if (!isNaN(articleNumber)) {
-          // Add a small delay to ensure the DOM is fully rendered
-          // This is especially important for client-side navigation
-          setTimeout(() => {
-            scrollToArticle(articleNumber);
-          }, 300);
+        if (hash && hash.startsWith('#article-')) {
+          // Extract article number from hash (e.g., #article-42 -> 42)
+          const articleId = hash.replace('#article-', '');
+          const articleNumber = parseInt(articleId, 10);
+          
+          if (!isNaN(articleNumber)) {
+            // Add a small delay to ensure the DOM is fully rendered
+            // This is especially important for client-side navigation
+            setTimeout(() => {
+              scrollHandling.scrollToArticle(articleNumber);
+              
+              // Mark that we've scrolled for this URL
+              sessionStorage.setItem(hasScrolledKey, 'true');
+              
+              // Remove the hash from the URL without triggering a page reload
+              // This prevents the browser from automatically scrolling to the hash on refresh
+              if (history.replaceState) {
+                history.replaceState(null, document.title, window.location.pathname);
+              }
+            }, 300);
+          }
         }
       }
     }
-  }, [slug]); // Re-run when slug changes for client-side navigation
-
-  // Scroll tracking
+  }, [scrollHandling])
+  
+  // Set up user activity tracking for reading progress
   useEffect(() => {
-    const handleScroll = () => {
-      // Show scroll to top button after scrolling 200px
-      setShowScrollTop(window.scrollY > 200)
-
-      // Update active section based on scroll position
-      const articleElements = document.querySelectorAll('[id^="article-"]')
-      let currentSection = null
-
-      articleElements.forEach((element) => {
-        const rect = element.getBoundingClientRect()
-        // Check if the element is in the viewport (with some buffer)
-        if (rect.top <= 150 && rect.bottom >= 150) {
-          const articleId = element.id.replace('article-', '')
-          currentSection = articleId
-        }
-      })
-
-      if (currentSection) {
-        setActiveSection(currentSection)
+    // Create a debounced version of updateActivity to avoid too many updates
+    let activityTimeout: NodeJS.Timeout | null = null;
+    
+    const debouncedUpdateActivity = () => {
+      // Clear any existing timeout
+      if (activityTimeout) {
+        clearTimeout(activityTimeout);
+      }
+      
+      // Set a new timeout
+      activityTimeout = setTimeout(() => {
+        updateActivity();
+      }, 300); // 300ms debounce
+    };
+    
+    // Add user activity listeners
+    window.addEventListener('mousemove', debouncedUpdateActivity)
+    window.addEventListener('keydown', debouncedUpdateActivity)
+    window.addEventListener('click', debouncedUpdateActivity)
+    window.addEventListener('touchstart', debouncedUpdateActivity)
+    window.addEventListener('scroll', debouncedUpdateActivity)
+    
+    // Trigger activity update immediately to start the session
+    updateActivity();
+    
+    // Also set up a periodic activity check to ensure the session stays active while reading
+    const periodicActivityCheck = setInterval(() => {
+      // Check if the document is visible (user hasn't switched tabs)
+      if (document.visibilityState === 'visible') {
+        updateActivity();
+      }
+    }, 30000); // Every 30 seconds
+    
+    return () => {
+      // Clean up all event listeners
+      window.removeEventListener('mousemove', debouncedUpdateActivity)
+      window.removeEventListener('keydown', debouncedUpdateActivity)
+      window.removeEventListener('click', debouncedUpdateActivity)
+      window.removeEventListener('touchstart', debouncedUpdateActivity)
+      window.removeEventListener('scroll', debouncedUpdateActivity)
+      
+      // Clear the debounce timeout if it exists
+      if (activityTimeout) {
+        clearTimeout(activityTimeout);
+      }
+      
+      // Clear the periodic activity check
+      clearInterval(periodicActivityCheck);
+    }
+  }, [updateActivity])
+  
+  // Start reading progress tracking when component mounts or chapter changes
+  useEffect(() => {
+    // Start tracking when component mounts and user is logged in
+    if (authState.user?.id) {
+      // Pause any existing tracking first (in case of chapter change)
+      pauseReading()
+      
+      // Sync any existing progress before starting new tracking
+      syncProgress()
+      
+      // Start tracking for current chapter
+      startReading()
+    }
+    
+    // Sync progress and pause tracking when component unmounts
+    return () => {
+      if (authState.user?.id) {
+        pauseReading()
+        syncProgress() // Final sync on unmount
       }
     }
-
-    // Add scroll listener to window since we need to track global scroll
-    window.addEventListener('scroll', handleScroll)
-    
-    // Initial check for active section
-    handleScroll()
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
+  }, [authState.user?.id, chapterNumber])
 
   // Helper function to format relevance text nicely
   const formatRelevance = (relevance: string): string => {
@@ -261,12 +322,12 @@ export default function ChapterDetailPage() {
           <div className="order-2 md:order-1">
             <ChapterSidebar 
               articles={articles}
-              activeSection={activeSection}
+              activeSection={scrollHandling.activeSection}
               isBookmarked={isBookmarked}
               isSimplified={isSimplified}
-              onArticleClick={scrollToArticle}
+              onArticleClick={scrollHandling.scrollToArticle}
               onBookmarkToggle={toggleBookmark}
-              onSimplifiedChange={setIsSimplified}
+              onSimplifiedChange={handleSimplifiedChange}
             />
           </div>
 
@@ -322,8 +383,8 @@ export default function ChapterDetailPage() {
 
       {/* Scroll to top button */}
       <ScrollToTopButton 
-        showScrollTop={showScrollTop}
-        onClick={scrollToTop}
+        showScrollTop={scrollHandling.showScrollTop}
+        onClick={scrollHandling.scrollToTop}
       />
     </div>
   )

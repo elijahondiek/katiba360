@@ -28,6 +28,7 @@ import { SavedContentLibrary } from "@/components/profile/saved-content-library"
 import { ReadingStats } from "@/components/profile/reading-stats"
 import { Achievements } from "@/components/profile/achievements"
 import { LogoutButton } from "@/components/auth/logout-button"
+import { ComingSoonChip } from "@/components/ui/coming-soon-chip"
 
 export default function ProfilePage() {
   const { t } = useLanguage()
@@ -36,45 +37,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <div className="flex items-center gap-2">
-                <Image src="/logo.svg" alt="Katiba360 Logo" width={40} height={40} className="h-10 w-auto" />
-                <span className="text-xl font-bold text-[#0A7B24]">{t("app.title")}</span>
-              </div>
-            </Link>
-          </div>
-
-          <div className="hidden md:flex items-center gap-6">
-            <nav className="flex gap-6">
-              <Link href="/chapters" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                {t("nav.chapters")}
-              </Link>
-              <Link href="/rights" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                {t("nav.rights")}
-              </Link>
-              <Link href="/learn" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                {t("nav.learn")}
-              </Link>
-              <Link href="/about" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                {t("nav.about")}
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <LanguageSelector />
-            <Button variant="ghost" size="icon" className="relative">
-              <User className="h-5 w-5 text-[#0A7B24]" />
-              <span className="absolute top-0 right-0 h-2 w-2 bg-[#1EB53A] rounded-full"></span>
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Profile Header */}
@@ -86,60 +48,49 @@ export default function ProfilePage() {
             <div className="bg-white rounded-lg border border-gray-200 h-fit overflow-hidden">
               <nav className="flex flex-col">
                 <button
-                  onClick={() => setActiveTab("overview")}
-                  className={`flex items-center gap-3 px-4 py-3 text-left transition-colors ${
-                    activeTab === "overview"
-                      ? "bg-[#1EB53A]/10 text-[#0A7B24] font-medium border-l-2 border-[#0A7B24]"
-                      : "text-[#4B5563] hover:bg-gray-50"
-                  }`}
+                  disabled
+                  className="flex items-center gap-3 px-4 py-3 text-left text-[#4B5563] opacity-70 cursor-not-allowed"
                 >
                   <BarChart3 className="h-5 w-5" />
                   <span>Overview</span>
+                  <ComingSoonChip variant="profile" compact={true} />
                 </button>
 
                 <button
-                  onClick={() => setActiveTab("saved")}
-                  className={`flex items-center gap-3 px-4 py-3 text-left transition-colors ${
-                    activeTab === "saved"
-                      ? "bg-[#1EB53A]/10 text-[#0A7B24] font-medium border-l-2 border-[#0A7B24]"
-                      : "text-[#4B5563] hover:bg-gray-50"
-                  }`}
+                  disabled
+                  className="flex items-center gap-3 px-4 py-3 text-left text-[#4B5563] opacity-70 cursor-not-allowed"
                 >
                   <BookMarked className="h-5 w-5" />
                   <span>Saved Content</span>
+                  <ComingSoonChip variant="profile" compact={true} />
                 </button>
 
                 <button
-                  onClick={() => setActiveTab("achievements")}
-                  className={`flex items-center gap-3 px-4 py-3 text-left transition-colors ${
-                    activeTab === "achievements"
-                      ? "bg-[#1EB53A]/10 text-[#0A7B24] font-medium border-l-2 border-[#0A7B24]"
-                      : "text-[#4B5563] hover:bg-gray-50"
-                  }`}
+                  disabled
+                  className="flex items-center gap-3 px-4 py-3 text-left text-[#4B5563] opacity-70 cursor-not-allowed"
                 >
                   <Award className="h-5 w-5" />
                   <span>Achievements</span>
+                  <ComingSoonChip variant="profile" compact={true} />
                 </button>
 
                 <button
-                  onClick={() => setActiveTab("offline")}
-                  className={`flex items-center gap-3 px-4 py-3 text-left transition-colors ${
-                    activeTab === "offline"
-                      ? "bg-[#1EB53A]/10 text-[#0A7B24] font-medium border-l-2 border-[#0A7B24]"
-                      : "text-[#4B5563] hover:bg-gray-50"
-                  }`}
+                  disabled
+                  className="flex items-center gap-3 px-4 py-3 text-left text-[#4B5563] opacity-70 cursor-not-allowed"
                 >
                   <Download className="h-5 w-5" />
                   <span>Offline Content</span>
+                  <ComingSoonChip variant="profile" compact={true} />
                 </button>
 
-                <Link
-                  href="/profile/settings"
-                  className="flex items-center gap-3 px-4 py-3 text-[#4B5563] hover:bg-gray-50 transition-colors"
+                <button
+                  disabled
+                  className="flex items-center gap-3 px-4 py-3 text-left text-[#4B5563] opacity-70 cursor-not-allowed"
                 >
                   <Settings className="h-5 w-5" />
                   <span>Settings</span>
-                </Link>
+                  <ComingSoonChip variant="profile" compact={true} />
+                </button>
 
                 <hr className="my-2 border-gray-200" />
 
@@ -156,7 +107,18 @@ export default function ProfilePage() {
             {/* Content Area */}
             <div>
               {activeTab === "overview" && (
-                <div className="space-y-8">
+                <div className="space-y-8 relative">
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-lg">
+                    <div className="bg-[#1EB53A]/10 text-[#0A7B24] px-4 py-2 rounded-lg text-xl font-medium mb-2">
+                      Available Soon
+                    </div>
+                    <p className="text-[#4B5563] max-w-md text-center">
+                      We're working on bringing you personalized reading statistics, activity tracking, and achievements.
+                    </p>
+                  </div>
+                  
+                  {/* Content (will be behind overlay) */}
                   <ReadingStats />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -245,6 +207,7 @@ export default function ProfilePage() {
                           variant="ghost"
                           className="w-full text-[#1EB53A] hover:text-[#0A7B24] hover:bg-[#1EB53A]/10"
                           onClick={() => setActiveTab("achievements")}
+                          disabled
                         >
                           View All Achievements
                           <ChevronRight className="h-4 w-4 ml-1" />
@@ -255,10 +218,51 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              {activeTab === "saved" && <SavedContentLibrary />}
-              {activeTab === "achievements" && <Achievements />}
+              {activeTab === "saved" && (
+                <div className="relative">
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-lg">
+                    <div className="bg-[#1EB53A]/10 text-[#0A7B24] px-4 py-2 rounded-lg text-xl font-medium mb-2">
+                      Available Soon
+                    </div>
+                    <p className="text-[#4B5563] max-w-md text-center">
+                      Your saved content library is coming soon. You'll be able to bookmark and organize your favorite constitutional content.
+                    </p>
+                  </div>
+                  
+                  {/* Content (will be behind overlay) */}
+                  <SavedContentLibrary />
+                </div>
+              )}
+              {activeTab === "achievements" && (
+                <div className="relative">
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-lg">
+                    <div className="bg-[#1EB53A]/10 text-[#0A7B24] px-4 py-2 rounded-lg text-xl font-medium mb-2">
+                      Available Soon
+                    </div>
+                    <p className="text-[#4B5563] max-w-md text-center">
+                      Track your learning journey with achievements and badges as you explore the constitution. This feature is coming soon.
+                    </p>
+                  </div>
+                  
+                  {/* Content (will be behind overlay) */}
+                  <Achievements />
+                </div>
+              )}
               {activeTab === "offline" && (
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <div className="bg-white rounded-lg border border-gray-200 p-6 relative">
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-lg">
+                    <div className="bg-[#1EB53A]/10 text-[#0A7B24] px-4 py-2 rounded-lg text-xl font-medium mb-2">
+                      Available Soon
+                    </div>
+                    <p className="text-[#4B5563] max-w-md text-center">
+                      Download constitutional content for offline access. Read and learn about your rights even without an internet connection.
+                    </p>
+                  </div>
+                  
+                  {/* Content (will be behind overlay) */}
                   <h2 className="text-xl font-bold text-[#0A7B24] mb-4">Offline Content</h2>
                   <p className="text-[#4B5563] mb-6">Manage your downloaded content for offline access.</p>
 

@@ -122,7 +122,7 @@ export default function SearchPage() {
     toggleFilter,
     resetSearch,
   } = useSearchPage({
-    debounceMs: 1200,
+    debounceMs: 2000,
     resultsPerPage: 10,
     highlight: true,
   })
