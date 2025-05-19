@@ -102,7 +102,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const loginKey = `${code}-${redirectUri}-${state || ''}`;
     
     if (lastLoginKeyRef.current === loginKey) {
-      console.log('Preventing duplicate login attempt');
+      // console.log('Preventing duplicate login attempt');
       return;
     }
     
@@ -117,7 +117,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }));
       }
       
-      console.log('Exchanging code for tokens...');
+      // console.log('Exchanging code for tokens...');
       const response = await fetchAPI('/api/v1/auth/google', {
         method: 'POST',
         body: JSON.stringify({
@@ -127,7 +127,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }),
       });
       
-      console.log('Response received:', response);
+      // console.log('Response received:', response);
       
       if (response.body) {
         const { access_token, refresh_token, user } = response.body;
@@ -189,7 +189,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             },
           });
           
-          console.log('Successfully logged out on server');
+          // console.log('Successfully logged out on server');
         } catch (apiError) {
           // If the API call fails, log the error but continue with local logout
           console.error('Error calling logout API:', apiError);
@@ -215,7 +215,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         isAuthenticated: false,
       });
       
-      console.log('Local logout completed');
+      // console.log('Local logout completed');
     }
   };
   

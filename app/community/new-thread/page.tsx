@@ -26,11 +26,11 @@ export default function NewThreadPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // In a real app, this would submit the thread to the server
-    console.log("Submitting thread:", {
-      title: threadTitle,
-      content: threadContent,
-      category,
-    })
+    // console.log("Submitting thread:", {
+    //   title: threadTitle,
+    //   content: threadContent,
+    //   category,
+    // })
     // Redirect to the forum page
     window.location.href = "/community"
   }

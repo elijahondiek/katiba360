@@ -57,25 +57,25 @@ export function useChapter(chapterNumber: number) {
               const firstArticle = response.body.chapter.articles[0];
               if (firstArticle.article_number) {
                 reference = `${chapterNumber}.${firstArticle.article_number}`;
-                console.log(`Using reference: ${reference} for related articles`);
+                // console.log(`Using reference: ${reference} for related articles`);
               }
             } else {
               // If no articles are available, append .1 as a fallback
               reference = `${chapterNumber}.1`;
-              console.log(`No articles found, using fallback reference: ${reference}`);
+              // console.log(`No articles found, using fallback reference: ${reference}`);
             }
             
             const relatedResponse = await getRelatedArticles(reference);
             
             if (relatedResponse && relatedResponse.body && relatedResponse.body.related_articles) {
-              console.log('Related articles response:', relatedResponse.body.related_articles);
+              // console.log('Related articles response:', relatedResponse.body.related_articles);
               setRelatedArticles(relatedResponse.body.related_articles);
             } else {
-              console.log('No related articles found or invalid response format');
+              // console.log('No related articles found or invalid response format');
               setRelatedArticles([]);
             }
           } catch (relatedErr) {
-            console.error('Error fetching related articles:', relatedErr);
+            // console.error('Error fetching related articles:', relatedErr);
             setRelatedArticles([]);
           } finally {
             setRelatedArticlesLoading(false);

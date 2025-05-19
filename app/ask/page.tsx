@@ -142,7 +142,7 @@ export default function AskPage() {
   // Submit feedback
   const submitFeedback = (messageId: string) => {
     // In a real app, this would send the feedback to the server
-    console.log(`Feedback for ${messageId}:`, feedbackComment)
+    // console.log(`Feedback for ${messageId}:`, feedbackComment)
     setShowFeedbackForm(null)
     setFeedbackComment("")
   }

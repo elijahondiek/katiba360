@@ -37,7 +37,7 @@ export function useBookmark(
     try {
       const response = await getUserBookmarks(userId);
       if (response?.body?.bookmarks) {
-        console.log('All bookmarks:', response.body.bookmarks);
+        // console.log('All bookmarks:', response.body.bookmarks);
         
         // Call the callback with all bookmarks if provided
         if (onBookmarksChange) {
@@ -53,7 +53,7 @@ export function useBookmark(
               bookmark.reference === chapterNumberStr
           );
           
-          console.log(`Bookmark for chapter ${chapterNumberStr}:`, chapterBookmark);
+          // console.log(`Bookmark for chapter ${chapterNumberStr}:`, chapterBookmark);
           
           // Update bookmark state
           const isChapterBookmarked = !!chapterBookmark;
@@ -61,7 +61,7 @@ export function useBookmark(
           
           // Store the bookmark ID if found
           if (chapterBookmark) {
-            console.log('Setting bookmark ID:', chapterBookmark.bookmark_id);
+            // console.log('Setting bookmark ID:', chapterBookmark.bookmark_id);
             setBookmarkId(chapterBookmark.bookmark_id);
           } else {
             setBookmarkId(null);
@@ -114,7 +114,7 @@ export function useBookmark(
       } else {
         // Remove bookmark using the bookmark ID
         if (typeof removeBookmark === 'function' && bookmarkId) {
-          console.log(`Removing bookmark with ID: ${bookmarkId} for chapter ${chapterNumber}`);
+          // console.log(`Removing bookmark with ID: ${bookmarkId} for chapter ${chapterNumber}`);
           try {
             await removeBookmark(userId, bookmarkId);
             

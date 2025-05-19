@@ -42,7 +42,7 @@ export default function AuthCallbackPage() {
         const redirectUri =
           process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
 
-        console.log("Starting authentication with code:", code.substring(0, 5) + "...")
+        // console.log("Starting authentication with code:", code.substring(0, 5) + "...")
 
         // Complete the authentication process
         await login(code, redirectUri, state ?? undefined)

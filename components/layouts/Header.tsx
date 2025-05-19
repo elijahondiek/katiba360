@@ -37,12 +37,12 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   
-  // Debug user object
-  useEffect(() => {
-    if (authState.user) {
-      console.log('Auth user object:', authState.user)
-    }
-  }, [authState.user])
+  // // Debug user object
+  // useEffect(() => {
+  //   if (authState.user) {
+  //     console.log('Auth user object:', authState.user)
+  //   }
+  // }, [authState.user])
   
   // Helper function to get avatar URL
   const getAvatarUrl = () => {

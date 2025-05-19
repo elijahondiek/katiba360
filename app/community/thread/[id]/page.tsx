@@ -162,7 +162,7 @@ export default function ThreadDetailPage({ params }: { params: { id: string } })
   const handleReplySubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // In a real app, this would submit the reply to the server
-    console.log("Submitting reply:", replyContent)
+    // console.log("Submitting reply:", replyContent)
     setReplyContent("")
   }
 

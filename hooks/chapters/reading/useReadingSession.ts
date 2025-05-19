@@ -82,7 +82,7 @@ export function useReadingSession() {
             totalTimeMs: prev.totalTimeMs + currentSessionTime,
           }));
           
-          DEBUG_MODE && console.log('Auto-paused reading due to inactivity');
+          // DEBUG_MODE && console.log('Auto-paused reading due to inactivity');
         }
       }
     }, 10000); // Check every 10 seconds
@@ -93,7 +93,7 @@ export function useReadingSession() {
   
   // Pause tracking reading time
   const pauseReading = useCallback(() => {
-    console.log('[ReadingSession] pauseReading called. isMounted:', isMountedRef.current, 'isPausing:', isPausingRef.current);
+    // console.log('[ReadingSession] pauseReading called. isMounted:', isMountedRef.current, 'isPausing:', isPausingRef.current);
     // Skip if component is unmounted or already pausing
     if (!isMountedRef.current) {
       console.warn('[ReadingSession] pauseReading called but not mounted.');
@@ -112,10 +112,10 @@ export function useReadingSession() {
       if (isMountedRef.current) {
         // Calculate time spent in current session using functional state update
         setSession(prev => {
-          console.log('[ReadingSession] setSession in pauseReading. prev:', prev);
+          // console.log('[ReadingSession] setSession in pauseReading. prev:', prev);
           if (!prev.isActive) {
             isPausingRef.current = false;
-            console.log('[ReadingSession] Already paused, skipping.');
+            // console.log('[ReadingSession] Already paused, skipping.');
             return prev; // No changes if already paused
           }
           const now = Date.now();
@@ -132,14 +132,14 @@ export function useReadingSession() {
                         prev.lastActiveTime === updated.lastActiveTime;
           if (isSame) {
             isPausingRef.current = false;
-            console.log('[ReadingSession] No session change in pauseReading, skipping update.');
+            // console.log('[ReadingSession] No session change in pauseReading, skipping update.');
             return prev;
           }
           setTimeout(() => {
             isPausingRef.current = false;
-            console.log('[ReadingSession] pauseReading finished and flag reset.');
+            // console.log('[ReadingSession] pauseReading finished and flag reset.');
           }, 0);
-          console.log('[ReadingSession] Updated session in pauseReading:', updated);
+          // console.log('[ReadingSession] Updated session in pauseReading:', updated);
           return updated;
         });
         
@@ -147,12 +147,12 @@ export function useReadingSession() {
         if (activityCheckIntervalRef.current) {
           clearInterval(activityCheckIntervalRef.current);
           activityCheckIntervalRef.current = null;
-          console.log('[ReadingSession] Cleared activity interval in pauseReading.');
+          // console.log('[ReadingSession] Cleared activity interval in pauseReading.');
         }
       } else {
         // Reset flag if unmounted
         isPausingRef.current = false;
-        console.warn('[ReadingSession] pauseReading finished but not mounted.');
+        // console.warn('[ReadingSession] pauseReading finished but not mounted.');
       }
     }, 0);
   }, []);  // No dependencies to avoid cascading updates
