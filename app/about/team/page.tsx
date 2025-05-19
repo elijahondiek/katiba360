@@ -310,7 +310,7 @@ export default function TeamPage() {
                     <a
                       href={
                         process.env.NEXT_PUBLIC_KATIBA360_APP_URL ||
-                        "https://github.com/elijahondiek/katiba360-app"
+                        "https://github.com/elijahondiek/katiba360"
                       }
                       target="_blank"
                       rel="noopener noreferrer"
@@ -413,7 +413,7 @@ export default function TeamPage() {
                   <a
                     href={
                       process.env.NEXT_PUBLIC_KATIBA360_APP_URL ||
-                      "https://github.com/elijahondiek/katiba360-app"
+                      "https://github.com/elijahondiek/katiba360"
                     }
                     target="_blank"
                     rel="noopener noreferrer"

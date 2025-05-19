@@ -38,7 +38,7 @@ export default function HomePage() {
             {/* Simple AI Announcement Chip */}
             <div className="flex justify-center mb-8">
               <Link
-                href="https://github.com/elijahondiek/katiba360-app"
+                href="https://github.com/elijahondiek/katiba360"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-3 py-1.5 bg-[#F0FFF4] text-[#0A7B24] rounded-full border border-[#1EB53A]/30 hover:bg-[#E6FFEC] transition-colors duration-200"

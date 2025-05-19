@@ -30,7 +30,7 @@ For the full design guide, see `katiba360-app/Global Design Guide.txt`.
 ## Getting Started
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/elijahondiek/katiba360-app.git
+   git clone https://github.com/elijahondiek/katiba360.git
    ```
 2. **Install dependencies:**
    ```sh

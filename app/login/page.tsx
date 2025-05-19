@@ -89,7 +89,7 @@ export default function LoginPage() {
 
             <div className="mt-12 flex space-x-4">
               <a
-                href="https://github.com/elijahondiek/katiba360-app"
+                href="https://github.com/elijahondiek/katiba360"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-white/80 transition-colors duration-300 flex items-center bg-black/20 backdrop-blur-sm rounded-lg px-4 py-2"
