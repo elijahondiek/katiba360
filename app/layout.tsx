@@ -7,7 +7,7 @@ import { AccessibilityProvider } from "@/contexts/accessibility-context"
 import { OfflineProvider } from "@/contexts/offline-context"
 import { LearningProvider } from "@/contexts/learning-context"
 import { AuthProvider } from "@/contexts/AuthContext"
-import { AccessibilityButton } from "@/components/accessibility-button"
+// import { AccessibilityButton } from "@/components/accessibility-button"
 import { OfflineIndicator } from "@/components/offline-indicator"
 import Footer from "@/components/Footer"
 import Header from "@/components/layouts/Header"
@@ -68,7 +68,7 @@ export default function RootLayout({
                     <main className="flex-grow flex flex-col">
                       {children}
                     </main>
-                    <AccessibilityButton />
+                    {/* <AccessibilityButton /> */}
                     <OfflineIndicator />
                     <Footer />
                     <Toaster />
