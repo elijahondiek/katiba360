@@ -2,6 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Highlight effect for sections when navigated to via anchor links */
+.highlight-section {
+  animation: highlight-pulse 5s ease-in-out;
+  scroll-margin-top: 100px; /* Ensures the element isn't hidden behind fixed headers */
+  background-color: rgba(30, 181, 58, 0.15); /* Maintain a subtle background even after animation */
+  border-radius: 4px;
+  padding: 8px 12px; /* Add padding around the content */
+  margin: 0 -12px; /* Negative margin to offset padding and maintain alignment */
+}
+
+@keyframes highlight-pulse {
+  0% {
+    background-color: rgba(30, 181, 58, 0.3); /* Light green matching Kenyan flag */
+    box-shadow: 0 0 0 4px rgba(30, 181, 58, 0.3);
+  }
+  40% {
+    background-color: rgba(30, 181, 58, 0.4);
+    box-shadow: 0 0 0 4px rgba(30, 181, 58, 0.4);
+  }
+  80% {
+    background-color: rgba(30, 181, 58, 0.25);
+    box-shadow: 0 0 0 4px rgba(30, 181, 58, 0.25);
+  }
+  100% {
+    background-color: rgba(30, 181, 58, 0.15);
+    box-shadow: none;
+  }
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }

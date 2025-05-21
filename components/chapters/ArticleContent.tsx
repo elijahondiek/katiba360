@@ -96,7 +96,11 @@ export function ArticleContent({ articles, processContent }: ArticleContentProps
                 
                 {/* If there are clauses, display them */}
                 {article.clauses && article.clauses.map((clause) => (
-                  <div key={clause.clause_number} className="mb-4">
+                  <div 
+                    key={clause.clause_number} 
+                    id={`article-${article.article_number}-clause-${clause.clause_number}`}
+                    className="mb-4"
+                  >
                     <div className="font-medium mb-2 flex">
                       <span className="mr-2 flex-shrink-0">{clause.clause_number}.</span>
                       <div dangerouslySetInnerHTML={{ __html: processContent(clause.content) }} />
@@ -106,7 +110,11 @@ export function ArticleContent({ articles, processContent }: ArticleContentProps
                     {clause.sub_clauses && clause.sub_clauses.length > 0 && (
                       <div className="pl-6 space-y-2">
                         {clause.sub_clauses.map((subClause) => (
-                          <div key={subClause.sub_clause_id} className="text-[#4B5563] flex">
+                          <div 
+                            key={subClause.sub_clause_id} 
+                            id={`article-${article.article_number}-clause-${clause.clause_number}-${subClause.sub_clause_id}`}
+                            className="text-[#4B5563] flex"
+                          >
                             <span className="mr-2 flex-shrink-0">({subClause.sub_clause_id})</span>
                             <div dangerouslySetInnerHTML={{ __html: processContent(subClause.content) }} />
                           </div>

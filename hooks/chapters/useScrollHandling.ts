@@ -1,45 +1,46 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useScrollToSection } from "@/hooks/useScrollToSection";
 
 interface Article {
   article_number: number;
 }
 
 export function useScrollHandling(contentRef: React.RefObject<HTMLDivElement>, articles: Article[]) {
+  const { scrollToElement } = useScrollToSection();
+  const initialLoadRef = useRef(true);
+  const [activeSection, setActiveSection] = useState("article-1");
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  
   // Handle hash-based scroll on mount and hashchange
   useEffect(() => {
     const scrollToHash = () => {
       if (typeof window === "undefined") return;
       const hash = window.location.hash;
-      if (hash && hash.startsWith("#article-")) {
-        const articleId = hash.substring(1);
+      
+      if (hash) {
+        // Remove the # character
+        const elementId = hash.substring(1);
+        
         // Only scroll if not already active
-        if (articleId !== activeSection) {
-          const articleElement = document.getElementById(articleId);
-          if (articleElement) {
-            const rect = articleElement.getBoundingClientRect();
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const articleTop = rect.top + scrollTop;
-            setTimeout(() => {
-              window.scrollTo({
-                top: articleTop - 100, // offset for sticky header
-                behavior: 'smooth',
-              });
-            }, 10);
-            setActiveSection(articleId);
-          }
+        if (elementId !== activeSection) {
+          // Use the enhanced scrollToElement function from useScrollToSection
+          scrollToElement(elementId);
+          setActiveSection(elementId);
         }
       }
     };
-    // On mount
-    scrollToHash();
+    
+    // On initial load or when articles change
+    if (initialLoadRef.current && articles.length > 0) {
+      // Small delay to ensure DOM is ready
+      setTimeout(scrollToHash, 100);
+      initialLoadRef.current = false;
+    }
+    
     // On hashchange
     window.addEventListener('hashchange', scrollToHash);
     return () => window.removeEventListener('hashchange', scrollToHash);
-    // Only run on mount/unmount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const [activeSection, setActiveSection] = useState("article-1");
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  }, [scrollToElement, articles, activeSection]);
 
   // Handle scroll to update active section and show/hide scroll to top button
   useEffect(() => {
