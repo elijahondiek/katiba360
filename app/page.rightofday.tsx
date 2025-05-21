@@ -74,7 +74,10 @@ export function RightOfDaySection() {
           <div className="flex flex-wrap gap-4">
             <Button 
               className="bg-[#1EB53A] hover:bg-[#0A7B24] text-white"
-              onClick={() => navigateToSection(`/chapters/4#article-${right.article_number}`)}
+              onClick={() => {
+                // Use the enhanced navigateToSection with the full URL
+                navigateToSection(`/chapters/4#article-${right.article_number}`);
+              }}
             >
               {t("home.readFullArticle")}
             </Button>
