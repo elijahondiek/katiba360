@@ -194,7 +194,7 @@ export function OfflineProvider({ children }: { children: ReactNode }) {
   // Remove a downloaded chapter
   const removeChapter = async (chapterId: string) => {
     const chapter = chapters.find((c) => c.id === chapterId)
-    if (!chapter || !chapter.isDownloaded) return
+    if (!chapter?.isDownloaded) return
 
     setChapters((prev) => prev.map((c) => (c.id === chapterId ? { ...c, isDownloaded: false } : c)))
 
