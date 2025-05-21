@@ -13,6 +13,7 @@ import Footer from "@/components/Footer"
 import Header from "@/components/layouts/Header"
 import { Toaster } from "@/components/ui/toaster"
 import { Analytics } from "@vercel/analytics/next"
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -57,6 +58,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-5XJNQKYMTN"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-5XJNQKYMTN');
+            `,
+          }}
+        />
+      </head>
       <body className={inter.className + " min-h-screen flex flex-col"}>
         <AccessibilityProvider>
           <LanguageProvider>
