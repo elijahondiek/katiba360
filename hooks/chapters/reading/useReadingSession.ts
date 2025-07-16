@@ -1,10 +1,11 @@
+// useReadingSession.ts
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-// Define constants
+// Constants
 const INACTIVITY_THRESHOLD_MS = 60000; // 1 minute
-const DEBUG_MODE = false; // Set to false to disable console logs
+const DEBUG_MODE = true;
 
-export interface ReadingSession {
+interface ReadingSession {
   startTime: number;
   totalTimeMs: number;
   isActive: boolean;
@@ -12,20 +13,18 @@ export interface ReadingSession {
 }
 
 export function useReadingSession() {
-  // State for tracking reading session
   const [session, setSession] = useState<ReadingSession>({
     startTime: Date.now(),
     totalTimeMs: 0,
     isActive: false,
     lastActiveTime: Date.now(),
   });
-  
-  // Refs declared at the top level to avoid closure issues
+
   const activityCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const readTimeRef = useRef<number>(0);
   const lastActiveTimeRef = useRef<number>(Date.now());
-  const isMountedRef = useRef<boolean>(true); // Track component mount state
-  
+  const isMountedRef = useRef<boolean>(true);
+
   // Calculate total read time in minutes
   const calculateReadTimeMinutes = useCallback((): number => {
     const currentSessionMs = session.isActive 
@@ -33,192 +32,144 @@ export function useReadingSession() {
       : 0;
     
     const totalMs = session.totalTimeMs + currentSessionMs;
-    const minutes = Math.round(totalMs / 60000 * 100) / 100; // Convert to minutes with 2 decimal precision
+    const minutes = Math.round(totalMs / 60000 * 100) / 100;
+    
+    DEBUG_MODE && console.log(`[READ TIME DEBUG] Session - Current: ${currentSessionMs}ms, Total: ${totalMs}ms, Minutes: ${minutes}`);
+    
     readTimeRef.current = minutes;
     return minutes;
   }, [session]);
-  
-  // Start tracking reading time
+
+  // Handle pausing the reading session
+  const pauseReading = useCallback(() => {
+    if (!session.isActive) return;
+    
+    const now = Date.now();
+    const sessionTime = now - session.startTime;
+    
+    setSession(prev => {
+      const updatedTotalMs = prev.totalTimeMs + sessionTime;
+      DEBUG_MODE && console.log(`[READ TIME DEBUG] Pausing session. Added ${sessionTime}ms, total: ${updatedTotalMs}ms`);
+      
+      return {
+        ...prev,
+        isActive: false,
+        totalTimeMs: updatedTotalMs,
+        lastActiveTime: now
+      };
+    });
+  }, [session.isActive, session.startTime]);
+
+  // Start or resume the reading session
   const startReading = useCallback(() => {
-    if (!isMountedRef.current) return; // Safety check
+    if (!isMountedRef.current) return;
     
-    // Set active state
-    setSession(prev => ({
-      ...prev,
-      isActive: true,
-      startTime: Date.now(),
-      lastActiveTime: Date.now(),
-    }));
+    if (session.isActive) {
+      lastActiveTimeRef.current = Date.now();
+      return;
+    }
     
-    // Set up activity check interval
+    DEBUG_MODE && console.log('[READ TIME DEBUG] Starting/resuming reading session');
+    
+    setSession(prev => {
+      const now = Date.now();
+      return {
+        ...prev,
+        isActive: true,
+        startTime: now,
+        lastActiveTime: now
+      };
+    });
+    
+    // Clear any existing interval
     if (activityCheckIntervalRef.current) {
       clearInterval(activityCheckIntervalRef.current);
     }
     
+    // Set up activity check
     activityCheckIntervalRef.current = setInterval(() => {
       if (!isMountedRef.current) {
-        // Component unmounted, clean up
         if (activityCheckIntervalRef.current) {
           clearInterval(activityCheckIntervalRef.current);
         }
         return;
       }
       
-      // Check for inactivity using the ref value
       const now = Date.now();
-      const lastActive = lastActiveTimeRef.current;
-      const isSessionActive = session.isActive;
-      
-      if (now - lastActive > INACTIVITY_THRESHOLD_MS && isSessionActive) {
-        // User has been inactive, pause the reading timer but use a local variable
-        // to avoid the dependency on session state
-        const currentSessionTime = now - session.startTime;
-        
-        // Use functional update to avoid stale state
-        if (isMountedRef.current) {
-          setSession(prev => ({
-            ...prev,
-            isActive: false,
-            totalTimeMs: prev.totalTimeMs + currentSessionTime,
-          }));
-          
-          // DEBUG_MODE && console.log('Auto-paused reading due to inactivity');
-        }
+      if (now - lastActiveTimeRef.current > INACTIVITY_THRESHOLD_MS) {
+        DEBUG_MODE && console.log('[READ TIME DEBUG] Inactivity detected, pausing session');
+        pauseReading();
       }
     }, 10000); // Check every 10 seconds
-  }, []);  // No dependencies to avoid cascading updates
-  
-  // Flag to prevent concurrent calls to pauseReading
-  const isPausingRef = useRef(false);
-  
-  // Pause tracking reading time
-  const pauseReading = useCallback(() => {
-    // console.log('[ReadingSession] pauseReading called. isMounted:', isMountedRef.current, 'isPausing:', isPausingRef.current);
-    // Skip if component is unmounted or already pausing
-    if (!isMountedRef.current) {
-      console.warn('[ReadingSession] pauseReading called but not mounted.');
-      return;
-    }
-    if (isPausingRef.current) {
-      console.warn('[ReadingSession] pauseReading reentrancy guard hit.');
-      return;
-    }
-    
-    // Set flag to prevent concurrent calls
-    isPausingRef.current = true;
-    
-    // Use a timeout to ensure we're outside any existing React render cycle
-    setTimeout(() => {
-      if (isMountedRef.current) {
-        // Calculate time spent in current session using functional state update
-        setSession(prev => {
-          // console.log('[ReadingSession] setSession in pauseReading. prev:', prev);
-          if (!prev.isActive) {
-            isPausingRef.current = false;
-            // console.log('[ReadingSession] Already paused, skipping.');
-            return prev; // No changes if already paused
-          }
-          const now = Date.now();
-          const sessionTime = now - prev.startTime;
-          const updated = {
-            ...prev,
-            isActive: false,
-            totalTimeMs: prev.totalTimeMs + sessionTime,
-          };
-          // Deep equality check to prevent redundant updates
-          const isSame = prev.isActive === updated.isActive &&
-                        prev.totalTimeMs === updated.totalTimeMs &&
-                        prev.startTime === updated.startTime &&
-                        prev.lastActiveTime === updated.lastActiveTime;
-          if (isSame) {
-            isPausingRef.current = false;
-            // console.log('[ReadingSession] No session change in pauseReading, skipping update.');
-            return prev;
-          }
-          setTimeout(() => {
-            isPausingRef.current = false;
-            // console.log('[ReadingSession] pauseReading finished and flag reset.');
-          }, 0);
-          // console.log('[ReadingSession] Updated session in pauseReading:', updated);
-          return updated;
-        });
-        
-        // Clear interval
-        if (activityCheckIntervalRef.current) {
-          clearInterval(activityCheckIntervalRef.current);
-          activityCheckIntervalRef.current = null;
-          // console.log('[ReadingSession] Cleared activity interval in pauseReading.');
-        }
-      } else {
-        // Reset flag if unmounted
-        isPausingRef.current = false;
-        // console.warn('[ReadingSession] pauseReading finished but not mounted.');
-      }
-    }, 0);
-  }, []);  // No dependencies to avoid cascading updates
-  
-  // lastActiveTimeRef is now declared at the top
-  
-  // Update activity timestamp (call this on user interactions)
+  }, [session.isActive, pauseReading]);
+
+  // Update activity timestamp
   const updateActivity = useCallback(() => {
-    if (session.isActive) {
-      // Update ref directly to avoid re-renders
-      lastActiveTimeRef.current = Date.now();
-      
-      // Only update state occasionally to avoid excessive re-renders
-      const timeSinceLastUpdate = Date.now() - session.lastActiveTime;
-      if (timeSinceLastUpdate > 5000) { // Only update state every 5 seconds
-        setSession(prev => ({
-          ...prev,
-          lastActiveTime: lastActiveTimeRef.current,
-        }));
-      }
+    if (!isMountedRef.current) return;
+    
+    const now = Date.now();
+    lastActiveTimeRef.current = now;
+    
+    // If session is paused, resume it
+    if (!session.isActive) {
+      DEBUG_MODE && console.log('[READ TIME DEBUG] Resuming session on activity');
+      startReading();
+      return;
     }
-  }, [session.isActive, session.lastActiveTime]);
-  
-  // Reset session timer
+    
+    // Update last active time in state occasionally
+    if (now - session.lastActiveTime > 5000) {
+      setSession(prev => ({
+        ...prev,
+        lastActiveTime: now
+      }));
+    }
+  }, [session.isActive, session.lastActiveTime, startReading]);
+
+  // Reset the session
   const resetSession = useCallback(() => {
+    if (!isMountedRef.current) return;
+    
+    DEBUG_MODE && console.log('[READ TIME DEBUG] Resetting session');
+    
     setSession({
       startTime: Date.now(),
       totalTimeMs: 0,
       isActive: false,
       lastActiveTime: Date.now(),
     });
+    
+    readTimeRef.current = 0;
   }, []);
-  
-  // Clean up on unmount
+
+  // Set up cleanup on unmount
   useEffect(() => {
-    // Mark as mounted
     isMountedRef.current = true;
     
     return () => {
-      // Mark as unmounted first to prevent state updates during cleanup
       isMountedRef.current = false;
       
-      // Save current reading time without triggering state updates
+      // Save final time before unmounting
       if (session.isActive) {
-        // Just record the final time in readTimeRef without state updates
         const now = Date.now();
         const sessionTime = now - session.startTime;
         readTimeRef.current = Math.round((session.totalTimeMs + sessionTime) / 60000 * 100) / 100;
       }
       
-      // Clean up interval
+      // Clear interval
       if (activityCheckIntervalRef.current) {
         clearInterval(activityCheckIntervalRef.current);
-        activityCheckIntervalRef.current = null;
       }
     };
-  }, [session.isActive, session.totalTimeMs, session.startTime]);
-  
-  // Calculate read time on each render but avoid re-renders from it
-  // by using the memoized function
-  calculateReadTimeMinutes();
-  
+  }, [session.isActive, session.startTime, session.totalTimeMs]);
+
+  // Calculate read time on each render
+  const currentReadTime = calculateReadTimeMinutes();
+
   return {
     session,
     isReading: session.isActive,
-    readTimeMinutes: readTimeRef.current,
+    readTimeMinutes: currentReadTime,
     startReading,
     pauseReading,
     updateActivity,

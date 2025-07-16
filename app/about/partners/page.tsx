@@ -24,21 +24,6 @@ export default function PartnersPage() {
   // Partner profile data
   const partnerProfiles = [
     {
-      name: "0chibo",
-      role: "Lead Developer & Technical Architect",
-      bio: "Leads the development of Katiba360, ensuring it's accessible, user-friendly, and impactful across platforms.",
-      socialLink: process.env.NEXT_PUBLIC_TEAM_PROFILE_URL || "https://x.com/0chibo_",
-      socialPlatform: "X/Twitter",
-      socialIcon: <Twitter className="h-5 w-5" />,
-      focus: [
-        "Technical development",
-        "UX optimization",
-        "Mobile-first design",
-        "Open-source collaboration",
-      ],
-      highlightText: "Available for dev projects & consulting",
-    },
-    {
       name: "The People of Kenya & Kenyan Developer Community",
       role: "Technical Contributors",
       bio: "Open-source collaborators and civic tech advocates advancing digital civic education in Kenya.",
@@ -115,65 +100,9 @@ export default function PartnersPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-stretch">
-              {/* Technical Partner Profile */}
-              <div className="md:w-1/2 bg-white border-2 border-[#F3F4F6] hover:border-[#1EB53A] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg group">
-                {/* Developer icon - positioned with space above and less gap below */}
-                <div className="flex justify-center -mb-8 relative z-10 mt-8">
-                  <div className="w-32 h-32 rounded-full bg-[#1EB53A] border-4 border-white shadow-lg flex items-center justify-center">
-                    <Laptop className="h-16 w-16 text-white" />
-                  </div>
-                </div>
-                <div className="relative pt-12 px-8 pb-8 flex flex-col items-center">
-
-                  {/* Decorative code elements */}
-                  <div className="absolute top-4 right-4 font-mono text-xs text-[#1EB53A]/30">
-                    <div>{"{"}</div>
-                    <div className="pl-2">"partner": [</div>
-                    <div className="pl-4">{"{developer}"}</div>
-                    <div className="pl-2">]</div>
-                    <div>{"}"}</div>
-                  </div>
-
-                  <div className="mt-4 text-center">
-                    <div className="inline-block bg-[#0A7B24] text-white text-xs font-bold px-2 py-1 rounded-full mb-4">
-                      Technical Partner
-                    </div>
-                    <h3 className="text-2xl font-bold text-[#0A7B24]">{partnerProfiles[0].name}</h3>
-                    <p className="text-[#6B7280] mb-4">{partnerProfiles[0].role}</p>
-
-                    <a
-                      href={partnerProfiles[0].socialLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center text-[#0A7B24] hover:text-[#1EB53A] transition-colors duration-300"
-                    >
-                      {partnerProfiles[0].socialIcon}
-                      <span className="ml-1">{partnerProfiles[0].socialPlatform}</span>
-                      <ExternalLink className="h-3 w-3 ml-1" />
-                    </a>
-
-                    <div className="mt-6 text-[#4B5563]">
-                      <p>{partnerProfiles[0].bio}</p>
-                    </div>
-
-                    <div className="mt-6 pt-6 border-t border-gray-200">
-                      <h4 className="font-medium text-[#0A7B24] mb-4 text-left">Partnership Focus:</h4>
-                      <ul className="space-y-2 text-left">
-                        {partnerProfiles[0].focus.map((item, index) => (
-                          <li key={index} className="flex items-start">
-                            <div className="mr-2 mt-1 text-[#1EB53A]">•</div>
-                            <span className="text-[#4B5563]">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+            <div className="flex justify-center">
               {/* The People of Kenya Partner Profile */}
-              <div className="md:w-1/2 bg-gradient-to-br from-white to-[#F9FAFB] border-2 border-[#F3F4F6] hover:border-[#1EB53A] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg group">
+              <div className="w-full max-w-3xl bg-gradient-to-br from-white to-[#F9FAFB] border-2 border-[#F3F4F6] hover:border-[#1EB53A] rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg group">
                 {/* Kenya people icon - positioned with space above and less gap below */}
                 <div className="flex justify-center -mb-8 relative z-10 mt-8">
                   <div className="w-32 h-32 rounded-full bg-[#CE1126] border-4 border-white shadow-lg flex items-center justify-center">
@@ -198,8 +127,8 @@ export default function PartnersPage() {
                     <div className="inline-block bg-[#0A7B24] text-white text-xs font-bold px-2 py-1 rounded-full mb-4">
                       Constitutional Stakeholders
                     </div>
-                    <h3 className="text-2xl font-bold text-[#0A7B24]">{partnerProfiles[1].name}</h3>
-                    <p className="text-[#6B7280] mb-4">{partnerProfiles[1].role}</p>
+                    <h3 className="text-2xl font-bold text-[#0A7B24]">{partnerProfiles[0].name}</h3>
+                    <p className="text-[#6B7280] mb-4">{partnerProfiles[0].role}</p>
 
                     <div className="flex justify-center space-x-2 mb-6">
                       <span className="inline-flex items-center bg-[#F0FFF4] text-[#0A7B24] text-xs px-2 py-1 rounded-full">
@@ -213,13 +142,13 @@ export default function PartnersPage() {
                     </div>
 
                     <div className="mt-2 text-[#4B5563]">
-                      <p>{partnerProfiles[1].bio}</p>
+                      <p>{partnerProfiles[0].bio}</p>
                     </div>
 
                     <div className="mt-6 pt-6 border-t border-gray-200">
                       <h4 className="font-medium text-[#0A7B24] mb-4 text-left">Partnership Focus:</h4>
                       <ul className="space-y-2 text-left">
-                        {partnerProfiles[1].focus.map((item, index) => (
+                        {partnerProfiles[0].focus.map((item, index) => (
                           <li key={index} className="flex items-start">
                             <div className="mr-2 mt-1 text-[#1EB53A]">•</div>
                             <span className="text-[#4B5563]">{item}</span>

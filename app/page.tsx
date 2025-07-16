@@ -13,6 +13,7 @@ import {
   Lock,
   Scale,
   Sparkles,
+  Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,9 +44,9 @@ export default function HomePage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-3 py-1.5 bg-[#F0FFF4] text-[#0A7B24] rounded-full border border-[#1EB53A]/30 hover:bg-[#E6FFEC] transition-colors duration-200"
               >
-                <Sparkles className="h-4 w-4 mr-1.5" />
+                <Megaphone className="h-4 w-4 mr-1.5" />
                 <span>
-                  Katiba360 AI coming soon for simplified reads and translations
+                  Whether you code, craft UX, translate or test – your talents can empower every Kenyan with Katiba360°!
                 </span>
                 <span className="ml-1 text-xs">→</span>
               </Link>
