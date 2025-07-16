@@ -7,7 +7,7 @@ const API_DEBOUNCE_MS = 60000; // 60 seconds - increased to avoid rate limiting
 const SYNC_INTERVAL_MS = 600000; // 10 minutes - increased to avoid rate limiting
 const MAX_RETRY_COUNT = 3; // Maximum number of retry attempts
 const RETRY_DELAY_MS = 5000; // 5 seconds between retries
-const DEBUG_MODE = false; // Set to false to disable console logs
+const DEBUG_MODE = true; // Enable debug logging to troubleshoot read time issues
 
 export function useReadingSync(
   userId: string | undefined,
@@ -85,6 +85,9 @@ export function useReadingSync(
     }
   }, [userId, itemType, reference, onProgressUpdate, isLoading]);
 
+  // Track the last session's read time to avoid double counting
+  const lastSyncedReadTimeRef = useRef<number>(0);
+
   // Sync progress with API
   const syncProgressWithAPI = useCallback(async (readTimeMinutes: number, force: boolean = false) => {
     if (!userId || !reference) {
@@ -107,9 +110,24 @@ export function useReadingSync(
       return false;
     }
     
+    // Calculate incremental time since last sync to avoid double counting
+    // Ensure readTimeMinutes is a valid number
+    const safeReadTimeMinutes = typeof readTimeMinutes === 'number' && !isNaN(readTimeMinutes) ? readTimeMinutes : 0;
+    const safeLastSyncedTime = typeof lastSyncedReadTimeRef.current === 'number' && !isNaN(lastSyncedReadTimeRef.current) ? lastSyncedReadTimeRef.current : 0;
+    
+    const incrementalReadTimeMinutes = Math.max(0, safeReadTimeMinutes - safeLastSyncedTime);
+    
     // Update the last API call time
     lastApiCallTimeRef.current = now;
-    DEBUG_MODE && console.log(`Making API call to update reading progress: ${readTimeMinutes} minutes`);
+    DEBUG_MODE && console.log(`[READ TIME DEBUG] Current session total: ${safeReadTimeMinutes} minutes`);
+    DEBUG_MODE && console.log(`[READ TIME DEBUG] Last synced: ${safeLastSyncedTime} minutes`);
+    DEBUG_MODE && console.log(`[READ TIME DEBUG] Sending incremental time to API: ${incrementalReadTimeMinutes} minutes`);
+    
+    // Skip API call if there's no new time to report
+    if (incrementalReadTimeMinutes <= 0 && !force) {
+      DEBUG_MODE && console.log(`No new reading time since last sync, skipping API call`);
+      return false;
+    }
     
     // Avoid setting state if we're already syncing
     if (!isSyncing) {
@@ -117,16 +135,24 @@ export function useReadingSync(
     }
     
     try {
+      // Send only the incremental time to the API
+      // Ensure we never send null or NaN values
+      const safeIncrementalTime = typeof incrementalReadTimeMinutes === 'number' && !isNaN(incrementalReadTimeMinutes) 
+        ? Math.max(0, Math.round(incrementalReadTimeMinutes * 100) / 100) 
+        : 0;
+        
       const response = await updateReadingProgress({
         userId,
         itemType,
         reference,
-        readTimeMinutes,
+        readTimeMinutes: safeIncrementalTime,
       });
       
       if (response?.body?.progress) {
         // Update our local state with the response
         const apiProgress = response.body.progress;
+        
+        DEBUG_MODE && console.log(`[READ TIME DEBUG] API returned total_read_time_minutes: ${apiProgress.total_read_time_minutes || 0}`);
         
         // Update our local state
         const updatedProgress: ReadingProgress = {
@@ -135,6 +161,10 @@ export function useReadingSync(
           readTimeMinutes: apiProgress.total_read_time_minutes || 0,
           lastUpdated: apiProgress.last_read.timestamp,
         };
+        
+        // Update the last synced time to prevent double counting
+        // Ensure we store a valid number
+        lastSyncedReadTimeRef.current = typeof readTimeMinutes === 'number' && !isNaN(readTimeMinutes) ? readTimeMinutes : 0;
         
         onProgressUpdate(updatedProgress);
         return true;
@@ -157,6 +187,7 @@ export function useReadingSync(
     const handleBeforeUnload = () => {
       // Skip if we've already synced or if there are too many API calls
       if (hasSyncedRef.current) {
+        DEBUG_MODE && console.log('[READ TIME DEBUG] Already synced before unload, skipping');
         return;
       }
       

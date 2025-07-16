@@ -207,12 +207,15 @@ export async function removeBookmark(
   );
 }
 
+// Debug mode for logging
+const DEBUG_MODE = true;
+
 /**
  * Update reading progress for the user
  * @param userId User's UUID
  * @param itemType Type of item (e.g., 'chapter', 'article')
  * @param reference Reference string (e.g., '1', '1.2')
- * @param readTimeMinutes Time spent reading in minutes
+ * @param readTimeMinutes Incremental time spent reading in minutes for this session only
  */
 export async function updateReadingProgress({
   userId,
@@ -226,6 +229,16 @@ export async function updateReadingProgress({
   readTimeMinutes: number;
 }) {
   try {
+    // Ensure readTimeMinutes is a valid number, never null or NaN
+    const safeReadTimeMinutes = typeof readTimeMinutes === 'number' && !isNaN(readTimeMinutes) ? 
+      Math.max(0, readTimeMinutes) : 0;
+    
+    // Log the API call for debugging
+    if (DEBUG_MODE) {
+      console.log(`[READ TIME DEBUG] API call: Sending incremental read time of ${safeReadTimeMinutes} minutes to server`);
+      console.log(`[READ TIME DEBUG] API params: userId=${userId}, itemType=${itemType}, reference=${reference}`);
+    }
+    
     const response = await fetchAPI(
       `/api/v1/constitution/user/${userId}/progress`,
       {
@@ -233,10 +246,15 @@ export async function updateReadingProgress({
         body: JSON.stringify({
           item_type: itemType,
           reference,
-          read_time_minutes: readTimeMinutes,
+          read_time_minutes: safeReadTimeMinutes,
+          is_incremental: true, // Flag to tell backend this is incremental time
         }),
       }
     );
+    
+    if (DEBUG_MODE && response?.body?.progress) {
+      console.log(`[READ TIME DEBUG] API response: total_read_time_minutes=${response.body.progress.total_read_time_minutes || 0}`);
+    }
     
     return response;
   } catch (error) {
