@@ -4,7 +4,7 @@ import { useReadingSession } from './useReadingSession';
 import { useReadingSync } from './useReadingSync';
 import { useReadingLocalStorage } from './useLocalStorage';
 
-const DEBUG_MODE = true;
+const DEBUG_MODE = process.env.NODE_ENV === 'development';
 
 export function useReadingProgress(
   userId: string | undefined,
@@ -18,22 +18,30 @@ export function useReadingProgress(
 
   const { saveProgress, getProgress } = useReadingLocalStorage();
   const sessionTracker = useReadingSession();
-  const { syncProgressWithAPI } = useReadingSync(userId, itemType, reference, handleProgressUpdate);
   const lastSaveTimeRef = useRef<number>(0);
   const isMountedRef = useRef<boolean>(true);
 
-  // Handle progress updates from sync
-  function handleProgressUpdate(progress: any) {
+  // Handle progress updates from sync - stabilized with useCallback
+  const handleProgressUpdate = useCallback((progress: any) => {
     if (!isMountedRef.current) return;
     
     const readTime = progress?.readTimeMinutes || 0;
     DEBUG_MODE && console.log(`[READ TIME DEBUG] Progress updated: ${readTime} minutes`);
     
-    setProgressData({
-      readTimeMinutes: readTime,
-      lastUpdated: new Date().toISOString()
+    setProgressData(prev => {
+      // Prevent unnecessary updates if the value hasn't changed
+      if (prev?.readTimeMinutes === readTime) {
+        return prev;
+      }
+      
+      return {
+        readTimeMinutes: readTime,
+        lastUpdated: new Date().toISOString()
+      };
     });
-  }
+  }, []);
+
+  const { syncProgressWithAPI } = useReadingSync(userId, itemType, reference, handleProgressUpdate);
 
   // Load progress on mount
   useEffect(() => {
@@ -71,7 +79,7 @@ export function useReadingProgress(
       // Pause the session when unmounting
       sessionTracker.pauseReading();
     };
-  }, [reference, getProgress, sessionTracker]);
+  }, [reference, getProgress, sessionTracker.updateActivity, sessionTracker.startReading, sessionTracker.pauseReading, handleProgressUpdate]);
 
   // Auto-save progress
   useEffect(() => {
@@ -100,7 +108,7 @@ export function useReadingProgress(
     }, 30000); // Save every 30 seconds
     
     return () => clearInterval(interval);
-  }, [sessionTracker.isReading, sessionTracker.readTimeMinutes, itemType, reference, saveProgress, userId, syncProgressWithAPI]);
+  }, [sessionTracker.isReading, itemType, reference, saveProgress, userId, syncProgressWithAPI]);
 
   // Save progress when it changes
   const saveProgressToStorage = useCallback((readTimeMinutes: number) => {

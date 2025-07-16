@@ -5,7 +5,7 @@ const LOCAL_STORAGE_KEY = 'katiba360_reading_progress';
 const PREVIOUS_CHAPTER_KEY = 'katiba360_previous_chapter';
 
 // Debug mode for logging
-const DEBUG_MODE = true;
+const DEBUG_MODE = process.env.NODE_ENV === 'development';
 
 export interface ReadingProgress {
   itemType: 'chapter' | 'article';
