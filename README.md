@@ -2,6 +2,8 @@
 
 **Making Kenya's constitution accessible to everyone through simple language and practical examples.**
 
+> 📡 **Related Repository:** [Katiba360° Backend API](https://github.com/elijahondiek/katiba360-backend) - The FastAPI backend powering this platform
+
 ## 🚀 Calling All Developers!
 
 We're actively seeking developers to help improve Katiba360° and make Kenya's constitution truly accessible to every citizen. Whether you **code**, **craft UX**, **translate**, or **test** – your talents can empower every Kenyan with constitutional knowledge!
@@ -183,6 +185,7 @@ katiba360-app/
 
 - **GitHub Issues:** [Report bugs or request features](https://github.com/elijahondiek/katiba360/issues)
 - **Discussions:** [Join community discussions](https://github.com/elijahondiek/katiba360/discussions)
+- **Backend Repository:** [Katiba360° Backend API](https://github.com/elijahondiek/katiba360-backend)
 - **Twitter:** [@WebShrewd](https://x.com/WebShrewd)
 - **Support the project:** [Buy me a coffee](https://buymeacoffee.com/Teksad)
 
