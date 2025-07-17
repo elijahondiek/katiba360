@@ -7,7 +7,7 @@ const API_DEBOUNCE_MS = 60000; // 60 seconds - increased to avoid rate limiting
 const SYNC_INTERVAL_MS = 600000; // 10 minutes - increased to avoid rate limiting
 const MAX_RETRY_COUNT = 3; // Maximum number of retry attempts
 const RETRY_DELAY_MS = 5000; // 5 seconds between retries
-const DEBUG_MODE = true; // Enable debug logging to troubleshoot read time issues
+const DEBUG_MODE = process.env.NODE_ENV === 'development'; // Enable debug logging only in development
 
 export function useReadingSync(
   userId: string | undefined,

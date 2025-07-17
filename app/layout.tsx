@@ -17,6 +17,7 @@ import { Analytics } from "@vercel/analytics/next"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://katiba360.com'),
   title: "Katiba360",
   description: "Kenya's Constitution at your fingertips",
   generator: 'WebShrewd',

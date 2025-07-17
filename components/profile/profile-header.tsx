@@ -7,63 +7,145 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { useAuth } from "@/contexts/AuthContext"
 import { format, parseISO } from "date-fns"
+import { getUserReadingProgress, getUserProfile, updateUserProfile } from "@/lib/api"
 
 export function ProfileHeader() {
   const { authState } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState("")
-  const [bio, setBio] = useState("Passionate about constitutional rights and civic education.")
+  const [bio, setBio] = useState("")
   const [joinDate, setJoinDate] = useState<string>("")
   const [totalContentRead, setTotalContentRead] = useState(0)
   const [totalReadingTime, setTotalReadingTime] = useState(0)
   const [achievementPoints, setAchievementPoints] = useState(0)
   const [userLevel, setUserLevel] = useState("Beginner")
+  const [loading, setLoading] = useState(true)
 
-  // Load user data from auth state
+  // Load user data from auth state and backend
   useEffect(() => {
-    if (authState.user) {
-      setName(authState.user.display_name || "User")
-      
-      // Format join date from created_at
-      if (authState.user.created_at) {
-        try {
-          const date = parseISO(authState.user.created_at)
-          setJoinDate(format(date, 'MMMM yyyy'))
-        } catch (error) {
-          console.error('Error parsing date:', error)
-          setJoinDate('Recent member')
-        }
+    async function loadUserData() {
+      if (!authState?.user?.id) {
+        setLoading(false)
+        return
       }
-    }
-    
-    // Load additional user stats from localStorage if available
-    try {
-      const userData = localStorage.getItem('user')
-      if (userData) {
-        const parsedData = JSON.parse(userData)
-        setTotalContentRead(parsedData.total_content_read || 0)
-        setTotalReadingTime(parsedData.total_reading_time_minutes || 0)
-        setAchievementPoints(parsedData.achievement_points || 0)
-        
-        // Determine user level based on achievement points
-        if (parsedData.achievement_points >= 100) {
-          setUserLevel("Expert Citizen")
-        } else if (parsedData.achievement_points >= 50) {
-          setUserLevel("Active Citizen")
-        } else if (parsedData.achievement_points >= 20) {
-          setUserLevel("Engaged Citizen")
-        } else {
-          setUserLevel("Beginner")
-        }
-      }
-    } catch (error) {
-      console.error('Error loading user data from localStorage:', error)
-    }
-  }, [authState.user])
 
-  const handleSave = () => {
-    setIsEditing(false)
-    // In a real app, save changes to the server
+      try {
+        // Set basic user info from auth state
+        setName(authState.user.display_name || "User")
+        
+        // Format join date from created_at
+        if (authState.user.created_at) {
+          try {
+            const date = parseISO(authState.user.created_at)
+            setJoinDate(format(date, 'MMMM yyyy'))
+          } catch (error) {
+            console.error('Error parsing date:', error)
+            setJoinDate('Recent member')
+          }
+        }
+
+        // Fetch user profile for bio and other details
+        try {
+          const profileResponse = await getUserProfile()
+          if (profileResponse?.body) {
+            setBio(profileResponse.body.bio || "Passionate about constitutional rights and civic education.")
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error)
+          setBio("Passionate about constitutional rights and civic education.")
+        }
+
+        // Fetch reading progress for stats
+        try {
+          const progressResponse = await getUserReadingProgress(authState.user.id)
+          if (progressResponse?.body?.progress) {
+            const progress = progressResponse.body.progress
+            
+            // Calculate total content read (chapters + articles)
+            const chaptersRead = progress.completed_chapters?.length || 0
+            const articlesRead = progress.completed_articles?.length || 0
+            setTotalContentRead(chaptersRead + articlesRead)
+            
+            // Convert reading time from minutes to display format
+            const totalMinutes = progress.total_read_time_minutes || 0
+            setTotalReadingTime(Math.round(totalMinutes))
+            
+            // Calculate achievement points (simple formula for now)
+            const points = (chaptersRead * 10) + (articlesRead * 5) + Math.floor(totalMinutes / 10)
+            setAchievementPoints(points)
+            
+            // Determine user level based on achievement points
+            if (points >= 100) {
+              setUserLevel("Expert Citizen")
+            } else if (points >= 50) {
+              setUserLevel("Active Citizen")
+            } else if (points >= 20) {
+              setUserLevel("Engaged Citizen")
+            } else {
+              setUserLevel("Beginner")
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching reading progress:', error)
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadUserData()
+  }, [authState?.user?.id])
+
+  const handleSave = async () => {
+    try {
+      // Save name and bio to backend
+      const response = await updateUserProfile({ 
+        display_name: name, 
+        bio: bio 
+      })
+      
+      console.log('Profile update response:', response)
+      
+      // Update auth state with new display name if successful
+      if (response?.body && authState.user) {
+        // Update the user in auth state
+        authState.user.display_name = name
+        // Also update localStorage if it exists
+        try {
+          const storedUser = localStorage.getItem('user')
+          if (storedUser) {
+            const userData = JSON.parse(storedUser)
+            userData.display_name = name
+            localStorage.setItem('user', JSON.stringify(userData))
+          }
+        } catch (e) {
+          console.error('Error updating localStorage:', e)
+        }
+      }
+      
+      setIsEditing(false)
+      console.log('Profile updated successfully')
+    } catch (error) {
+      console.error('Error saving profile:', error)
+      // You could show a toast notification here
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
+          <div className="h-24 w-24 rounded-full bg-gray-200 animate-pulse"></div>
+          <div className="flex-grow space-y-3">
+            <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-96 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -2,7 +2,18 @@
   "permissions": {
     "allow": [
       "Bash(taskkill:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git config:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(python test_reading_progress_float.py:*)",
+      "Bash(python:*)",
+      "Bash(venvScripts:*)",
+      "Bash(. venv/Scripts/activate)",
+      "Bash(pnpm add:*)",
+      "Bash(source:*)"
     ],
     "deny": []
   }

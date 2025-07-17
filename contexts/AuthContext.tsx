@@ -4,6 +4,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/lib/api';
 import Cookies from 'js-cookie'; // Added for setting cookies after login
+import { offlineAuthService } from '@/services/offline-auth.service';
+import { offlineContentService } from '@/services/offline-content.service';
 
 
 // Define user type based on the API response
@@ -28,6 +30,7 @@ interface AuthState {
   refreshToken: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isOfflineMode: boolean;
 }
 
 // Define auth context props
@@ -36,6 +39,7 @@ interface AuthContextProps {
   login: (code: string, redirectUri: string, state?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshAccessToken: () => Promise<void>;
+  syncOfflineAuth: () => Promise<void>;
 }
 
 // Create auth context
@@ -57,6 +61,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     refreshToken: null,
     isLoading: true,
     isAuthenticated: false,
+    isOfflineMode: false,
   });
   
   // Load auth state from local storage on mount
@@ -67,19 +72,55 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const storedAccessToken = localStorage.getItem('accessToken');
         const storedRefreshToken = localStorage.getItem('refreshToken');
         
+        // Check online authentication first
         if (storedUser && storedAccessToken) {
+          const user = JSON.parse(storedUser);
           setAuthState({
-            user: JSON.parse(storedUser),
+            user,
             accessToken: storedAccessToken,
             refreshToken: storedRefreshToken,
             isLoading: false,
             isAuthenticated: true,
+            isOfflineMode: false,
+          });
+          
+          // Store offline auth state for future offline use
+          offlineAuthService.storeOfflineAuth({
+            user,
+            accessToken: storedAccessToken,
+            refreshToken: storedRefreshToken,
           });
         } else {
-          setAuthState(prevState => ({
-            ...prevState,
-            isLoading: false,
-          }));
+          // Check offline authentication
+          const offlineAuth = offlineAuthService.getOfflineAuthState();
+          if (offlineAuth) {
+            setAuthState({
+              user: {
+                id: offlineAuth.user_id,
+                email: offlineAuth.email,
+                display_name: offlineAuth.display_name || '',
+                bio: offlineAuth.bio || '',
+                avatar_url: offlineAuth.avatar_url || '',
+                first_name: '',
+                last_name: '',
+                profile_image_url: offlineAuth.avatar_url || '',
+                auth_provider: 'offline',
+                is_active: true,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              },
+              accessToken: null,
+              refreshToken: null,
+              isLoading: false,
+              isAuthenticated: true,
+              isOfflineMode: true,
+            });
+          } else {
+            setAuthState(prevState => ({
+              ...prevState,
+              isLoading: false,
+            }));
+          }
         }
       } catch (error) {
         console.error('Error loading auth state:', error);
@@ -91,6 +132,55 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
     
     loadAuthState();
+  }, []);
+  
+  // Monitor online/offline status and token events
+  useEffect(() => {
+    const handleOnline = () => {
+      offlineAuthService.setOfflineMode(false);
+      syncOfflineAuth();
+    };
+    
+    const handleOffline = () => {
+      offlineAuthService.setOfflineMode(true);
+      setAuthState(prevState => ({
+        ...prevState,
+        isOfflineMode: true,
+      }));
+    };
+
+    const handleTokenRefreshed = (event: CustomEvent) => {
+      const { accessToken, refreshToken } = event.detail;
+      
+      // Update local storage
+      localStorage.setItem('accessToken', accessToken);
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
+      }
+      
+      // Update auth state
+      setAuthState(prevState => ({
+        ...prevState,
+        accessToken,
+        refreshToken: refreshToken || prevState.refreshToken,
+      }));
+    };
+
+    const handleAuthExpired = () => {
+      logout();
+    };
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('tokenRefreshed', handleTokenRefreshed as EventListener);
+    window.addEventListener('authExpired', handleAuthExpired);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('tokenRefreshed', handleTokenRefreshed as EventListener);
+      window.removeEventListener('authExpired', handleAuthExpired);
+    };
   }, []);
   
   // Create a ref to track login attempts outside the login function
@@ -153,6 +243,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
           refreshToken: refresh_token,
           isLoading: false,
           isAuthenticated: true,
+          isOfflineMode: false,
+        });
+        
+        // Store offline auth state for future offline use
+        offlineAuthService.storeOfflineAuth({
+          user,
+          accessToken: access_token,
+          refreshToken: refresh_token,
         });
         
         // Use a timeout to avoid state update conflicts
@@ -206,6 +304,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Remove accessToken cookie for middleware logout
       Cookies.remove('accessToken', { path: '/' });
       
+      // Clear offline auth and content
+      offlineAuthService.clearAllAuth();
+      offlineContentService.clearAllOfflineContent();
+      
       // Update auth state
       setAuthState({
         user: null,
@@ -213,6 +315,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         refreshToken: null,
         isLoading: false,
         isAuthenticated: false,
+        isOfflineMode: false,
       });
       
       // console.log('Local logout completed');
@@ -248,12 +351,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
           accessToken: access_token,
           refreshToken: refresh_token || prevState.refreshToken,
         }));
+        
+        // Update offline auth state
+        if (authState.user) {
+          offlineAuthService.storeOfflineAuth({
+            user: authState.user,
+            accessToken: access_token,
+            refreshToken: refresh_token || authState.refreshToken || '',
+          });
+        }
       }
     } catch (error) {
       console.error('Token refresh error:', error);
       
       // If refresh fails, log out the user
       await logout();
+    }
+  };
+  
+  // Sync offline auth with online state
+  const syncOfflineAuth = async () => {
+    if (!navigator.onLine) return;
+    
+    try {
+      await offlineAuthService.syncWithOnlineAuth();
+      
+      // Update auth state to reflect online mode
+      setAuthState(prevState => ({
+        ...prevState,
+        isOfflineMode: false,
+      }));
+      
+      // Clean up expired offline content
+      await offlineContentService.cleanupExpiredChapters();
+    } catch (error) {
+      console.error('Error syncing offline auth:', error);
     }
   };
   
@@ -264,6 +396,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         login,
         logout,
         refreshAccessToken,
+        syncOfflineAuth,
       }}
     >
       {children}

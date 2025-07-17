@@ -3,7 +3,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 // Constants
 const INACTIVITY_THRESHOLD_MS = 60000; // 1 minute
-const DEBUG_MODE = true;
+const DEBUG_MODE = process.env.NODE_ENV === 'development';
 
 interface ReadingSession {
   startTime: number;
@@ -81,9 +81,10 @@ export function useReadingSession() {
       };
     });
     
-    // Clear any existing interval
+    // Clear any existing interval to prevent memory leaks
     if (activityCheckIntervalRef.current) {
       clearInterval(activityCheckIntervalRef.current);
+      activityCheckIntervalRef.current = null;
     }
     
     // Set up activity check
@@ -91,6 +92,7 @@ export function useReadingSession() {
       if (!isMountedRef.current) {
         if (activityCheckIntervalRef.current) {
           clearInterval(activityCheckIntervalRef.current);
+          activityCheckIntervalRef.current = null;
         }
         return;
       }
@@ -142,7 +144,7 @@ export function useReadingSession() {
     readTimeRef.current = 0;
   }, []);
 
-  // Set up cleanup on unmount
+  // Set up cleanup on unmount - fix memory leak by removing dependencies
   useEffect(() => {
     isMountedRef.current = true;
     
@@ -150,18 +152,20 @@ export function useReadingSession() {
       isMountedRef.current = false;
       
       // Save final time before unmounting
-      if (session.isActive) {
+      const currentSession = session;
+      if (currentSession.isActive) {
         const now = Date.now();
-        const sessionTime = now - session.startTime;
-        readTimeRef.current = Math.round((session.totalTimeMs + sessionTime) / 60000 * 100) / 100;
+        const sessionTime = now - currentSession.startTime;
+        readTimeRef.current = Math.round((currentSession.totalTimeMs + sessionTime) / 60000 * 100) / 100;
       }
       
       // Clear interval
       if (activityCheckIntervalRef.current) {
         clearInterval(activityCheckIntervalRef.current);
+        activityCheckIntervalRef.current = null;
       }
     };
-  }, [session.isActive, session.startTime, session.totalTimeMs]);
+  }, []); // Empty dependency array - only run on mount/unmount
 
   // Calculate read time on each render
   const currentReadTime = calculateReadTimeMinutes();

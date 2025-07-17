@@ -2,6 +2,8 @@
 
 import { useRef, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAuth } from "@/contexts/AuthContext";
+import { ArticleHeader } from "@/components/chapters/article-header";
 
 interface SubClause {
   sub_clause_id: string;
@@ -24,10 +26,22 @@ interface Article {
 interface ArticleContentProps {
   articles: Article[];
   processContent: (content: string) => string;
+  chapterNumber?: number;
+  bookmarkedArticles?: Set<string>;
+  loadingArticles?: Set<string>;
+  onToggleBookmark?: (articleNumber: number, articleTitle: string) => void;
 }
 
-export function ArticleContent({ articles, processContent }: ArticleContentProps) {
+export function ArticleContent({ 
+  articles, 
+  processContent, 
+  chapterNumber,
+  bookmarkedArticles = new Set(),
+  loadingArticles = new Set(),
+  onToggleBookmark
+}: ArticleContentProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const { authState } = useAuth();
 
   // Key terms tooltip effect
   useEffect(() => {
@@ -82,10 +96,15 @@ export function ArticleContent({ articles, processContent }: ArticleContentProps
           {articles.map((article) => {
             return (
               <div key={article.article_number} id={`article-${article.article_number}`} className="mb-12 article-section">
-                {/* Display the article title as a heading */}
-                <h2 className="text-2xl font-bold text-[#0A7B24] mb-4">
-                  Article {article.article_number}: {article.article_title}
-                </h2>
+                {/* Article header with improved UX */}
+                <ArticleHeader
+                  articleNumber={article.article_number}
+                  articleTitle={article.article_title}
+                  chapterNumber={chapterNumber!}
+                  isBookmarked={bookmarkedArticles.has(`${chapterNumber}.${article.article_number}`)}
+                  onBookmarkToggle={() => onToggleBookmark?.(article.article_number, article.article_title)}
+                  isBookmarkLoading={loadingArticles.has(`${chapterNumber}.${article.article_number}`)}
+                />
                 
                 {/* If there's content directly on the article, display it */}
                 {article.content && (
