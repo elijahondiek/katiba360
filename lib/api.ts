@@ -4,9 +4,9 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Log API URL in production for debugging (remove after fixing)
-if (typeof window !== 'undefined' && !API_BASE_URL) {
-  console.error('NEXT_PUBLIC_API_URL is not defined');
+// Log API URL for debugging
+if (typeof window !== 'undefined') {
+  console.log('API_BASE_URL:', API_BASE_URL);
 }
 
 /**
