@@ -45,6 +45,12 @@ class OfflineAuthService {
    * Store authentication state for offline use
    */
   storeOfflineAuth(onlineAuthState: OnlineAuthState): void {
+    // Validate that user data exists
+    if (!onlineAuthState?.user?.id || !onlineAuthState?.user?.email) {
+      console.warn('Cannot store offline auth state: Invalid user data', onlineAuthState);
+      return;
+    }
+
     const offlineAuthState: OfflineAuthState = {
       user_id: onlineAuthState.user.id,
       email: onlineAuthState.user.email,

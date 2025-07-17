@@ -270,11 +270,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
         });
         
         // Store offline auth state for future offline use
-        offlineAuthService.storeOfflineAuth({
-          user,
-          accessToken: access_token,
-          refreshToken: refresh_token,
-        });
+        try {
+          offlineAuthService.storeOfflineAuth({
+            user,
+            accessToken: access_token,
+            refreshToken: refresh_token,
+          });
+        } catch (offlineError) {
+          // Log error but don't fail the login process
+          console.error('Failed to store offline auth state:', offlineError);
+        }
         
         // Use a timeout to avoid state update conflicts
         setTimeout(() => {
