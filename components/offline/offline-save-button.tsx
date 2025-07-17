@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Download, Check, Loader2, Trash2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
+import { ToastService } from "@/services/toast.service"
 import { useAuth } from "@/contexts/AuthContext"
 import { offlineContentService } from "@/services/offline-content.service"
 import { cn } from "@/lib/utils"
@@ -32,7 +32,6 @@ export function OfflineSaveButton({
   onRemoveSuccess,
 }: OfflineSaveButtonProps) {
   const { authState } = useAuth()
-  const { toast } = useToast()
   const [isOfflineAvailable, setIsOfflineAvailable] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingStatus, setIsCheckingStatus] = useState(true)
@@ -68,13 +67,12 @@ export function OfflineSaveButton({
     }
   }
 
-  const handleSaveOffline = async () => {
+  const handleSaveOffline = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
     if (!authState?.user?.id) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to save content offline",
-        variant: "destructive"
-      })
+      ToastService.authRequired("Please log in to save content offline")
       return
     }
 
@@ -84,38 +82,29 @@ export function OfflineSaveButton({
         const chapterNumber = parseInt(contentId)
         await offlineContentService.downloadChapter(chapterNumber)
         
-        toast({
-          title: "Content Saved",
-          description: `${contentTitle} is now available offline`,
-          variant: "default"
-        })
+        ToastService.offlineContentSaved(contentTitle)
       } else {
         // For articles, save the entire chapter
         const chapterNumber = parseInt(contentId.split('.')[0])
         await offlineContentService.downloadChapter(chapterNumber)
         
-        toast({
-          title: "Chapter Saved",
-          description: `Chapter ${chapterNumber} (including this article) is now available offline`,
-          variant: "default"
-        })
+        ToastService.offlineContentSaved(`Chapter ${chapterNumber} (including this article)`)
       }
       
       setIsOfflineAvailable(true)
       onSaveSuccess?.()
     } catch (error) {
       console.error('Error saving offline:', error)
-      toast({
-        title: "Save Failed",
-        description: "Failed to save content for offline access",
-        variant: "destructive"
-      })
+      ToastService.offlineContentError("save")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleRemoveOffline = async () => {
+  const handleRemoveOffline = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
     if (!authState?.user?.id) return
 
     setIsLoading(true)
@@ -126,21 +115,13 @@ export function OfflineSaveButton({
       
       await offlineContentService.removeOfflineChapter(chapterNumber)
       
-      toast({
-        title: "Content Removed",
-        description: `${contentTitle} removed from offline storage`,
-        variant: "default"
-      })
+      ToastService.offlineContentRemoved(contentTitle)
       
       setIsOfflineAvailable(false)
       onRemoveSuccess?.()
     } catch (error) {
       console.error('Error removing offline:', error)
-      toast({
-        title: "Remove Failed",
-        description: "Failed to remove content from offline storage",
-        variant: "destructive"
-      })
+      ToastService.offlineContentError("remove")
     } finally {
       setIsLoading(false)
     }

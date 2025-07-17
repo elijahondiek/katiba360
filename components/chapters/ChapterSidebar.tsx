@@ -95,6 +95,8 @@ export function ChapterSidebar({
             }
           />
 
+          {/* Simplified Text toggle - hidden pending implementation */}
+          {/* 
           <div className="flex items-center justify-between px-2 py-1">
             <span className="text-sm text-[#4B5563]">Simplified Text</span>
             <button
@@ -108,6 +110,7 @@ export function ChapterSidebar({
               />
             </button>
           </div>
+          */}
         </div>
       </div>
     </div>

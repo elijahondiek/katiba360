@@ -171,9 +171,8 @@ export default function ChaptersPage() {
     try {
       if (!isCurrentlyBookmarked) {
         // Add bookmark
-        await saveBookmark({
-          userId: authState.user.id,
-          bookmark_type: "chapter",
+        await saveBookmark(authState.user.id, {
+          type: "chapter",
           reference: chapterNumberStr,
           title: chapterTitle,
         });
@@ -319,6 +318,7 @@ export default function ChaptersPage() {
                 <button
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     handleToggleBookmark(
                       chapter.chapter_number,
                       chapter.chapter_title

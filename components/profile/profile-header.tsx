@@ -18,8 +18,19 @@ export function ProfileHeader() {
   const [totalContentRead, setTotalContentRead] = useState(0)
   const [totalReadingTime, setTotalReadingTime] = useState(0)
   const [achievementPoints, setAchievementPoints] = useState(0)
-  const [userLevel, setUserLevel] = useState("Beginner")
+  const [userLevel, setUserLevel] = useState("Mwananchi")
   const [loading, setLoading] = useState(true)
+
+  // Helper function to get user level and level number
+  const getUserLevelInfo = (points: number) => {
+    if (points >= 500) return { level: 7, name: "Mfalme wa Kiraia", translation: "Civic Champion" }
+    if (points >= 300) return { level: 6, name: "Mzalendo", translation: "Patriot" }
+    if (points >= 200) return { level: 5, name: "Mwongozi", translation: "Leader" }
+    if (points >= 100) return { level: 4, name: "Mzungumzaji", translation: "Spokesperson" }
+    if (points >= 50) return { level: 3, name: "Mshirikiano", translation: "Collaborator" }
+    if (points >= 20) return { level: 2, name: "Mjuzi", translation: "Knowledgeable" }
+    return { level: 1, name: "Mwananchi", translation: "Citizen" }
+  }
 
   // Load user data from auth state and backend
   useEffect(() => {
@@ -74,16 +85,9 @@ export function ProfileHeader() {
             const points = (chaptersRead * 10) + (articlesRead * 5) + Math.floor(totalMinutes / 10)
             setAchievementPoints(points)
             
-            // Determine user level based on achievement points
-            if (points >= 100) {
-              setUserLevel("Expert Citizen")
-            } else if (points >= 50) {
-              setUserLevel("Active Citizen")
-            } else if (points >= 20) {
-              setUserLevel("Engaged Citizen")
-            } else {
-              setUserLevel("Beginner")
-            }
+            // Determine user level based on achievement points - Kenyan-themed ranking system
+            const levelInfo = getUserLevelInfo(points)
+            setUserLevel(levelInfo.name)
           }
         } catch (error) {
           console.error('Error fetching reading progress:', error)
@@ -214,8 +218,11 @@ export function ProfileHeader() {
                   <span>Member since {joinDate}</span>
                 </div>
                 <div className="flex items-center text-sm text-[#6B7280]">
-                  <span className="bg-[#1EB53A]/10 text-[#0A7B24] px-2 py-0.5 rounded-full text-xs font-medium">
-                    Level {achievementPoints >= 100 ? '4' : achievementPoints >= 50 ? '3' : achievementPoints >= 20 ? '2' : '1'}: {userLevel}
+                  <span 
+                    className="bg-[#1EB53A]/10 text-[#0A7B24] px-2 py-0.5 rounded-full text-xs font-medium cursor-help"
+                    title={`${getUserLevelInfo(achievementPoints).translation} - ${achievementPoints} Mzalendo Points`}
+                  >
+                    Level {getUserLevelInfo(achievementPoints).level}: {userLevel}
                   </span>
                 </div>
               </div>
@@ -247,7 +254,7 @@ export function ProfileHeader() {
                     <CheckCircle2 className="h-4 w-4 text-[#0A7B24]" />
                   </div>
                   <div>
-                    <p className="text-xs text-[#6B7280]">Achievement Points</p>
+                    <p className="text-xs text-[#6B7280]">Mzalendo Points</p>
                     <p className="font-medium text-[#374151]">{achievementPoints} points</p>
                   </div>
                 </div>

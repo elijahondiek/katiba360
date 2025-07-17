@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { saveBookmark, getUserBookmarks, removeBookmark } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
+import { ToastService } from "@/services/toast.service";
 
 interface User {
   id: string;
@@ -27,7 +27,6 @@ export function useBookmark(
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [bookmarkId, setBookmarkId] = useState<string | null>(null);
-  const { toast } = useToast();
 
   // Fetch bookmarks function that can be called multiple times
   const fetchBookmarks = useCallback(async () => {
@@ -83,11 +82,7 @@ export function useBookmark(
   // Toggle bookmark function
   const toggleBookmark = async () => {
     if (!userId) {
-      toast({
-        title: "Authentication Required",
-        description: "You must be logged in to save bookmarks.",
-        variant: "destructive",
-      });
+      ToastService.authRequired("You must be logged in to save bookmarks.");
       return;
     }
     
@@ -99,18 +94,13 @@ export function useBookmark(
     try {
       if (!isBookmarked) {
         // Add bookmark
-        await saveBookmark({
-          userId,
-          bookmark_type: 'chapter',
+        await saveBookmark(userId, {
+          type: 'chapter',
           reference: chapterNumberStr,
           title: chapterTitle,
         });
         
-        toast({
-          title: "Success",
-          description: "Bookmark saved successfully!",
-          variant: "success",
-        });
+        ToastService.bookmarkSaved(chapterTitle);
       } else {
         // Remove bookmark using the bookmark ID
         if (typeof removeBookmark === 'function' && bookmarkId) {
@@ -118,27 +108,14 @@ export function useBookmark(
           try {
             await removeBookmark(userId, bookmarkId);
             
-            // Use info variant for bookmark removal
-            toast({
-              title: "Bookmark Removed",
-              description: `${chapterTitle} removed from bookmarks`,
-              variant: "info",
-            });
+            ToastService.bookmarkRemoved(chapterTitle);
           } catch (error) {
             console.error('Error removing bookmark:', error);
-            toast({
-              title: "Error",
-              description: "Could not remove bookmark",
-              variant: "destructive",
-            });
+            ToastService.bookmarkError("remove");
           }
         } else {
           console.error(`Cannot remove bookmark: missing bookmark ID (${bookmarkId}) or removeBookmark function`);
-          toast({
-            title: "Error",
-            description: "Could not remove bookmark",
-            variant: "destructive",
-          });
+          ToastService.bookmarkError("remove");
         }
       }
       
@@ -146,11 +123,7 @@ export function useBookmark(
       await fetchBookmarks();
       
     } catch (e) {
-      toast({
-        title: "Error",
-        description: "Failed to update bookmark.",
-        variant: "destructive",
-      });
+      ToastService.error("Failed to update bookmark.");
       console.error(e);
     } finally {
       setIsLoading(false);

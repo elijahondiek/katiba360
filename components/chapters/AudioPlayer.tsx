@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useRef, memo, useEffect } from "react";
-import { Play, Pause, Volume2 } from "lucide-react";
+import { Play, Pause, Volume2, ChevronDown, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AudioPlayerProps {
@@ -11,10 +11,15 @@ interface AudioPlayerProps {
   currentTime: number;
   audioSpeed: number;
   volume: number;
+  availableVoices: SpeechSynthesisVoice[];
+  selectedVoice: SpeechSynthesisVoice | null;
   onTogglePlay: () => void;
   onProgressChange: (value: number[]) => void;
   onSpeedChange: (value: number) => void;
   onVolumeChange: (value: number[]) => void;
+  onVoiceChange: (voice: SpeechSynthesisVoice) => void;
+  getVoiceLabel: (voice: SpeechSynthesisVoice) => string;
+  getVoiceDetail: (voice: SpeechSynthesisVoice) => string;
   formatTime: (seconds: number) => string;
 }
 
@@ -85,15 +90,22 @@ const AudioPlayerComponent = ({
   currentTime,
   audioSpeed,
   volume,
+  availableVoices,
+  selectedVoice,
   onTogglePlay,
   onProgressChange,
   onSpeedChange,
   onVolumeChange,
+  onVoiceChange,
+  getVoiceLabel,
+  getVoiceDetail,
   formatTime,
 }: AudioPlayerProps) => {
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [showVoiceMenu, setShowVoiceMenu] = useState(false);
   const prevProgressRef = useRef(audioProgress);
   const prevVolumeRef = useRef(volume);
+  const voiceMenuRef = useRef<HTMLDivElement>(null);
 
   // Using callbackRef pattern for stable callbacks
   const progressChangeCallbackRef = useRef(onProgressChange);
@@ -125,6 +137,18 @@ const AudioPlayerComponent = ({
     if (Math.abs(value / 100 - prevVolumeRef.current) > 0.01) {
       volumeChangeCallbackRef.current([value / 100]);
     }
+  }, []);
+
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (voiceMenuRef.current && !voiceMenuRef.current.contains(event.target as Node)) {
+        setShowVoiceMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
@@ -166,6 +190,47 @@ const AudioPlayerComponent = ({
                 onChange={handleVolumeChange}
                 className="cursor-pointer"
               />
+            </div>
+          )}
+        </div>
+
+        {/* Voice Selector */}
+        <div className="relative" ref={voiceMenuRef}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2 text-xs text-[#4B5563] hover:bg-[#F3F4F6] flex items-center gap-1"
+            onClick={() => setShowVoiceMenu(!showVoiceMenu)}
+          >
+            <Mic className="h-3 w-3" />
+            <span className="hidden sm:inline max-w-[60px] truncate">
+              {selectedVoice ? getVoiceLabel(selectedVoice) : 'Voice'}
+            </span>
+            <ChevronDown className="h-3 w-3" />
+          </Button>
+
+          {showVoiceMenu && (
+            <div className="absolute right-0 bottom-full mb-2 bg-white border border-[#E5E7EB] rounded-lg shadow-lg z-50 min-w-[200px] max-h-[300px] overflow-y-auto">
+              <div className="p-2">
+                <div className="text-xs font-medium text-[#374151] mb-2 px-2">Select Voice</div>
+                {availableVoices
+                  .filter(voice => voice.lang.startsWith('en'))
+                  .map((voice) => (
+                    <button
+                      key={voice.name}
+                      onClick={() => {
+                        onVoiceChange(voice);
+                        setShowVoiceMenu(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-[#F3F4F6] transition-colors ${
+                        selectedVoice?.name === voice.name ? 'bg-[#1EB53A]/10 text-[#1EB53A]' : 'text-[#4B5563]'
+                      }`}
+                    >
+                      <div className="font-medium">{getVoiceLabel(voice)}</div>
+                      <div className="text-xs text-[#6B7280]">{getVoiceDetail(voice)}</div>
+                    </button>
+                  ))}
+              </div>
             </div>
           )}
         </div>

@@ -170,7 +170,7 @@ export function ArticleHeader({
             </DropdownMenuTrigger>
             
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={handleOfflineToggle} disabled={isOfflineLoading}>
+              <DropdownMenuItem onClick={handleOfflineToggle} disabled={isOfflineLoading} className="cursor-pointer">
                 {isOfflineAvailable ? (
                   <>
                     <CheckCircle2 className="h-4 w-4 mr-2 text-[#1EB53A]" />
@@ -184,12 +184,12 @@ export function ArticleHeader({
                 )}
               </DropdownMenuItem>
               
-              <DropdownMenuItem onClick={handleShare}>
+              <DropdownMenuItem onClick={handleShare} className="cursor-pointer">
                 <Share2 className="h-4 w-4 mr-2" />
                 Share Article
               </DropdownMenuItem>
               
-              <DropdownMenuItem onClick={handleCopyLink}>
+              <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
                 <Copy className="h-4 w-4 mr-2" />
                 Copy Link
               </DropdownMenuItem>

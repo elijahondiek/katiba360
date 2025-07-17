@@ -50,7 +50,8 @@ export default function AuthCallbackPage() {
         // The login function will handle the redirect
       } catch (error) {
         console.error("Error processing authentication:", error)
-        setError("Authentication failed. Please try again.")
+        const errorMessage = error instanceof Error ? error.message : "Authentication failed. Please try again."
+        setError(errorMessage)
         setIsProcessing(false)
       }
     }

@@ -207,17 +207,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }));
       }
       
-      // console.log('Exchanging code for tokens...');
-      const response = await fetchAPI('/api/v1/auth/google', {
-        method: 'POST',
-        body: JSON.stringify({
-          code,
-          redirect_uri: redirectUri,
-          state,
-        }),
-      });
+      // Exchange code for tokens
       
-      // console.log('Response received:', response);
+      // Add a timeout to the fetch request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
+      const response = await (async () => {
+        try {
+          const response = await fetchAPI('/api/v1/auth/google', {
+            method: 'POST',
+            body: JSON.stringify({
+              code,
+              redirect_uri: redirectUri,
+              state,
+            }),
+            signal: controller.signal,
+          });
+          
+          clearTimeout(timeoutId);
+          
+          if (!response || !response.body) {
+            throw new Error('Invalid response from authentication server');
+          }
+          
+          return response;
+        } catch (error) {
+          clearTimeout(timeoutId);
+          if (error instanceof Error && error.name === 'AbortError') {
+            throw new Error('Authentication request timed out. Please try again.');
+          }
+          throw error;
+        }
+      })();
       
       if (response.body) {
         const { access_token, refresh_token, user } = response.body;
@@ -260,6 +282,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (error) {
       console.error('Login error:', error);
+      
       setAuthState(prevState => ({
         ...prevState,
         isLoading: false,

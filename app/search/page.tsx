@@ -173,7 +173,7 @@ export default function SearchPage() {
         <div className="container mx-auto px-4">
           {/* Page Title */}
           <h1 className="text-2xl font-bold text-[#0A7B24] mb-6">
-            {query ? `Search Results for "${query}"` : "Search the Constitution"}
+            {searchQuery ? `Search Results for "${searchQuery}"` : "Search the Constitution"}
           </h1>
 
           {/* Search Bar */}
@@ -288,7 +288,7 @@ export default function SearchPage() {
               {/* Results Count */}
               {!isLoading && !error && results.length > 0 && (
                 <div className="mb-4 text-[#6B7280]">
-                  Found {totalResults} results for "{query}"
+                  Found {totalResults} results for "{searchQuery}"
                 </div>
               )}
 
@@ -354,14 +354,14 @@ export default function SearchPage() {
               )}
 
               {/* No Results State */}
-              {!isLoading && results.length === 0 && query && (
+              {!isLoading && results.length === 0 && searchQuery && (
                 <div className="text-center py-12 border border-[#E5E7EB] rounded-xl bg-white">
                   <div className="bg-[#F3F4F6] rounded-full p-4 inline-flex mb-4">
                     <Search className="h-8 w-8 text-[#6B7280]" />
                   </div>
                   <h2 className="text-xl font-bold text-[#374151] mb-2">No results found</h2>
                   <p className="text-[#6B7280] mb-6">
-                    We couldn't find any matches for "{query}". Try adjusting your search terms.
+                    We couldn't find any matches for "{searchQuery}". Try adjusting your search terms.
                   </p>
                   <Button
                     variant="outline"
@@ -373,26 +373,71 @@ export default function SearchPage() {
                 </div>
               )}
 
-              {/* Similar Questions Section */}
-              {!isLoading && query && (
-                <div className="mt-12">
-                  <h2 className="text-xl font-bold text-[#0A7B24] mb-4">Similar Questions</h2>
-                  <div className="overflow-x-auto pb-4">
-                    <div className="flex flex-wrap gap-4 sm:flex-nowrap sm:space-x-4">
-                      {similarQuestions.map((question, index) => (
-                        <div
-                          key={index}
-                          className="border border-[#E5E7EB] rounded-lg p-4 hover:border-[#1EB53A] hover:shadow-sm transition-all cursor-pointer w-full sm:w-auto bg-white"
-                          style={{ minWidth: "260px" }}
+              {/* Empty State - Before Search */}
+              {!isLoading && !searchQuery && (
+                <div className="text-center py-16 border border-[#E5E7EB] rounded-xl bg-white">
+                  <div className="bg-[#F0FFF4] rounded-full p-6 inline-flex mb-6">
+                    <Search className="h-12 w-12 text-[#1EB53A]" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-[#0A7B24] mb-3">Search the Constitution</h2>
+                  <p className="text-[#6B7280] mb-8 max-w-md mx-auto">
+                    Find specific articles, rights, chapters, or ask questions about the Kenyan Constitution.
+                  </p>
+                  
+                  {/* Quick Search Suggestions */}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-medium text-[#374151] mb-4">Popular Searches</h3>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {["Bill of Rights", "Land ownership", "President powers", "Counties", "Citizenship"].map((term) => (
+                        <button
+                          key={term}
                           onClick={() => {
-                            setSearchQuery(question)
-                            router.push(`/search?q=${encodeURIComponent(question)}`)
+                            setSearchQuery(term)
+                            router.push(`/search?q=${encodeURIComponent(term)}`)
                           }}
+                          className="px-3 py-1.5 bg-[#F0FFF4] text-[#0A7B24] rounded-full border border-[#1EB53A]/30 hover:bg-[#E6FFEC] transition-colors text-sm"
                         >
-                          <p className="text-[#374151] font-medium">{question}</p>
-                        </div>
+                          {term}
+                        </button>
                       ))}
                     </div>
+                  </div>
+                  
+                  <div className="flex justify-center gap-4">
+                    <Button
+                      variant="outline"
+                      className="border-[#1EB53A] text-[#1EB53A] hover:bg-[#1EB53A]/10"
+                      onClick={() => router.push("/chapters")}
+                    >
+                      Browse Chapters
+                    </Button>
+                    <Button
+                      className="bg-[#1EB53A] hover:bg-[#0A7B24] text-white"
+                      onClick={() => router.push("/ask")}
+                    >
+                      Ask a Question
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Similar Questions Section */}
+              {!isLoading && searchQuery && (
+                <div className="mt-12">
+                  <h2 className="text-xl font-bold text-[#0A7B24] mb-4">Similar Questions</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {similarQuestions.map((question, index) => (
+                      <div
+                        key={index}
+                        className="border border-[#E5E7EB] rounded-lg p-4 hover:border-[#1EB53A] hover:shadow-sm transition-all cursor-pointer bg-white"
+                        onClick={() => {
+                          setSearchQuery(question)
+                          router.push(`/search?q=${encodeURIComponent(question)}`)
+                        }}
+                      >
+                        <p className="text-[#374151] font-medium">{question}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

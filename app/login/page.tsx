@@ -29,6 +29,8 @@ export default function LoginPage() {
       setErrorMessage("Authentication failed. Please try again.");
     } else if (error === "server_error") {
       setErrorMessage("A server error occurred. Please try again later.");
+    } else if (error === "network_error") {
+      setErrorMessage("Network error occurred. Please check your connection and try again.");
     }
   }, [searchParams]);
 
@@ -46,11 +48,26 @@ export default function LoginPage() {
   const handleGoogleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (isConnecting) return;
     setIsConnecting(true);
+    
     // Construct the Google OAuth URL
-    const googleAuthUrl = process.env.NEXT_PUBLIC_API_URL
-      && `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`
-    // Redirect to the Google OAuth URL
-    window.location.href = googleAuthUrl;
+    const googleAuthUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`;
+    
+    // Redirect to Google OAuth
+    
+    // Add a small delay to ensure UI updates, then redirect
+    setTimeout(() => {
+      try {
+        window.location.href = googleAuthUrl;
+      } catch (error) {
+        console.error('Redirect error:', error);
+        // Fallback: try using window.open
+        const popup = window.open(googleAuthUrl, '_self');
+        if (!popup) {
+          setErrorMessage('Please allow popups for this site and try again.');
+          setIsConnecting(false);
+        }
+      }
+    }, 100);
   };
 
   return (
