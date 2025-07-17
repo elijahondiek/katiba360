@@ -4,10 +4,6 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Log API URL for debugging
-if (typeof window !== 'undefined') {
-  console.log('API_BASE_URL:', API_BASE_URL);
-}
 
 /**
  * Make a request to the backend API
