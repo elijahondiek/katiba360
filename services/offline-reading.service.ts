@@ -31,7 +31,22 @@ class OfflineReadingService {
   private readonly CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
   private memoryCache = new Map<string, ReadingContent>()
   
-  private constructor() {}
+  private constructor() {
+    // Periodically purge expired entries
+    setInterval(() => this.purgeExpiredEntries(), this.CACHE_DURATION);
+  }
+
+  /**
+   * Purge expired entries from the memory cache
+   */
+  private purgeExpiredEntries(): void {
+    const now = Date.now();
+    for (const [key, value] of this.memoryCache.entries()) {
+      if (now - value.timestamp > this.CACHE_DURATION) {
+        this.memoryCache.delete(key);
+      }
+    }
+  }
   
   static getInstance(): OfflineReadingService {
     if (!OfflineReadingService.instance) {
