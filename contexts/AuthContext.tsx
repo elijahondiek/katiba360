@@ -195,11 +195,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   
   // Login with Google OAuth
   const login = async (code: string, redirectUri: string, state?: string) => {
+    console.log('Login called with:', { code: code.substring(0, 5) + '...', redirectUri, state });
+    
     // Prevent multiple calls with the same parameters
     const loginKey = `${code}-${redirectUri}-${state || ''}`;
     
     if (lastLoginKeyRef.current === loginKey) {
-      // console.log('Preventing duplicate login attempt');
+      console.log('Preventing duplicate login attempt');
       return;
     }
     
@@ -222,6 +224,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       const response = await (async () => {
         try {
+          console.log('Making API call to /api/v1/auth/google...');
           const data = await fetchAPI('/api/v1/auth/google', {
             method: 'POST',
             body: JSON.stringify({
@@ -233,6 +236,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           });
           
           clearTimeout(timeoutId);
+          console.log('API response received:', data);
           
           if (!data) {
             throw new Error('Invalid response from authentication server');
@@ -251,6 +255,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       if (response?.body) {
         const { access_token, refresh_token, user } = response.body;
+        console.log('Tokens extracted:', { access_token: access_token ? 'Present' : 'Missing', refresh_token: refresh_token ? 'Present' : 'Missing', user: user ? 'Present' : 'Missing' });
         
         // Save auth state to local storage
         localStorage.setItem('user', JSON.stringify(user));
@@ -302,6 +307,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
               // If state is not base64 encoded JSON, ignore it
             }
           }
+          console.log('Redirecting to:', redirectPath);
           router.push(redirectPath);
         }, 100);
       }
