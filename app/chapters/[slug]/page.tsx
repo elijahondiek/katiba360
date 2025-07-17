@@ -1,6 +1,8 @@
 "use client"
 
 import React, { useRef, useState, useEffect, useCallback } from "react"
+import { getUserBookmarks, saveBookmark, removeBookmark } from "@/lib/api"
+import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/contexts/language-context"
 import { useAuth } from '@/contexts/AuthContext'
@@ -14,6 +16,7 @@ import { ArticleContent } from "@/components/chapters/ArticleContent"
 import { AudioPlayer } from "@/components/chapters/AudioPlayer"
 import { RelatedArticles } from "@/components/chapters/RelatedArticles"
 import { ScrollToTopButton } from "@/components/chapters/ScrollToTopButton"
+import { FloatingOfflineMenu } from "@/components/chapters/floating-offline-menu"
 
 // Import custom hooks
 import { useChapter } from "@/hooks/chapters/useChapter"
@@ -89,6 +92,99 @@ export default function ChapterDetailPage() {
     chapterNumber, 
     chapter?.chapter_title ?? ''
   )
+  
+  // State for article bookmarks
+  const [articleBookmarks, setArticleBookmarks] = useState<Set<string>>(new Set())
+  const [loadingArticleBookmarks, setLoadingArticleBookmarks] = useState<Set<string>>(new Set())
+  
+  // Load all bookmarks once for the chapter
+  useEffect(() => {
+    const loadBookmarks = async () => {
+      if (!authState.user?.id || !chapterNumber) return
+      
+      try {
+        const response = await getUserBookmarks(authState.user.id)
+        if (response?.body?.bookmarks) {
+          const articleBookmarkRefs = response.body.bookmarks
+            .filter((bookmark: any) => 
+              bookmark.type === 'article' && 
+              bookmark.reference.startsWith(`${chapterNumber}.`)
+            )
+            .map((bookmark: any) => bookmark.reference)
+          setArticleBookmarks(new Set(articleBookmarkRefs))
+        }
+      } catch (error) {
+        console.error('Error loading bookmarks:', error)
+      }
+    }
+    
+    loadBookmarks()
+  }, [authState.user?.id, chapterNumber])
+  
+  // Add toast hook
+  const { toast } = useToast()
+  
+  // Handle article bookmark toggle
+  const toggleArticleBookmark = useCallback(async (articleNumber: number, articleTitle: string) => {
+    if (!authState.user?.id || !chapterNumber) return
+    
+    const articleRef = `${chapterNumber}.${articleNumber}`
+    const isCurrentlyBookmarked = articleBookmarks.has(articleRef)
+    
+    setLoadingArticleBookmarks(prev => new Set(prev).add(articleRef))
+    
+    try {
+      if (isCurrentlyBookmarked) {
+        // Find and remove bookmark
+        const response = await getUserBookmarks(authState.user.id)
+        if (response?.body?.bookmarks) {
+          const bookmark = response.body.bookmarks.find(
+            (b: any) => b.type === 'article' && b.reference === articleRef
+          )
+          if (bookmark) {
+            await removeBookmark(authState.user.id, bookmark.bookmark_id)
+            setArticleBookmarks(prev => {
+              const newSet = new Set(prev)
+              newSet.delete(articleRef)
+              return newSet
+            })
+            toast({
+              title: "Bookmark Removed",
+              description: `Article ${articleNumber} removed from bookmarks`,
+              variant: "default",
+            })
+          }
+        }
+      } else {
+        // Add bookmark
+        await saveBookmark({
+          userId: authState.user.id,
+          bookmark_type: 'article',
+          reference: articleRef,
+          title: articleTitle,
+        })
+        setArticleBookmarks(prev => new Set(prev).add(articleRef))
+        toast({
+          title: "Success",
+          description: `Article ${articleNumber} bookmarked successfully!`,
+          variant: "success",
+        })
+      }
+    } catch (error) {
+      console.error('Error toggling article bookmark:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update bookmark.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoadingArticleBookmarks(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(articleRef)
+        return newSet
+      })
+    }
+  }, [authState.user?.id, chapterNumber, articleBookmarks, toast])
   
   // Handle audio synthesis
   // Navigation for chapters
@@ -319,6 +415,10 @@ export default function ChapterDetailPage() {
                   <ArticleContent 
                     articles={[article]}
                     processContent={processContent}
+                    chapterNumber={chapterNumber}
+                    bookmarkedArticles={articleBookmarks}
+                    loadingArticles={loadingArticleBookmarks}
+                    onToggleBookmark={toggleArticleBookmark}
                   />
                 </div>
               ))}
@@ -330,6 +430,10 @@ export default function ChapterDetailPage() {
                   <ArticleContent 
                     articles={[article]}
                     processContent={processContent}
+                    chapterNumber={chapterNumber}
+                    bookmarkedArticles={articleBookmarks}
+                    loadingArticles={loadingArticleBookmarks}
+                    onToggleBookmark={toggleArticleBookmark}
                   />
                 </div>
               ))}
@@ -350,6 +454,15 @@ export default function ChapterDetailPage() {
         showScrollTop={scrollHandling.showScrollTop}
         onClick={scrollHandling.scrollToTop}
       />
+
+      {/* Floating offline menu for mobile */}
+      {chapter && (
+        <FloatingOfflineMenu
+          chapterNumber={chapterNumber}
+          chapterTitle={chapter.chapter_title}
+          className="md:hidden"
+        />
+      )}
     </div>
   )
 }
