@@ -40,7 +40,7 @@ export default function AuthCallbackPage() {
 
         // Construct the redirect URI that matches what was sent to Google
         const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 
-          `${window.location.origin}/auth/callback`
+          `${window.location.origin}/api/auth/google/callback`
 
 
         // Complete the authentication process
