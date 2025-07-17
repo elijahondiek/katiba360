@@ -35,11 +35,13 @@ export async function fetchAPI(
   };
 
   // Enhanced logging for debugging
-  console.log('--- API Request ---');
-  console.log(`Endpoint: ${endpoint}`);
-  console.log(`URL: ${url}`);
-  console.log('Options:', JSON.stringify(finalOptions, null, 2));
-  console.log('-------------------');
+  if (DEBUG_MODE) {
+    console.log('--- API Request ---');
+    console.log(`Endpoint: ${endpoint}`);
+    console.log(`URL: ${url}`);
+    console.log('Options:', JSON.stringify(finalOptions, null, 2));
+    console.log('-------------------');
+  }
 
   const response = await fetch(url, finalOptions);
 
