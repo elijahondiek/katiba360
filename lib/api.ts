@@ -4,6 +4,11 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
+// Log API URL in production for debugging (remove after fixing)
+if (typeof window !== 'undefined' && !API_BASE_URL) {
+  console.error('NEXT_PUBLIC_API_URL is not defined');
+}
+
 /**
  * Make a request to the backend API
  */
@@ -16,6 +21,10 @@ export async function fetchAPI(
   let accessToken = null;
   if (typeof window !== 'undefined') {
     accessToken = localStorage.getItem('accessToken');
+    // Ensure we don't send "undefined" as the token
+    if (accessToken === 'undefined' || accessToken === 'null') {
+      accessToken = null;
+    }
   }
   
   const defaultOptions: RequestInit = {
@@ -45,7 +54,15 @@ export async function fetchAPI(
 
   const response = await fetch(url, finalOptions);
 
-  const data = await response.json();
+  let data;
+  try {
+    data = await response.json();
+  } catch (e) {
+    console.error('Failed to parse response as JSON:', e);
+    console.error('Response status:', response.status);
+    console.error('Response headers:', response.headers);
+    throw new Error('Invalid JSON response from server');
+  }
 
   if (!response.ok) {
     const error = new Error(data.detail ?? 'An error occurred while fetching data');

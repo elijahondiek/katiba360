@@ -47,8 +47,11 @@ export function middleware(request: NextRequest) {
   // Check for authentication token
   const accessToken = request.cookies.get('accessToken')?.value;
   
-  // If no token is found, redirect to login
-  if (!accessToken) {
+  // Check if token is valid (not undefined or null string)
+  const hasValidToken = accessToken && accessToken !== 'undefined' && accessToken !== 'null';
+  
+  // If no valid token is found, redirect to login
+  if (!hasValidToken) {
     const loginUrl = new URL('/login', request.url);
     
     // Add the original URL as a redirect parameter

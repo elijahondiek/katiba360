@@ -68,12 +68,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const loadAuthState = () => {
       try {
+        // Clean up any invalid values in localStorage
+        ['user', 'accessToken', 'refreshToken'].forEach(key => {
+          const value = localStorage.getItem(key);
+          if (value === 'undefined' || value === 'null') {
+            localStorage.removeItem(key);
+          }
+        });
         const storedUser = localStorage.getItem('user');
         const storedAccessToken = localStorage.getItem('accessToken');
         const storedRefreshToken = localStorage.getItem('refreshToken');
         
         // Check online authentication first
-        if (storedUser && storedAccessToken) {
+        if (storedUser && storedUser !== 'undefined' && storedAccessToken && storedAccessToken !== 'undefined') {
           const user = JSON.parse(storedUser);
           setAuthState({
             user,
@@ -215,7 +222,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       const response = await (async () => {
         try {
-          const response = await fetchAPI('/api/v1/auth/google', {
+          const data = await fetchAPI('/api/v1/auth/google', {
             method: 'POST',
             body: JSON.stringify({
               code,
@@ -227,11 +234,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
           
           clearTimeout(timeoutId);
           
-          if (!response || !response.body) {
+          if (!data) {
             throw new Error('Invalid response from authentication server');
           }
           
-          return response;
+          // The data already has the correct structure from generate_response
+          return data;
         } catch (error) {
           clearTimeout(timeoutId);
           if (error instanceof Error && error.name === 'AbortError') {
@@ -241,7 +249,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       })();
       
-      if (response.body) {
+      if (response?.body) {
         const { access_token, refresh_token, user } = response.body;
         
         // Save auth state to local storage
@@ -269,15 +277,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
         });
         
         // Store offline auth state for future offline use
-        offlineAuthService.storeOfflineAuth({
-          user,
-          accessToken: access_token,
-          refreshToken: refresh_token,
-        });
+        try {
+          offlineAuthService.storeOfflineAuth({
+            user,
+            accessToken: access_token,
+            refreshToken: refresh_token,
+          });
+        } catch (offlineError) {
+          // Log error but don't fail the login process
+          console.error('Failed to store offline auth state:', offlineError);
+        }
         
         // Use a timeout to avoid state update conflicts
         setTimeout(() => {
-          router.push('/');
+          // Check if state contains redirect information
+          let redirectPath = '/';
+          if (state) {
+            try {
+              const stateData = JSON.parse(atob(state));
+              if (stateData.redirect) {
+                redirectPath = stateData.redirect;
+              }
+            } catch (e) {
+              // If state is not base64 encoded JSON, ignore it
+            }
+          }
+          router.push(redirectPath);
         }, 100);
       }
     } catch (error) {

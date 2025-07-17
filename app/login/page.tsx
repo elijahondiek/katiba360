@@ -37,9 +37,10 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (authState.isAuthenticated) {
-      router.push("/");
+      const redirect = searchParams.get("redirect");
+      router.push(redirect || "/");
     }
-  }, [authState.isAuthenticated, router]);
+  }, [authState.isAuthenticated, router, searchParams]);
 
   // Loading state for login button
   const [isConnecting, setIsConnecting] = useState(false);
@@ -50,7 +51,15 @@ export default function LoginPage() {
     setIsConnecting(true);
     
     // Construct the Google OAuth URL
-    const googleAuthUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`;
+    let googleAuthUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`;
+    
+    // Add redirect parameter to state if present
+    const redirect = searchParams.get("redirect");
+    if (redirect) {
+      // Encode the redirect parameter in the state parameter
+      const state = btoa(JSON.stringify({ redirect }));
+      googleAuthUrl += `?state=${encodeURIComponent(state)}`;
+    }
     
     // Redirect to Google OAuth
     
