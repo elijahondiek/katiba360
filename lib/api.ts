@@ -21,6 +21,10 @@ export async function fetchAPI(
   let accessToken = null;
   if (typeof window !== 'undefined') {
     accessToken = localStorage.getItem('accessToken');
+    // Ensure we don't send "undefined" as the token
+    if (accessToken === 'undefined' || accessToken === 'null') {
+      accessToken = null;
+    }
   }
   
   const defaultOptions: RequestInit = {

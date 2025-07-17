@@ -68,12 +68,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const loadAuthState = () => {
       try {
+        // Clean up any invalid values in localStorage
+        ['user', 'accessToken', 'refreshToken'].forEach(key => {
+          const value = localStorage.getItem(key);
+          if (value === 'undefined' || value === 'null') {
+            localStorage.removeItem(key);
+          }
+        });
         const storedUser = localStorage.getItem('user');
         const storedAccessToken = localStorage.getItem('accessToken');
         const storedRefreshToken = localStorage.getItem('refreshToken');
         
         // Check online authentication first
-        if (storedUser && storedAccessToken) {
+        if (storedUser && storedUser !== 'undefined' && storedAccessToken && storedAccessToken !== 'undefined') {
           const user = JSON.parse(storedUser);
           setAuthState({
             user,
@@ -231,8 +238,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
             throw new Error('Invalid response from authentication server');
           }
           
-          // Wrap the data in a response object for backward compatibility
-          return { body: data };
+          // The data already has the correct structure from generate_response
+          return data;
         } catch (error) {
           clearTimeout(timeoutId);
           if (error instanceof Error && error.name === 'AbortError') {
@@ -242,7 +249,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       })();
       
-      if (response.body) {
+      if (response?.body) {
         const { access_token, refresh_token, user } = response.body;
         
         // Save auth state to local storage
@@ -283,7 +290,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
         
         // Use a timeout to avoid state update conflicts
         setTimeout(() => {
-          router.push('/');
+          // Check if state contains redirect information
+          let redirectPath = '/';
+          if (state) {
+            try {
+              const stateData = JSON.parse(atob(state));
+              if (stateData.redirect) {
+                redirectPath = stateData.redirect;
+              }
+            } catch (e) {
+              // If state is not base64 encoded JSON, ignore it
+            }
+          }
+          router.push(redirectPath);
         }, 100);
       }
     } catch (error) {
