@@ -21,7 +21,7 @@ export default function Footer() {
       <div className="h-2 bg-gradient-to-r from-[#0A7B24] via-[#1EB53A] to-[#CE1126]"></div>
       <footer className="bg-[#0A7B24] text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             <div>
               <div className="flex items-center mb-4">
                 <div className="font-bold text-2xl">
@@ -121,6 +121,28 @@ export default function Footer() {
                     className="text-[#E5E7EB] hover:text-white"
                   >
                     Contact Us
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-bold text-lg mb-4">{t("footer.legal")}</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    href="/terms"
+                    className="text-[#E5E7EB] hover:text-white"
+                  >
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/privacy"
+                    className="text-[#E5E7EB] hover:text-white"
+                  >
+                    Privacy Policy
                   </Link>
                 </li>
               </ul>

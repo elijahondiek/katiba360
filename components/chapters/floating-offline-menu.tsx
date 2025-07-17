@@ -126,7 +126,7 @@ export function FloatingOfflineMenu({ chapterNumber, chapterTitle, className }: 
               )}
             </div>
             
-            <div className="text-xs text-[#9CA3AF] mb-3">
+            <div className="text-xs text-[#9CA3AF] mb-3 truncate">
               {chapterTitle}
             </div>
             
@@ -162,7 +162,7 @@ export function FloatingOfflineMenu({ chapterNumber, chapterTitle, className }: 
       <Button
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
-          "h-14 w-14 rounded-full shadow-lg transition-all duration-200",
+          "h-10 w-10 rounded-full shadow-md transition-all duration-200 flex items-center justify-center opacity-60 hover:opacity-100",
           isOfflineAvailable 
             ? "bg-[#1EB53A] hover:bg-[#0A7B24] text-white"
             : "bg-[#1EB53A] hover:bg-[#0A7B24] text-white",
@@ -170,11 +170,11 @@ export function FloatingOfflineMenu({ chapterNumber, chapterTitle, className }: 
         )}
       >
         {isExpanded ? (
-          <ChevronUp className="h-6 w-6" />
+          <ChevronUp className="h-4 w-4" />
         ) : isOfflineAvailable ? (
-          <Check className="h-6 w-6" />
+          <Check className="h-4 w-4" />
         ) : (
-          <Download className="h-6 w-6" />
+          <Download className="h-4 w-4" />
         )}
       </Button>
     </div>

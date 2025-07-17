@@ -2,11 +2,11 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react"
 import { getUserBookmarks, saveBookmark, removeBookmark } from "@/lib/api"
-import { useToast } from "@/hooks/use-toast"
+import { ToastService } from "@/services/toast.service"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/contexts/language-context"
 import { useAuth } from '@/contexts/AuthContext'
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 
 // Import custom components
@@ -17,6 +17,7 @@ import { AudioPlayer } from "@/components/chapters/AudioPlayer"
 import { RelatedArticles } from "@/components/chapters/RelatedArticles"
 import { ScrollToTopButton } from "@/components/chapters/ScrollToTopButton"
 import { FloatingOfflineMenu } from "@/components/chapters/floating-offline-menu"
+import { ChapterNavigation } from "@/components/chapters/ChapterNavigation"
 
 // Import custom hooks
 import { useChapter } from "@/hooks/chapters/useChapter"
@@ -33,6 +34,7 @@ export default function ChapterDetailPage() {
   // Get auth state for user ID
   const { authState } = useAuth()
   const params = useParams()
+  const router = useRouter()
   const slug = params.slug as string
   
   // Get translation function from language context
@@ -121,8 +123,6 @@ export default function ChapterDetailPage() {
     loadBookmarks()
   }, [authState.user?.id, chapterNumber])
   
-  // Add toast hook
-  const { toast } = useToast()
   
   // Handle article bookmark toggle
   const toggleArticleBookmark = useCallback(async (articleNumber: number, articleTitle: string) => {
@@ -148,35 +148,22 @@ export default function ChapterDetailPage() {
               newSet.delete(articleRef)
               return newSet
             })
-            toast({
-              title: "Bookmark Removed",
-              description: `Article ${articleNumber} removed from bookmarks`,
-              variant: "default",
-            })
+            ToastService.bookmarkRemoved(`Article ${articleNumber}`)
           }
         }
       } else {
         // Add bookmark
-        await saveBookmark({
-          userId: authState.user.id,
-          bookmark_type: 'article',
+        await saveBookmark(authState.user.id, {
+          type: 'article',
           reference: articleRef,
           title: articleTitle,
         })
         setArticleBookmarks(prev => new Set(prev).add(articleRef))
-        toast({
-          title: "Success",
-          description: `Article ${articleNumber} bookmarked successfully!`,
-          variant: "success",
-        })
+        ToastService.bookmarkSaved(`Article ${articleNumber}`)
       }
     } catch (error) {
       console.error('Error toggling article bookmark:', error)
-      toast({
-        title: "Error",
-        description: "Failed to update bookmark.",
-        variant: "destructive",
-      })
+      ToastService.error("Failed to update bookmark.")
     } finally {
       setLoadingArticleBookmarks(prev => {
         const newSet = new Set(prev)
@@ -184,12 +171,11 @@ export default function ChapterDetailPage() {
         return newSet
       })
     }
-  }, [authState.user?.id, chapterNumber, articleBookmarks, toast])
+  }, [authState.user?.id, chapterNumber, articleBookmarks])
   
   // Handle audio synthesis
   // Navigation for chapters
   const [autoPlayNext, setAutoPlayNext] = useState(false);
-  const router = require('next/navigation').useRouter();
 
   // Helper: get next chapter slug (assuming numeric order)
   const getNextChapterSlug = () => {
@@ -230,11 +216,16 @@ export default function ChapterDetailPage() {
     audioDuration,
     currentTime,
     volume,
+    availableVoices,
+    selectedVoice,
     formatTime,
     toggleAudio,
     handleProgressChange,
     handleSpeedChange,
-    handleVolumeChange
+    handleVolumeChange,
+    handleVoiceChange,
+    getVoiceLabel,
+    getVoiceDetail
   } = useAudioSynthesis(contentRef, { onEnd: handleAudioEnd })
   
   // We'll use scrollToTop and scrollToArticle from the scrollHandling hook
@@ -263,10 +254,30 @@ export default function ChapterDetailPage() {
         updateActivity();
       }, 300); // 300ms debounce
     };
+
+    // Keyboard navigation handler
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle navigation if not typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      // Handle arrow key navigation
+      if (e.key === 'ArrowLeft' && chapterNumber > 1) {
+        e.preventDefault();
+        router.push(`/chapters/${chapterNumber - 1}`);
+      } else if (e.key === 'ArrowRight' && chapterNumber < 18) {
+        e.preventDefault();
+        router.push(`/chapters/${chapterNumber + 1}`);
+      }
+      
+      // Update activity for any key press
+      debouncedUpdateActivity();
+    };
     
     // Add user activity listeners
     window.addEventListener('mousemove', debouncedUpdateActivity)
-    window.addEventListener('keydown', debouncedUpdateActivity)
+    window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('click', debouncedUpdateActivity)
     window.addEventListener('touchstart', debouncedUpdateActivity)
     window.addEventListener('scroll', debouncedUpdateActivity)
@@ -285,7 +296,7 @@ export default function ChapterDetailPage() {
     return () => {
       // Clean up all event listeners
       window.removeEventListener('mousemove', debouncedUpdateActivity)
-      window.removeEventListener('keydown', debouncedUpdateActivity)
+      window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('click', debouncedUpdateActivity)
       window.removeEventListener('touchstart', debouncedUpdateActivity)
       window.removeEventListener('scroll', debouncedUpdateActivity)
@@ -371,7 +382,8 @@ export default function ChapterDetailPage() {
       {/* Header */}
       <ChapterHeader 
         chapterTitle={chapterTitle} 
-        chapterNumber={chapterNumber} 
+        chapterNumber={chapterNumber}
+        totalChapters={18}
       />
 
       <main className="container mx-auto px-4 py-8">
@@ -401,10 +413,15 @@ export default function ChapterDetailPage() {
               currentTime={currentTime}
               audioSpeed={audioSpeed}
               volume={volume}
+              availableVoices={availableVoices}
+              selectedVoice={selectedVoice}
               onTogglePlay={toggleAudio}
               onProgressChange={handleProgressChange}
               onSpeedChange={handleSpeedChange}
               onVolumeChange={handleVolumeChange}
+              onVoiceChange={handleVoiceChange}
+              getVoiceLabel={getVoiceLabel}
+              getVoiceDetail={getVoiceDetail}
               formatTime={formatTime}
             />
 
@@ -444,6 +461,12 @@ export default function ChapterDetailPage() {
               relatedArticles={relatedArticles}
               relatedArticlesLoading={relatedArticlesLoading}
               formatRelevance={formatRelevance}
+            />
+
+            {/* Chapter Navigation */}
+            <ChapterNavigation 
+              currentChapter={chapterNumber}
+              totalChapters={18}
             />
           </div>
         </div>

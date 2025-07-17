@@ -10,25 +10,7 @@ export default function ChapterDetailLoading() {
 
   return (
     <div className="min-h-screen bg-white" aria-label="Loading chapter details">
-      {/* Header Skeleton */}
-      <header className="border-b border-gray-200 sticky top-0 bg-white z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-10 w-10 bg-[#1EB53A] rounded-md animate-pulse"></div>
-            <div className="h-6 w-32 bg-gray-200 rounded-md animate-pulse"></div>
-          </div>
 
-          <div className="hidden md:flex items-center gap-6">
-            <nav className="flex gap-6">
-              {Array.from({ length: 4 }, (_, i) => (
-                <div key={`nav-${i}`} className="h-5 w-20 bg-gray-200 rounded-md animate-pulse"></div>
-              ))}
-            </nav>
-          </div>
-
-          <div className="h-8 w-24 bg-gray-200 rounded-md animate-pulse"></div>
-        </div>
-      </header>
 
       {/* Back to Chapters Link Skeleton */}
       <div className="container mx-auto px-4 py-4">

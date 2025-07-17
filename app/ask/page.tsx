@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import {
   Send,
   ThumbsUp,
@@ -18,7 +17,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useLanguage } from "@/contexts/language-context"
-import { LanguageSelector } from "@/components/language-selector"
 import { cn } from "@/lib/utils"
 
 // Types for the conversation
@@ -91,6 +89,11 @@ export default function AskPage() {
       setQuestionToUse(null) // Reset the question
     }
   }, [questionToUse])
+
+  // Scroll to top when component mounts (for navigation from other pages)
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   // Handle message submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -219,43 +222,8 @@ export default function AskPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      {/* Header */}
-      <header className="border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <div className="flex items-center gap-2">
-                <Image src="/logo.svg" alt="Katiba360 Logo" width={40} height={40} className="h-10 w-auto" />
-                <span className="text-xl font-bold text-[#0A7B24]">{t("app.title")}</span>
-              </div>
-            </Link>
-          </div>
-
-          <div className="hidden md:flex items-center gap-6">
-            <nav className="flex gap-6">
-              <Link href="/chapters" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                {t("nav.chapters")}
-              </Link>
-              <Link href="/rights" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                {t("nav.rights")}
-              </Link>
-              <Link href="/learn" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                {t("nav.learn")}
-              </Link>
-              <Link href="/about" className="text-[#374151] hover:text-[#0A7B24] font-medium">
-                {t("nav.about")}
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <LanguageSelector />
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-grow container mx-auto px-4 py-8 flex flex-col">
+    <div className="bg-white flex flex-col">
+      <main className="container mx-auto px-4 py-8 flex flex-col">
         <div className="max-w-3xl mx-auto w-full flex-grow flex flex-col">
           <h1 className="text-2xl font-bold text-[#0A7B24] mb-6">Ask About the Constitution</h1>
 
@@ -485,17 +453,6 @@ export default function AskPage() {
           )}
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-[#0A7B24] text-white py-8">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <p>
-              &copy; {new Date().getFullYear()} Katiba360. {t("footer.copyright")}
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

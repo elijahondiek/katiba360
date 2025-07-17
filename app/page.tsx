@@ -42,13 +42,17 @@ export default function HomePage() {
                 href="https://github.com/elijahondiek/katiba360"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-3 py-1.5 bg-[#F0FFF4] text-[#0A7B24] rounded-full border border-[#1EB53A]/30 hover:bg-[#E6FFEC] transition-colors duration-200"
+                className="inline-flex flex-col md:flex-row items-center md:items-center px-4 py-2 bg-[#F0FFF4] text-[#0A7B24] rounded-lg md:rounded-full border border-[#1EB53A]/30 hover:bg-[#E6FFEC] transition-colors duration-200"
               >
-                <Megaphone className="h-4 w-4 mr-1.5" />
-                <span>
-                  Whether you code, craft UX, translate or test – your talents can empower every Kenyan with Katiba360°!
+                <div className="flex items-center">
+                  <Megaphone className="hidden md:block h-4 w-4 mr-1.5" />
+                  <span className="text-center md:text-left">
+                    Whether you code, craft UX, translate or test – your talents can empower every Kenyan with Katiba360°!
+                  </span>
+                </div>
+                <span className="mt-2 md:mt-0 md:ml-2 text-xs font-medium bg-[#1EB53A] text-white px-2 py-0.5 rounded-md">
+                  Contribute
                 </span>
-                <span className="ml-1 text-xs">→</span>
               </Link>
             </div>
 

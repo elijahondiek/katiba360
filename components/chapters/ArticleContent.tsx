@@ -6,7 +6,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ArticleHeader } from "@/components/chapters/article-header";
 
 interface SubClause {
-  sub_clause_id: string;
+  sub_clause_id?: string;
+  sub_clause_letter?: string;
+  sub_clause_number?: string;
   content: string;
 }
 
@@ -128,16 +130,19 @@ export function ArticleContent({
                     {/* If there are sub-clauses, display them */}
                     {clause.sub_clauses && clause.sub_clauses.length > 0 && (
                       <div className="pl-6 space-y-2">
-                        {clause.sub_clauses.map((subClause) => (
-                          <div 
-                            key={subClause.sub_clause_id} 
-                            id={`article-${article.article_number}-clause-${clause.clause_number}-${subClause.sub_clause_id}`}
-                            className="text-[#4B5563] flex"
-                          >
-                            <span className="mr-2 flex-shrink-0">({subClause.sub_clause_id})</span>
-                            <div dangerouslySetInnerHTML={{ __html: processContent(subClause.content) }} />
-                          </div>
-                        ))}
+                        {clause.sub_clauses.map((subClause) => {
+                          const subClauseId = subClause.sub_clause_id || subClause.sub_clause_letter || subClause.sub_clause_number || '';
+                          return (
+                            <div 
+                              key={subClauseId} 
+                              id={`article-${article.article_number}-clause-${clause.clause_number}-${subClauseId}`}
+                              className="text-[#4B5563] flex"
+                            >
+                              <span className="mr-2 flex-shrink-0">({subClauseId})</span>
+                              <div dangerouslySetInnerHTML={{ __html: processContent(subClause.content) }} />
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>

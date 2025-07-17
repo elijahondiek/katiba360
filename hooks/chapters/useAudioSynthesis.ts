@@ -17,6 +17,8 @@ export function useAudioSynthesis(
   const [audioDuration, setAudioDuration] = useState(0); // Always recalc
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(1); // 0 to 1
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
 
   // --- REFS FOR LATEST STATE ---
   const audioDurationRef = useRef(audioDuration);
@@ -38,6 +40,70 @@ export function useAudioSynthesis(
   // Additional refs to track progress without causing re-renders
   const currentProgressRef = useRef<number>(0);
   const currentTimeRef = useRef<number>(0);
+
+  // Initialize voices and load saved preference
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      setAvailableVoices(voices);
+
+      // Load saved voice preference from localStorage
+      const savedVoiceName = localStorage.getItem('tts-voice-preference');
+      
+      if (savedVoiceName) {
+        const savedVoice = voices.find(voice => voice.name === savedVoiceName);
+        if (savedVoice) {
+          setSelectedVoice(savedVoice);
+          return;
+        }
+      }
+
+      // Find the best default voice
+      let bestVoice = null;
+      
+      // Priority order for default voice selection - Google voices first
+      const preferences = [
+        // Google English voices (prioritize US, then UK, then others)
+        (v: SpeechSynthesisVoice) => v.lang.startsWith('en-US') && v.name.includes('Google'),
+        (v: SpeechSynthesisVoice) => v.lang.startsWith('en-GB') && v.name.includes('Google'),
+        (v: SpeechSynthesisVoice) => v.lang.startsWith('en') && v.name.includes('Google'),
+        // Other high-quality English voices
+        (v: SpeechSynthesisVoice) => v.lang.startsWith('en') && v.name.includes('Microsoft'),
+        (v: SpeechSynthesisVoice) => v.lang.startsWith('en') && v.name.includes('Apple'),
+        (v: SpeechSynthesisVoice) => v.lang.startsWith('en') && v.name.includes('Amazon'),
+        (v: SpeechSynthesisVoice) => v.lang.startsWith('en') && v.default,
+        (v: SpeechSynthesisVoice) => v.lang.startsWith('en-US'),
+        (v: SpeechSynthesisVoice) => v.lang.startsWith('en'),
+        (v: SpeechSynthesisVoice) => v.default,
+      ];
+
+      for (const preference of preferences) {
+        bestVoice = voices.find(preference);
+        if (bestVoice) break;
+      }
+
+      // Fallback to first available voice
+      if (!bestVoice && voices.length > 0) {
+        bestVoice = voices[0];
+      }
+
+      setSelectedVoice(bestVoice);
+    };
+
+    // Load voices immediately if available
+    loadVoices();
+
+    // Also listen for voiceschanged event (some browsers load voices asynchronously)
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      }
+    };
+  }, []);
 
   // Initialize audio duration when component mounts
   // --- CLEANUP ---
@@ -277,6 +343,11 @@ export function useAudioSynthesis(
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = audioSpeed;
     utterance.volume = volume;
+    
+    // Set the selected voice if available
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    }
     // On end, stop everything
     utterance.onend = () => {
       setIsPlaying(false);
@@ -317,9 +388,11 @@ export function useAudioSynthesis(
     // Recalculate duration for new speed
     const { estimatedDuration } = extractTextContent();
     setAudioDuration(estimatedDuration / value); // Faster = shorter duration
+    
     if (isPlaying) {
+      // Restart from beginning with new speed
       window.speechSynthesis.cancel();
-      setTimeout(() => toggleAudio(), 100); // restart speech at new speed
+      setTimeout(() => toggleAudio(), 100);
     }
   };
 
@@ -330,6 +403,132 @@ export function useAudioSynthesis(
     if (utteranceRef.current) utteranceRef.current.volume = newVolume;
   };
 
+  // --- VOICE CHANGE ---
+  const handleVoiceChange = (voice: SpeechSynthesisVoice) => {
+    setSelectedVoice(voice);
+    
+    // Save preference to localStorage
+    localStorage.setItem('tts-voice-preference', voice.name);
+    
+    // If currently playing, restart with new voice from beginning
+    if (isPlaying) {
+      window.speechSynthesis.cancel();
+      setTimeout(() => toggleAudio(), 100);
+    }
+  };
+
+  // --- VOICE LABEL HELPER ---
+  const getVoiceLabel = (voice: SpeechSynthesisVoice): string => {
+    const name = voice.name;
+    const lang = voice.lang;
+    
+    // Handle Google voices
+    if (name.includes('Google')) {
+      if (lang.includes('en-US')) return 'Google US';
+      if (lang.includes('en-GB')) return 'Google UK';
+      if (lang.includes('en-AU')) return 'Google AU';
+      if (lang.includes('en-IN')) return 'Google IN';
+      return 'Google';
+    }
+    
+    // Handle Microsoft voices
+    if (name.includes('Microsoft')) {
+      if (name.includes('Zira')) return 'Zira';
+      if (name.includes('David')) return 'David';
+      if (name.includes('Mark')) return 'Mark';
+      if (name.includes('Hazel')) return 'Hazel';
+      if (lang.includes('en-US')) return 'Microsoft US';
+      if (lang.includes('en-GB')) return 'Microsoft UK';
+      return 'Microsoft';
+    }
+    
+    // Handle Apple voices
+    if (name.includes('Apple')) {
+      if (name.includes('Samantha')) return 'Samantha';
+      if (name.includes('Alex')) return 'Alex';
+      if (name.includes('Victoria')) return 'Victoria';
+      if (name.includes('Daniel')) return 'Daniel';
+      if (lang.includes('en-US')) return 'Apple US';
+      if (lang.includes('en-GB')) return 'Apple UK';
+      return 'Apple';
+    }
+    
+    // Handle Amazon voices
+    if (name.includes('Amazon')) {
+      return 'Amazon';
+    }
+    
+    // Handle other voices - extract meaningful names
+    if (name.includes('Samantha')) return 'Samantha';
+    if (name.includes('Alex')) return 'Alex';
+    if (name.includes('Victoria')) return 'Victoria';
+    if (name.includes('Daniel')) return 'Daniel';
+    if (name.includes('Karen')) return 'Karen';
+    if (name.includes('Moira')) return 'Moira';
+    if (name.includes('Tessa')) return 'Tessa';
+    if (name.includes('Veena')) return 'Veena';
+    if (name.includes('Fiona')) return 'Fiona';
+    
+    // Default: clean up the name
+    return name.split(' ').slice(0, 2).join(' ');
+  };
+
+  // --- VOICE DETAIL HELPER (for full descriptions) ---
+  const getVoiceDetail = (voice: SpeechSynthesisVoice): string => {
+    const name = voice.name;
+    const lang = voice.lang;
+    
+    // Handle Google voices
+    if (name.includes('Google')) {
+      if (lang.includes('en-US')) return 'Google US English (Female)';
+      if (lang.includes('en-GB')) return 'Google UK English (Female)';
+      if (lang.includes('en-AU')) return 'Google Australian English (Female)';
+      if (lang.includes('en-IN')) return 'Google Indian English (Female)';
+      return 'Google English';
+    }
+    
+    // Handle Microsoft voices
+    if (name.includes('Microsoft')) {
+      if (name.includes('Zira')) return 'Microsoft Zira (Female)';
+      if (name.includes('David')) return 'Microsoft David (Male)';
+      if (name.includes('Mark')) return 'Microsoft Mark (Male)';
+      if (name.includes('Hazel')) return 'Microsoft Hazel (Female)';
+      if (lang.includes('en-US')) return 'Microsoft US English';
+      if (lang.includes('en-GB')) return 'Microsoft UK English';
+      return 'Microsoft English';
+    }
+    
+    // Handle Apple voices
+    if (name.includes('Apple')) {
+      if (name.includes('Samantha')) return 'Apple Samantha (Female)';
+      if (name.includes('Alex')) return 'Apple Alex (Male)';
+      if (name.includes('Victoria')) return 'Apple Victoria (Female)';
+      if (name.includes('Daniel')) return 'Apple Daniel (Male)';
+      if (lang.includes('en-US')) return 'Apple US English';
+      if (lang.includes('en-GB')) return 'Apple UK English';
+      return 'Apple English';
+    }
+    
+    // Handle Amazon voices
+    if (name.includes('Amazon')) {
+      return 'Amazon Polly';
+    }
+    
+    // Handle other voices - extract meaningful names
+    if (name.includes('Samantha')) return 'Samantha (Female)';
+    if (name.includes('Alex')) return 'Alex (Male)';
+    if (name.includes('Victoria')) return 'Victoria (Female)';
+    if (name.includes('Daniel')) return 'Daniel (Male)';
+    if (name.includes('Karen')) return 'Karen (Female)';
+    if (name.includes('Moira')) return 'Moira (Female)';
+    if (name.includes('Tessa')) return 'Tessa (Female)';
+    if (name.includes('Veena')) return 'Veena (Female)';
+    if (name.includes('Fiona')) return 'Fiona (Female)';
+    
+    // Default: clean up the name
+    return name.split(' ').slice(0, 2).join(' ');
+  };
+
   // --- RETURN API ---
   return {
     isPlaying,
@@ -338,11 +537,16 @@ export function useAudioSynthesis(
     audioDuration,
     currentTime,
     volume,
+    availableVoices,
+    selectedVoice,
     formatTime,
     toggleAudio,
     handleProgressChange,
     handleSpeedChange,
     handleVolumeChange,
+    handleVoiceChange,
+    getVoiceLabel,
+    getVoiceDetail,
   };
 
 }

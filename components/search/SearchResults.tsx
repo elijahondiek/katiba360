@@ -90,14 +90,14 @@ export function SearchResults({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto" aria-describedby="search-results-description">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-[#0A7B24]">
             {t('search.results')} {query && `"${query}"`}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="mt-4">
+        <div id="search-results-description" className="mt-4">
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
               <Loader2 className="h-8 w-8 text-[#1EB53A] animate-spin" />

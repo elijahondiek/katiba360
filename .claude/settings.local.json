@@ -13,7 +13,12 @@
       "Bash(venvScripts:*)",
       "Bash(. venv/Scripts/activate)",
       "Bash(pnpm add:*)",
-      "Bash(source:*)"
+      "Bash(source:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(rm:*)",
+      "Bash(.\\venv\\Scripts\\python.exe -m alembic:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

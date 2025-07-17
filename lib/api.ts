@@ -191,29 +191,24 @@ export async function getPopularSections(timeframe: string = 'week'): Promise<an
 /**
  * Save a bookmark for the user
  * @param userId User's UUID
- * @param bookmark_type Type of bookmark (e.g., 'chapter', 'article', etc)
- * @param reference Reference string (e.g., '1', '1.2', etc)
- * @param title Title of the bookmarked item
+ * @param bookmark Bookmark object with type, reference, and title
  */
-export async function saveBookmark({
-  userId,
-  bookmark_type,
-  reference,
-  title,
-}: {
-  userId: string;
-  bookmark_type: string;
-  reference: string;
-  title: string;
-}): Promise<any> {
+export async function saveBookmark(
+  userId: string,
+  bookmark: {
+    type: string;
+    reference: string;
+    title: string;
+  }
+): Promise<any> {
   return fetchAPI(
     `/api/v1/constitution/user/${userId}/bookmarks`,
     {
       method: 'POST',
       body: JSON.stringify({
-        bookmark_type,
-        reference,
-        title,
+        bookmark_type: bookmark.type,
+        reference: bookmark.reference,
+        title: bookmark.title,
       }),
     }
   );
@@ -324,7 +319,7 @@ export async function getUserReadingStreak(): Promise<any> {
  * @param period Time period ('week', 'month', 'year')
  */
 export async function getReadingAnalytics(period: string): Promise<any> {
-  return fetchAPI(`/api/v1/reading/analytics/${period}`);
+  return fetchAPI(`/api/v1/reading/analytics/${period}`)
 }
 
 /**
