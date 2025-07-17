@@ -50,7 +50,9 @@ We're actively seeking developers to help improve Katiba360° and make Kenya's c
 - **Educational Resources:** Learn about rights, chapters, and key constitutional concepts
 - **Interactive Scenarios:** Real-world constitutional applications
 - **User Authentication:** Google OAuth integration
-- **Reading Progress:** Track your constitutional learning journey
+- **Smart Reading Progress:** Content-aware completion tracking with realistic thresholds
+- **Optimized Bookmarking:** Efficient bookmark management with reduced API calls
+- **Improved Profile UI:** Streamlined profile dropdown with better UX
 
 ## 🛠 Tech Stack
 
