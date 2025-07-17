@@ -215,7 +215,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       const response = await (async () => {
         try {
-          const response = await fetchAPI('/api/v1/auth/google', {
+          const data = await fetchAPI('/api/v1/auth/google', {
             method: 'POST',
             body: JSON.stringify({
               code,
@@ -227,11 +227,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
           
           clearTimeout(timeoutId);
           
-          if (!response || !response.body) {
+          if (!data) {
             throw new Error('Invalid response from authentication server');
           }
           
-          return response;
+          // Wrap the data in a response object for backward compatibility
+          return { body: data };
         } catch (error) {
           clearTimeout(timeoutId);
           if (error instanceof Error && error.name === 'AbortError') {
