@@ -81,75 +81,12 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left Side - Visual Element with improved readability */}
-      <div className="md:w-1/2 bg-[#0A7B24] overflow-hidden">
-        <div className="h-full flex flex-col justify-center px-8 py-12 md:py-0 text-white">
-          <div className="max-w-md mx-auto md:mx-0 md:ml-auto">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-sm">
-              Katiba<span className="text-white">360</span>
-            </h1>
-
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4 text-white drop-shadow-sm">
-                Constitutional Knowledge for All Kenyans
-              </h2>
-              <p className="text-white text-lg drop-shadow-sm">
-                Making Kenya's constitution accessible, understandable, and
-                actionable for every citizen.
-              </p>
-            </div>
-
-            <div className="bg-white/20 backdrop-blur-md rounded-xl p-6 border border-white/30 shadow-sm">
-              <h3 className="text-xl font-semibold mb-3 text-white drop-shadow-sm">
-                From the Constitution of Kenya
-              </h3>
-              <blockquote className="italic text-white mb-4 drop-shadow-sm">
-                "Every person has the right to privacy, which includes the right
-                not to have information relating to their family or private
-                affairs unnecessarily required or revealed."
-              </blockquote>
-              <p className="text-right text-white/90 text-sm drop-shadow-sm">
-                — Article 31, Constitution of Kenya
-              </p>
-            </div>
-
-            <div className="mt-12 flex space-x-4">
-              <a
-                href="https://github.com/elijahondiek/katiba360"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-white/80 transition-colors duration-300 flex items-center bg-black/20 backdrop-blur-sm rounded-lg px-4 py-2"
-              >
-                <Github className="h-5 w-5 mr-2" />
-                <span>GitHub</span>
-              </a>
-              <a
-                href="https://x.com/WebShrewd"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-white/80 transition-colors duration-300 flex items-center bg-black/20 backdrop-blur-sm rounded-lg px-4 py-2"
-              >
-                <Twitter className="h-5 w-5 mr-2" />
-                <span>Twitter</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Side - Login Form */}
-      <div className="md:w-1/2 bg-white flex flex-col">
+      {/* Login Form - Show first on mobile */}
+      <div className="order-1 md:order-2 md:w-1/2 bg-white flex flex-col">
         <div className="flex-grow flex flex-col justify-center px-8 py-12 md:py-0">
           <div className="max-w-md w-full mx-auto">
             <div className="mb-12">
-              <Link
-                href="/"
-                className="inline-flex items-center text-[#6B7280] hover:text-[#0A7B24] transition-colors duration-300 mb-8"
-              >
-                <span className="border-b border-transparent hover:border-[#0A7B24]">
-                  Return to Home
-                </span>
-              </Link>
+
 
               <h2 className="text-3xl font-bold text-[#111827] mb-2">
                 Welcome Back
@@ -265,24 +202,59 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="py-4 px-8 border-t border-[#E5E7EB] bg-[#F9FAFB]">
-          <div className="max-w-md mx-auto flex items-center justify-between">
-            <p className="text-sm text-[#6B7280]">
-              © 2023 Katiba360. All rights reserved.
-            </p>
-            <div className="flex space-x-4">
-              <Link
-                href="/about"
-                className="text-sm text-[#6B7280] hover:text-[#0A7B24] transition-colors duration-200"
+      </div>
+
+      {/* Visual Element - Show after login form on mobile */}
+      <div className="order-2 md:order-1 md:w-1/2 bg-[#0A7B24] overflow-hidden">
+        <div className="h-full flex flex-col justify-center px-8 py-12 md:py-0 text-white">
+          <div className="max-w-md mx-auto md:mx-0 md:ml-auto">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-sm">
+              Katiba<span className="text-white">360</span>
+            </h1>
+
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-white drop-shadow-sm">
+                Constitutional Knowledge for All Kenyans
+              </h2>
+              <p className="text-white text-lg drop-shadow-sm">
+                Making Kenya's constitution accessible, understandable, and
+                actionable for every citizen.
+              </p>
+            </div>
+
+            <div className="bg-white/20 backdrop-blur-md rounded-xl p-6 border border-white/30 shadow-sm">
+              <h3 className="text-xl font-semibold mb-3 text-white drop-shadow-sm">
+                From the Constitution of Kenya
+              </h3>
+              <blockquote className="italic text-white mb-4 drop-shadow-sm">
+                "Every person has the right to privacy, which includes the right
+                not to have information relating to their family or private
+                affairs unnecessarily required or revealed."
+              </blockquote>
+              <p className="text-right text-white/90 text-sm drop-shadow-sm">
+                — Article 31, Constitution of Kenya
+              </p>
+            </div>
+
+            <div className="mt-12 flex space-x-4">
+              <a
+                href="https://github.com/elijahondiek/katiba360"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-white/80 transition-colors duration-300 flex items-center bg-black/20 backdrop-blur-sm rounded-lg px-4 py-2"
               >
-                About
-              </Link>
-              <Link
-                href="/privacy"
-                className="text-sm text-[#6B7280] hover:text-[#0A7B24] transition-colors duration-200"
+                <Github className="h-5 w-5 mr-2" />
+                <span>GitHub</span>
+              </a>
+              <a
+                href="https://x.com/WebShrewd"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-white/80 transition-colors duration-300 flex items-center bg-black/20 backdrop-blur-sm rounded-lg px-4 py-2"
               >
-                Privacy
-              </Link>
+                <Twitter className="h-5 w-5 mr-2" />
+                <span>Twitter</span>
+              </a>
             </div>
           </div>
         </div>
