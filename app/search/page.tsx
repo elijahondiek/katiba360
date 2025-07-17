@@ -136,6 +136,9 @@ export default function SearchPage() {
 
   // Track expanded results
   const [expandedResults, setExpandedResults] = useState<string[]>([])
+  
+  // Track filter collapse state on mobile
+  const [isFilterCollapsed, setIsFilterCollapsed] = useState(true)
 
   // Handle search submission
   const handleSearch = (e: React.FormEvent) => {
@@ -196,59 +199,9 @@ export default function SearchPage() {
           </div>
 
           {/* Main Content Area */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Filters Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl border border-[#E5E7EB] p-4 sticky top-24">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-medium text-[#0A7B24]">Filters</h2>
-                  {activeFilters.length > 0 && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={resetSearch}
-                      className="text-[#6B7280] hover:text-[#0A7B24] p-0 h-auto"
-                    >
-                      Clear All
-                    </Button>
-                  )}
-                </div>
-
-                <div className="space-y-6">
-                  {filterCategories.map((category, categoryIndex) => (
-                    <div key={categoryIndex} className="border-t border-[#E5E7EB] pt-4">
-                      <h3 className="text-sm font-medium text-[#374151] mb-2">{category.name}</h3>
-                      <div className="space-y-2">
-                        {category.options.map((option) => (
-                          <div key={option.id} className="flex items-center">
-                            <Checkbox
-                              id={option.id}
-                              checked={activeFilters.includes(option.id)}
-                              onCheckedChange={() => toggleFilter(option.id)}
-                              className="border-[#D1D5DB] text-[#1EB53A] focus:ring-[#1EB53A]"
-                            />
-                            <label
-                              htmlFor={option.id}
-                              className={cn(
-                                "ml-2 text-sm cursor-pointer",
-                                activeFilters.includes(option.id)
-                                  ? "text-[#0A7B24] font-medium"
-                                  : "text-[#4B5563]"
-                              )}
-                            >
-                              {option.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Results Area */}
-            <div className="lg:col-span-3">
+          <div className="flex flex-col lg:grid lg:grid-cols-4 gap-8">
+            {/* Results Area - Show first on mobile */}
+            <div className="order-1 lg:order-2 lg:col-span-3">
               {/* Loading State */}
               {isLoading && (
                 <div className="flex flex-col items-center justify-center py-12">
@@ -441,6 +394,81 @@ export default function SearchPage() {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Filters Sidebar - Show after results on mobile */}
+            <div className="order-2 lg:order-1 lg:col-span-1">
+              <div className="bg-white rounded-xl border border-[#E5E7EB] p-4 lg:sticky lg:top-24">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-medium text-[#0A7B24]">Filters</h2>
+                    {activeFilters.length > 0 && (
+                      <span className="bg-[#1EB53A] text-white text-xs px-2 py-1 rounded-full">
+                        {activeFilters.length}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {activeFilters.length > 0 && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={resetSearch}
+                        className="text-[#6B7280] hover:text-[#0A7B24] p-0 h-auto"
+                      >
+                        Clear All
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsFilterCollapsed(!isFilterCollapsed)}
+                      className="lg:hidden text-[#6B7280] hover:text-[#0A7B24] p-0 h-auto"
+                    >
+                      {isFilterCollapsed ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 rotate-180" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className={cn(
+                  "space-y-6",
+                  "lg:block", // Always show on desktop
+                  isFilterCollapsed ? "hidden" : "block" // Toggle on mobile
+                )}>
+                  {filterCategories.map((category, categoryIndex) => (
+                    <div key={categoryIndex} className="border-t border-[#E5E7EB] pt-4">
+                      <h3 className="text-sm font-medium text-[#374151] mb-2">{category.name}</h3>
+                      <div className="space-y-2">
+                        {category.options.map((option) => (
+                          <div key={option.id} className="flex items-center">
+                            <Checkbox
+                              id={option.id}
+                              checked={activeFilters.includes(option.id)}
+                              onCheckedChange={() => toggleFilter(option.id)}
+                              className="border-[#D1D5DB] text-[#1EB53A] focus:ring-[#1EB53A]"
+                            />
+                            <label
+                              htmlFor={option.id}
+                              className={cn(
+                                "ml-2 text-sm cursor-pointer",
+                                activeFilters.includes(option.id)
+                                  ? "text-[#0A7B24] font-medium"
+                                  : "text-[#4B5563]"
+                              )}
+                            >
+                              {option.label}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>

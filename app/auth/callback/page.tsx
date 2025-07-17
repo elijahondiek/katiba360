@@ -42,13 +42,6 @@ export default function AuthCallbackPage() {
         const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || 
           `${window.location.origin}/auth/callback`
 
-        console.log("Starting authentication with code:", code.substring(0, 5) + "...")
-        console.log("Redirect URI:", redirectUri)
-        console.log("Environment check:", {
-          NEXT_PUBLIC_GOOGLE_REDIRECT_URI: process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI,
-          NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-          origin: window.location.origin
-        })
 
         // Complete the authentication process
         await login(code, redirectUri, state ?? undefined)
