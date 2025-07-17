@@ -76,7 +76,11 @@ export function ShareDialog({
     setTimeout(() => setCopied(false), 2000)
     
     // Track sharing event
-    await sharingService.trackShare(contentType, contentId, 'copy-link', shareUrl)
+    try {
+      await sharingService.trackShare(contentType, contentId, 'copy-link', shareUrl)
+    } catch (error) {
+      console.error("Failed to track share event for copy-link:", error)
+    }
   }
 
   const handleSharePlatform = async (platform: string) => {
