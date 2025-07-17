@@ -28,11 +28,14 @@ import { chapterIconMap } from "./chapterIconMap";
 
 import { useChapters } from "@/hooks/useChapters";
 import { useBookmark } from "@/hooks/chapters/useBookmark";
-import { saveBookmark, removeBookmark } from "@/lib/api";
+import { saveBookmark, removeBookmark, getUserReadingProgress } from "@/lib/api";
 
 import { chapterCategoryMap, chapterCategories } from "./chapterCategoryMap";
 import { useAuth } from "@/contexts/AuthContext";
 import Loading from "./loading";
+import { OfflineSaveButton } from "@/components/offline/offline-save-button";
+import { OfflineStatusIndicator } from "@/components/offline/offline-status-indicator";
+import { BulkOfflineSave } from "@/components/offline/bulk-offline-save";
 
 // Custom hook to manage bookmarks for the chapters page
 function useChapterBookmarks(userId: string | undefined) {
@@ -95,6 +98,8 @@ export default function ChaptersPage() {
   const { chapters, isLoading, error } = useChapters();
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
+  const [readingProgress, setReadingProgress] = useState<Record<string, number>>({});
+  const [showBulkDownload, setShowBulkDownload] = useState(false);
   const { language } = useLanguage();
   const { authState } = useAuth();
   // Get toast functionality
@@ -103,6 +108,32 @@ export default function ChaptersPage() {
   // Use our custom hook to manage bookmarks
   const { bookmarkedChapters, bookmarkIdMap, bookmarksLoading, refreshBookmarks } = 
     useChapterBookmarks(authState.user?.id);
+  
+  // Fetch reading progress when user is authenticated
+  useEffect(() => {
+    const fetchReadingProgress = async () => {
+      if (!authState.user?.id) {
+        setReadingProgress({});
+        return;
+      }
+      
+      try {
+        const response = await getUserReadingProgress(authState.user.id);
+        if (response?.body?.progress?.completed_chapters) {
+          // Convert completed chapters array to a map for easy lookup
+          const progressMap: Record<string, number> = {};
+          response.body.progress.completed_chapters.forEach((chapterNum: string) => {
+            progressMap[chapterNum] = 100; // Completed chapters are 100%
+          });
+          setReadingProgress(progressMap);
+        }
+      } catch (error) {
+        console.error('Error fetching reading progress:', error);
+      }
+    };
+    
+    fetchReadingProgress();
+  }, [authState.user?.id]);
 
   // // Debug current bookmark state
   // useEffect(() => {
@@ -230,7 +261,33 @@ export default function ChaptersPage() {
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
             </div>
+            
+            {/* Bulk Download Toggle */}
+            {authState.user && (
+              <Button
+                onClick={() => setShowBulkDownload(!showBulkDownload)}
+                variant="outline"
+                className="text-[#1EB53A] border-[#1EB53A] hover:bg-[#1EB53A]/10"
+              >
+                {showBulkDownload ? "Hide" : "Bulk Download"}
+              </Button>
+            )}
           </div>
+
+          {/* Bulk Download Panel */}
+          {showBulkDownload && authState.user && (
+            <div className="mb-8">
+              <BulkOfflineSave
+                onSaveComplete={(savedChapters) => {
+                  toast({
+                    title: "Download Complete",
+                    description: `${savedChapters.length} chapters saved for offline reading`,
+                    variant: "default"
+                  });
+                }}
+              />
+            </div>
+          )}
 
           {/* Categories */}
           <div className="flex flex-wrap gap-2 mb-8">
@@ -311,19 +368,34 @@ export default function ChaptersPage() {
                           : "Articles"}
                       </span>
                       <span>
-                        {chapter.progress > 0
-                          ? `${chapter.progress}% Complete`
+                        {readingProgress[chapter.chapter_number.toString()] > 0
+                          ? "Complete"
                           : "Not started"}
                       </span>
                     </div>
 
                     <Progress
-                      value={chapter.progress}
-                      className="h-2 bg-[#E5E7EB]"
+                      value={readingProgress[chapter.chapter_number.toString()] || 0}
+                      className="h-2 bg-[#E5E7EB] mb-3"
                       indicatorClassName={cn(
-                        chapter.progress > 0 ? "bg-[#1EB53A]" : "bg-[#D1D5DB]"
+                        readingProgress[chapter.chapter_number.toString()] > 0 ? "bg-[#1EB53A]" : "bg-[#D1D5DB]"
                       )}
                     />
+
+                    {/* Offline Status and Save Button */}
+                    {authState.user && (
+                      <div className="flex items-center justify-end">
+                        
+                        <OfflineSaveButton
+                          contentId={chapter.chapter_number.toString()}
+                          contentType="chapter"
+                          contentTitle={chapter.chapter_title}
+                          variant="ghost"
+                          size="sm"
+                          showText={false}
+                        />
+                      </div>
+                    )}
                   </div>
                 </Link>
               </div>
