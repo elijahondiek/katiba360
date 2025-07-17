@@ -10,47 +10,72 @@ We're actively seeking developers to help improve Katiba360° and make Kenya's c
 
 ### 🎯 Priority Features We Need Help With
 
-1. **🌍 Local Dialect Translation** (Most Needed!)
-   - Translate constitution content to Kenyan local dialects
-   - Implement language switching infrastructure
-   - Integrate with translation APIs or manual translation workflows
+1. **🧪 Testing Infrastructure** (Most Needed!)
+   - Set up comprehensive testing framework (Jest/React Testing Library)
+   - Add unit tests for components and hooks
+   - Implement integration tests for user flows
+   - Add end-to-end testing capabilities
 
-2. **📝 Missing Article Sections**
-   - Our programmatic scraping wasn't perfect - help us fill gaps
-   - Cross-reference with official constitution documents
-   - Validate and complete missing content
+2. **🛡️ Error Handling & Production Readiness**
+   - Implement global error boundaries
+   - Configure production console log removal
+   - Add performance monitoring and analytics
+   - Implement comprehensive error tracking
 
-3. **📱 Offline Content Support**
-   - Cache critical constitutional content for offline access
-   - Implement service workers for offline functionality
-   - Sync user progress when back online
+3. **🚀 Performance Optimization**
+   - Implement code splitting for large components
+   - Add bundle analysis and optimization
+   - Enable Next.js image optimization
+   - Add virtualization for long lists
 
-4. **👤 Mzalendo Profile Integration**
-   - API testing and frontend integration
-   - User achievements system
-   - Personalization features
-   - Settings and overview dashboards
+4. **📱 PWA Capabilities**
+   - Implement service worker for offline functionality
+   - Add background sync capabilities
+   - Implement push notifications
+   - Add app manifest for installability
 
-5. **🔊 Text-to-Speech Enhancement**
-   - Humanize TTS functionality
-   - Add voice selection and speed controls
-   - Integrate with accessibility features
+5. **🔍 Advanced Search Features**
+   - Implement search result highlighting
+   - Add search filters and sorting
+   - Implement voice search integration
+   - Add search history and suggestions
 
-6. **🐛 General Bug Fixes**
-   - UI/UX improvements
-   - Performance optimizations
-   - Cross-browser compatibility
-   - Mobile responsiveness issues
+6. **♿ Accessibility Enhancements**
+   - Complete ARIA labels and roles
+   - Add keyboard navigation support
+   - Implement high contrast mode
+   - Add screen reader optimization
 
 ## ✨ Current Features
 
+### 🔐 **Authentication & User Management**
+- **Google OAuth Integration:** Secure authentication with automatic token refresh
+- **User Profiles:** Complete profile management with preferences and settings
+- **Offline Authentication:** Authentication works even when offline
+- **Protected Routes:** Secure route protection with middleware
+
+### 🌍 **Multilingual Support**
+- **6 Language Support:** English, Swahili, Kikuyu, Luo, Kalenjin, and Kamba
+- **Dynamic Language Switching:** Seamless language switching with UI
+- **Translation Fallbacks:** Intelligent fallback handling for missing translations
+- **Persistent Language Preference:** User language choices saved automatically
+
+### 📖 **Constitution Content**
+- **Complete Constitution:** All 18 chapters with 12,675+ lines of content
+- **Structured Content:** Proper hierarchy with articles, clauses, and sub-clauses
 - **Full-text Search:** Quickly find articles, chapters, and rights
-- **Multilingual Support:** English, Swahili, and growing local language support
+- **Smart Reading Progress:** Content-aware completion tracking with realistic thresholds
+
+### 📱 **Offline Functionality**
+- **Comprehensive Offline Support:** IndexedDB-based content storage
+- **Chapter Downloads:** Download individual chapters for offline reading
+- **Offline Sync:** Automatic synchronization when back online
+- **Offline Status Indicators:** Clear indicators for offline/online status
+
+### 🎨 **User Experience**
 - **Responsive Design:** Seamless experience on desktop and mobile
 - **Educational Resources:** Learn about rights, chapters, and key constitutional concepts
 - **Interactive Scenarios:** Real-world constitutional applications
-- **User Authentication:** Google OAuth integration
-- **Smart Reading Progress:** Content-aware completion tracking with realistic thresholds
 - **Optimized Bookmarking:** Efficient bookmark management with reduced API calls
 - **Improved Profile UI:** Streamlined profile dropdown with better UX
 
