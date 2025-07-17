@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Copy, Facebook, Twitter, Share2 } from "lucide-react"
 import { useLanguage } from "@/contexts/language-context"
 import { cn } from "@/lib/utils"
+import { sharingService } from "@/services/sharing.service"
 
 // Custom WhatsApp icon component
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -39,6 +40,8 @@ interface ShareDialogProps {
   description?: string
   triggerButton?: React.ReactNode
   onShare?: (platform: string) => void
+  contentType?: string
+  contentId?: string
 }
 
 export function ShareDialog({
@@ -46,7 +49,9 @@ export function ShareDialog({
   url = typeof window !== 'undefined' ? window.location.href : '',
   description = "Check out this content on Katiba360",
   triggerButton,
-  onShare
+  onShare,
+  contentType = "content",
+  contentId = "unknown"
 }: ShareDialogProps) {
   const { t } = useLanguage()
   const [shareUrl, setShareUrl] = useState(url)
@@ -65,13 +70,16 @@ export function ShareDialog({
     }
   }, [isOpen])
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     navigator.clipboard.writeText(shareUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+    
+    // Track sharing event
+    await sharingService.trackShare(contentType, contentId, 'copy-link', shareUrl)
   }
 
-  const handleSharePlatform = (platform: string) => {
+  const handleSharePlatform = async (platform: string) => {
     let shareLink = ''
     const encodedUrl = encodeURIComponent(shareUrl)
     const encodedTitle = encodeURIComponent(title)
@@ -93,6 +101,14 @@ export function ShareDialog({
 
     if (shareLink) {
       window.open(shareLink, '_blank', 'noopener,noreferrer')
+      
+      // Track sharing event
+      await sharingService.trackShare(
+        contentType, 
+        contentId, 
+        platform as 'facebook' | 'twitter' | 'whatsapp', 
+        shareUrl
+      )
     }
 
     if (onShare) {

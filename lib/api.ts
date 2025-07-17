@@ -13,7 +13,6 @@ export async function fetchAPI(
 ): Promise<any> {
   const url = `${API_BASE_URL}${endpoint}`;
   
-  // Get access token from localStorage if available
   let accessToken = null;
   if (typeof window !== 'undefined') {
     accessToken = localStorage.getItem('accessToken');
@@ -22,24 +21,50 @@ export async function fetchAPI(
   const defaultOptions: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
-      // Add authorization header if token exists
       ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}),
       ...options.headers,
     },
   };
 
-  const response = await fetch(url, {
-    ...defaultOptions,
+  const finalOptions = {
     ...options,
-  });
+    headers: {
+      ...defaultOptions.headers,
+      ...options.headers,
+    },
+  };
+
+  // Enhanced logging for debugging
+  console.log('--- API Request ---');
+  console.log(`Endpoint: ${endpoint}`);
+  console.log(`URL: ${url}`);
+  console.log('Options:', JSON.stringify(finalOptions, null, 2));
+  console.log('-------------------');
+
+  const response = await fetch(url, finalOptions);
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.detail ?? 'An error occurred while fetching data');
+    const error = new Error(data.detail ?? 'An error occurred while fetching data');
+    (error as any).status = response.status;
+    console.error('API Error:', { url, status: response.status, response: data });
+    throw error;
   }
 
   return data;
+}
+
+/**
+ * Make a request with automatic token refresh on 401 errors
+ */
+export async function fetchAPIWithRefresh(
+  endpoint: string, 
+  options: RequestInit = {}
+): Promise<any> {
+  // Import here to avoid circular dependency
+  const { apiInterceptorService } = await import('@/services/api-interceptor.service');
+  return apiInterceptorService.fetchWithRefresh(endpoint, options);
 }
 
 /**
@@ -65,6 +90,20 @@ export async function exchangeGoogleCode(
  */
 export async function getUserProfile(): Promise<any> {
   return fetchAPI('/api/v1/users/profile');
+}
+
+/**
+ * Update the current user's profile
+ * @param profileData Profile data to update
+ */
+export async function updateUserProfile(profileData: {
+  display_name?: string;
+  bio?: string;
+}): Promise<any> {
+  return fetchAPI('/api/v1/users/profile', {
+    method: 'PUT',
+    body: JSON.stringify(profileData),
+  });
 }
 
 /**
@@ -183,7 +222,7 @@ export async function saveBookmark({
  * @param userId User's UUID
  */
 export async function getUserBookmarks(userId: string): Promise<any> {
-  return fetchAPI(`/api/v1/constitution/user/${userId}/bookmarks`);
+  return fetchAPIWithRefresh(`/api/v1/constitution/user/${userId}/bookmarks`);
 }
 
 /**
@@ -208,7 +247,7 @@ export async function removeBookmark(
 }
 
 // Debug mode for logging
-const DEBUG_MODE = true;
+const DEBUG_MODE = process.env.NODE_ENV === 'development';
 
 /**
  * Update reading progress for the user
@@ -268,5 +307,95 @@ export async function updateReadingProgress({
  * @param userId User's UUID
  */
 export async function getUserReadingProgress(userId: string): Promise<any> {
-  return fetchAPI(`/api/v1/constitution/user/${userId}/progress`);
+  return fetchAPIWithRefresh(`/api/v1/constitution/user/${userId}/progress`);
+}
+
+/**
+ * Get user's reading streak
+ */
+export async function getUserReadingStreak(): Promise<any> {
+  return fetchAPI('/api/v1/reading/streak');
+}
+
+/**
+ * Get reading analytics for a specific period
+ * @param period Time period ('week', 'month', 'year')
+ */
+export async function getReadingAnalytics(period: string): Promise<any> {
+  return fetchAPI(`/api/v1/reading/analytics/${period}`);
+}
+
+/**
+ * Get user achievements
+ */
+export async function getUserAchievements(): Promise<any> {
+  return fetchAPIWithRefresh('/api/v1/achievements');
+}
+
+/**
+ * Get user saved content
+ * @param folderId Optional folder ID to filter by
+ */
+export async function getUserSavedContent(folderId?: string): Promise<any> {
+  const queryParam = folderId ? `?folder_id=${folderId}` : '';
+  return fetchAPI(`/api/v1/content/saved${queryParam}`);
+}
+
+/**
+ * Save content for user
+ * @param contentData Content data to save
+ */
+export async function saveContent(contentData: {
+  content_type: string;
+  content_id: string;
+  title: string;
+  description?: string;
+  folder_id?: string;
+}): Promise<any> {
+  return fetchAPI('/api/v1/content/saved', {
+    method: 'POST',
+    body: JSON.stringify(contentData),
+  });
+}
+
+/**
+ * Remove saved content
+ * @param contentId Content ID to remove
+ */
+export async function removeSavedContent(contentId: string): Promise<any> {
+  return fetchAPI(`/api/v1/content/saved/${contentId}`, {
+    method: 'DELETE',
+  });
+}
+
+/**
+ * Get user's offline content
+ */
+export async function getUserOfflineContent(): Promise<any> {
+  return fetchAPI('/api/v1/content/offline');
+}
+
+/**
+ * Add content for offline access
+ * @param contentData Offline content data
+ */
+export async function addOfflineContent(contentData: {
+  content_id: string;
+  content_type: string;
+  priority?: number;
+}): Promise<any> {
+  return fetchAPI('/api/v1/content/offline', {
+    method: 'POST',
+    body: JSON.stringify(contentData),
+  });
+}
+
+/**
+ * Remove offline content
+ * @param contentId Content ID to remove from offline
+ */
+export async function removeOfflineContent(contentId: string): Promise<any> {
+  return fetchAPI(`/api/v1/content/offline/${contentId}`, {
+    method: 'DELETE',
+  });
 }

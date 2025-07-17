@@ -85,6 +85,8 @@ export function ChapterSidebar({
             title={`Chapter ${chapterNumber}: ${chapterTitle} - Katiba360`}
             description={`Learn about ${chapterTitle} in the Kenyan Constitution`}
             url={chapterUrl}
+            contentType="chapter"
+            contentId={chapterNumber.toString()}
             triggerButton={
               <Button variant="outline" className="w-full justify-start text-[#4B5563]">
                 <Share2 className="h-4 w-4 mr-2" />

@@ -19,16 +19,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Menu, X, User, LogOut, ChevronDown } from "lucide-react"
 import Portal from "../Portal"
-
-// Online status indicator component
-const OnlineStatusIndicator = () => {
-  return (
-    <span className="relative flex h-2 w-2">
-      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1EB53A] opacity-75"></span>
-      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0A7B24]"></span>
-    </span>
-  )
-}
+import { OnlineOfflineStatus } from "@/components/ui/online-offline-status"
+import { ProfileDropdown } from "@/components/ui/profile-dropdown"
 
 export default function Header() {
   const { t } = useLanguage()
@@ -205,52 +197,7 @@ export default function Header() {
           ) : (
             <div className="hidden md:flex items-center gap-3">
               {/* User Profile Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 rounded-full border border-gray-200 p-0 hover:bg-[#F3F4F6]"
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage 
-                        src={getAvatarUrl()} 
-                        alt={getDisplayName()} 
-                        onError={(e) => {
-                          // If image fails to load, hide it so fallback shows
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                      <AvatarFallback className="bg-[#F0FFF4] text-[#0A7B24]">
-                        {getDisplayName().charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    {/* Online status indicator */}
-                    <span className="absolute top-0 right-0">
-                      <OnlineStatusIndicator />
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel className="flex flex-col">
-                    <span>{getDisplayName()}</span>
-                    <span className="text-xs text-gray-500 mt-1 truncate">{authState.user?.email}</span>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <LogoutLink className="cursor-pointer w-full flex items-center text-[#CE1126]">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Logout</span>
-                    </LogoutLink>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <ProfileDropdown />
             </div>
           )}
 
@@ -297,28 +244,27 @@ export default function Header() {
             {authState.isAuthenticated && (
               <div className="mb-8 pb-6 border-b border-gray-200">
                 <div className="flex items-center">
-                  <Avatar className="h-12 w-12 mr-4">
-                    <AvatarImage 
-                      src={getAvatarUrl()} 
-                      alt={getDisplayName()} 
-                      onError={(e) => {
-                        // If image fails to load, hide it so fallback shows
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                    <AvatarFallback className="bg-[#F0FFF4] text-[#0A7B24] text-lg">
-                      {getDisplayName().charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center">
-                      <h3 className="font-medium text-[#111827]">
-                        {getDisplayName()}
-                      </h3>
-                      <span className="ml-2">
-                        <OnlineStatusIndicator />
-                      </span>
-                    </div>
+                  <div className="relative">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage 
+                        src={getAvatarUrl()} 
+                        alt={getDisplayName()} 
+                        onError={(e) => {
+                          // If image fails to load, hide it so fallback shows
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      <AvatarFallback className="bg-[#F0FFF4] text-[#0A7B24] text-lg">
+                        {getDisplayName().charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    {/* Breathing dot status indicator */}
+                    <OnlineOfflineStatus className="absolute -top-1 -right-1" showInMobile={true} />
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <h3 className="font-medium text-[#111827]">
+                      {getDisplayName()}
+                    </h3>
                     <p className="text-sm text-[#6B7280]">{authState.user?.email}</p>
                   </div>
                 </div>
