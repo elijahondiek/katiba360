@@ -57,6 +57,11 @@ class ApiInterceptorService {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<any> {
+    // SSR safety check
+    if (typeof window === 'undefined') {
+      throw new Error('Token refresh not available during SSR')
+    }
+    
     const refreshToken = localStorage.getItem('refreshToken')
     
     if (!refreshToken) {
@@ -102,6 +107,11 @@ class ApiInterceptorService {
    * Perform token refresh
    */
   private async performTokenRefresh(): Promise<void> {
+    // SSR safety check
+    if (typeof window === 'undefined') {
+      throw new Error('Token refresh not available during SSR')
+    }
+    
     const refreshToken = localStorage.getItem('refreshToken')
     
     if (!refreshToken) {
@@ -167,6 +177,11 @@ class ApiInterceptorService {
    * Clear auth and redirect to login
    */
   private clearAuthAndRedirect(): void {
+    // SSR safety check
+    if (typeof window === 'undefined') {
+      return
+    }
+    
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('user')
@@ -185,6 +200,11 @@ class ApiInterceptorService {
    * Redirect to login
    */
   private redirectToLogin(): void {
+    // SSR safety check
+    if (typeof window === 'undefined') {
+      return
+    }
+    
     window.location.href = '/login?error=session_expired'
   }
 
@@ -192,6 +212,11 @@ class ApiInterceptorService {
    * Check if token is about to expire (within 2 minutes)
    */
   isTokenExpiring(): boolean {
+    // SSR safety check
+    if (typeof window === 'undefined') {
+      return false
+    }
+    
     const token = localStorage.getItem('accessToken')
     if (!token) return true
 
@@ -212,6 +237,11 @@ class ApiInterceptorService {
    * Get time until token expires (in seconds)
    */
   getTimeUntilExpiration(): number {
+    // SSR safety check
+    if (typeof window === 'undefined') {
+      return 0
+    }
+    
     const token = localStorage.getItem('accessToken')
     if (!token) return 0
 
