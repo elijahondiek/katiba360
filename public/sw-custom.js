@@ -20,7 +20,29 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET requests
+  // Handle POST requests to backend API
+  if (request.method === 'POST') {
+    const apiUrl = self.SW_CONFIG?.API_URL || 'http://localhost:8000';
+    if (url.href.startsWith(apiUrl)) {
+      event.respondWith(
+        fetch(request).catch(() => {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Offline', 
+              message: 'Cannot process POST requests while offline'
+            }),
+            {
+              status: 503,
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
+        })
+      );
+      return;
+    }
+  }
+
+  // Skip other non-GET requests
   if (request.method !== 'GET') return;
 
   // Handle backend API requests dynamically using config
@@ -112,22 +134,57 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname === '/manifest.json' || 
       url.pathname.endsWith('.png') || 
       url.pathname.endsWith('.jpg') || 
-      url.pathname.endsWith('.svg')) {
+      url.pathname.endsWith('.svg') ||
+      url.pathname.endsWith('.ico')) {
     event.respondWith(
-      caches.match(request).then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(request).then(response => {
-          // Cache static files
-          const responseToCache = response.clone();
-          caches.open('static-assets').then(cache => {
-            cache.put(request, responseToCache);
+      caches.open('static-assets').then(cache => {
+        return cache.match(request).then(response => {
+          if (response) {
+            console.log('[SW] Returning cached static asset:', url.pathname);
+            return response;
+          }
+          
+          // Try to fetch and cache
+          return fetch(request).then(fetchResponse => {
+            // Cache static files
+            if (fetchResponse.status === 200) {
+              const responseToCache = fetchResponse.clone();
+              cache.put(request, responseToCache);
+            }
+            return fetchResponse;
+          }).catch(() => {
+            console.log('[SW] Failed to fetch static asset:', url.pathname);
+            // For manifest.json, return a minimal valid manifest
+            if (url.pathname === '/manifest.json') {
+              return new Response(JSON.stringify({
+                name: 'Katiba360',
+                short_name: 'Katiba360',
+                start_url: '/',
+                display: 'standalone'
+              }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' }
+              });
+            }
+            return new Response('Not Found', { status: 404 });
           });
-          return response;
-        }).catch(() => {
-          // Return a 404 for missing static files when offline
-          return new Response('Not Found', { status: 404 });
+        });
+      })
+    );
+    return;
+  }
+
+  // Handle RSC requests (Next.js specific)
+  if (url.searchParams.has('_rsc')) {
+    event.respondWith(
+      fetch(request).catch(() => {
+        // Return empty RSC response when offline
+        return new Response('0:["$","div",null,{"children":"Offline"}]', {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/x-component',
+            'x-offline': 'true'
+          }
         });
       })
     );
@@ -135,7 +192,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Handle navigation requests (HTML pages)
-  if (request.mode === 'navigate') {
+  if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
       fetch(request)
         .then(response => {
