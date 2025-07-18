@@ -363,9 +363,25 @@ export default function ChaptersPage() {
                   <div className="mt-auto">
                     <div className="flex justify-between text-sm text-[#6B7280] mb-2">
                       <span>
-                        {Array.isArray(chapter.articles)
-                          ? `${chapter.articles.length} Articles`
-                          : "Articles"}
+                        {(() => {
+                          let articleCount = 0;
+                          
+                          // Count articles from direct articles array
+                          if (Array.isArray(chapter.articles)) {
+                            articleCount += chapter.articles.length;
+                          }
+                          
+                          // Count articles from parts array (for chapters like Chapter 14)
+                          if (Array.isArray(chapter.parts)) {
+                            chapter.parts.forEach((part: any) => {
+                              if (Array.isArray(part.articles)) {
+                                articleCount += part.articles.length;
+                              }
+                            });
+                          }
+                          
+                          return articleCount > 0 ? `${articleCount} Articles` : "Articles";
+                        })()}
                       </span>
                       <span>
                         {readingProgress[chapter.chapter_number.toString()] > 0
