@@ -58,22 +58,22 @@ export default function ProfilePage() {
             {/* Mobile Horizontal Tabs */}
             <div className="lg:hidden mb-6">
               <div className="bg-white rounded-lg border border-gray-200 p-1">
-                <div className="flex overflow-x-auto scrollbar-hide">
+                <div className="grid grid-cols-5 gap-1">
                   <button
                     onClick={() => setActiveTab("overview")}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                    className={`flex flex-col items-center gap-1 px-2 py-2 rounded-md text-xs font-medium transition-colors ${
                       activeTab === "overview" 
                         ? "bg-[#1EB53A] text-white" 
                         : "text-[#4B5563] hover:bg-gray-100"
                     }`}
                   >
                     <BarChart3 className="h-4 w-4" />
-                    <span>Overview</span>
+                    <span>Stats</span>
                   </button>
 
                   <button
                     onClick={() => setActiveTab("saved")}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                    className={`flex flex-col items-center gap-1 px-2 py-2 rounded-md text-xs font-medium transition-colors ${
                       activeTab === "saved" 
                         ? "bg-[#1EB53A] text-white" 
                         : "text-[#4B5563] hover:bg-gray-100"
@@ -85,7 +85,7 @@ export default function ProfilePage() {
 
                   <button
                     onClick={() => setActiveTab("achievements")}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                    className={`flex flex-col items-center gap-1 px-2 py-2 rounded-md text-xs font-medium transition-colors ${
                       activeTab === "achievements" 
                         ? "bg-[#1EB53A] text-white" 
                         : "text-[#4B5563] hover:bg-gray-100"
@@ -97,19 +97,19 @@ export default function ProfilePage() {
 
                   <button
                     onClick={() => setActiveTab("offline")}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                    className={`flex flex-col items-center gap-1 px-2 py-2 rounded-md text-xs font-medium transition-colors ${
                       activeTab === "offline" 
                         ? "bg-[#1EB53A] text-white" 
                         : "text-[#4B5563] hover:bg-gray-100"
                     }`}
                   >
                     <Download className="h-4 w-4" />
-                    <span>Offline</span>
+                    <span>Files</span>
                   </button>
 
                   <button
                     onClick={() => setActiveTab("settings")}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                    className={`flex flex-col items-center gap-1 px-2 py-2 rounded-md text-xs font-medium transition-colors ${
                       activeTab === "settings" 
                         ? "bg-[#1EB53A] text-white" 
                         : "text-[#4B5563] hover:bg-gray-100"
@@ -119,17 +119,6 @@ export default function ProfilePage() {
                     <span>Settings</span>
                   </button>
                 </div>
-              </div>
-              
-              {/* Mobile Logout Button */}
-              <div className="mt-3">
-                <button 
-                  onClick={() => logout()}
-                  className="flex items-center gap-2 px-3 py-2 text-[#CE1126] hover:bg-red-50 rounded-md transition-colors text-sm font-medium"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Sign Out</span>
-                </button>
               </div>
             </div>
 
