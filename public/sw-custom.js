@@ -3,11 +3,67 @@
 // Import configuration
 self.importScripts('/sw-config.js');
 
+// IndexedDB helper functions
+async function getFromIndexedDB(storeName, key) {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('katiba360_offline', 1);
+    
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const getRequest = store.get(key);
+      
+      getRequest.onsuccess = () => resolve(getRequest.result);
+      getRequest.onerror = () => reject(getRequest.error);
+    };
+    
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Get all chapters from IndexedDB
+async function getAllChaptersFromDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('katiba360_offline', 1);
+    
+    request.onsuccess = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains('chapters')) {
+        resolve([]);
+        return;
+      }
+      
+      const transaction = db.transaction(['chapters'], 'readonly');
+      const store = transaction.objectStore('chapters');
+      const getAllRequest = store.getAll();
+      
+      getAllRequest.onsuccess = () => resolve(getAllRequest.result || []);
+      getAllRequest.onerror = () => reject(getAllRequest.error);
+    };
+    
+    request.onerror = () => reject(request.error);
+  });
+}
+
 // Skip waiting and claim clients immediately
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing custom service worker');
   console.log('[SW] API URL:', self.SW_CONFIG?.API_URL);
-  self.skipWaiting();
+  
+  // Pre-cache essential files
+  event.waitUntil(
+    caches.open('static-assets').then(cache => {
+      return cache.addAll([
+        '/manifest.json',
+        '/logo.png',
+        '/logo-192x192.png',
+        '/logo-512x512.png'
+      ]).catch(error => {
+        console.log('[SW] Failed to pre-cache some files:', error);
+      });
+    }).then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (event) => {
@@ -78,8 +134,50 @@ self.addEventListener('fetch', (event) => {
           });
           return response;
         })
-        .catch(() => {
-          // When offline, try to get from cache
+        .catch(async () => {
+          // When offline, first try IndexedDB for chapter data
+          if (url.pathname.includes('/constitution/chapters')) {
+            try {
+              // Extract chapter number from URL if present
+              const chapterMatch = url.pathname.match(/chapters\/(\d+)/);
+              
+              if (chapterMatch) {
+                // Single chapter request
+                const chapterNumber = parseInt(chapterMatch[1]);
+                const chapter = await getFromIndexedDB('chapters', chapterNumber);
+                
+                if (chapter) {
+                  console.log('[SW] Returning chapter from IndexedDB:', chapterNumber);
+                  return new Response(JSON.stringify({
+                    status: 'success',
+                    data: chapter,
+                    offline: true
+                  }), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                }
+              } else {
+                // All chapters request
+                const chapters = await getAllChaptersFromDB();
+                if (chapters.length > 0) {
+                  console.log('[SW] Returning all chapters from IndexedDB');
+                  return new Response(JSON.stringify({
+                    status: 'success',
+                    body: { chapters: chapters },
+                    offline: true
+                  }), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                }
+              }
+            } catch (error) {
+              console.error('[SW] Error reading from IndexedDB:', error);
+            }
+          }
+          
+          // Try cache as fallback
           return caches.match(request).then(response => {
             if (response) {
               console.log('[SW] Returning cached backend API response for:', url.pathname);
@@ -89,7 +187,7 @@ self.addEventListener('fetch', (event) => {
             return new Response(
               JSON.stringify({ 
                 error: 'Offline', 
-                message: 'Backend API not available offline',
+                message: 'Content not available offline',
                 cached: false
               }),
               {
