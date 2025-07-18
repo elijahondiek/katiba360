@@ -4,6 +4,8 @@
 export interface Article {
   article_number: number;
   article_title: string;
+  part_number?: number;
+  part_title?: string;
   clauses: Array<{
     clause_number: string;
     content: string;

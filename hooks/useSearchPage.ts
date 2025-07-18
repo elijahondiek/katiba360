@@ -4,9 +4,13 @@ import { searchConstitution, getChapters } from '@/lib/api';
 // Define result types based on the API response
 export interface SearchResult {
   id: string;
-  type: 'chapter' | 'article' | 'clause' | 'right' | 'scenario' | 'sub_clause';
+  type: 'chapter' | 'part' | 'article' | 'article_title' | 'clause' | 'sub_clause' | 'preamble' | 'right' | 'scenario';
   title: string;
   chapter?: {
+    number: string;
+    title: string;
+  };
+  part?: {
     number: string;
     title: string;
   };
@@ -174,13 +178,15 @@ export function useSearchPage(options: UseSearchPageOptions = {}) {
         // Transform API results to our SearchResult format
         const transformedResults = apiResults.map((item: any): SearchResult => {
           // Get the type directly from the API response
-          const type = item.type as 'chapter' | 'article' | 'clause' | 'right' | 'scenario' | 'sub_clause';
+          const type = item.type as 'chapter' | 'part' | 'article' | 'article_title' | 'clause' | 'sub_clause' | 'preamble' | 'right' | 'scenario';
           
           // Determine the URL based on the type
           let url = '/';
           if (type === 'chapter') {
             url = `/chapters/${item.chapter_number}`;
-          } else if (['article', 'clause', 'sub_clause'].includes(type)) {
+          } else if (type === 'part') {
+            url = `/chapters/${item.chapter_number}#part-${item.part_number}`;
+          } else if (['article', 'article_title', 'clause', 'sub_clause'].includes(type)) {
             url = `/chapters/${item.chapter_number}#article-${item.article_number}`;
             if (item.clause_number) {
               url += `-clause-${item.clause_number}`;
@@ -188,20 +194,29 @@ export function useSearchPage(options: UseSearchPageOptions = {}) {
                 url += `-${item.sub_clause_letter}`;
               }
             }
+          } else if (type === 'preamble') {
+            url = `/chapters/preamble`;
+          } else {
+            // Fallback for any other types - go to the chapter
+            url = `/chapters/${item.chapter_number || 1}`;
           }
           
           // Create a unique ID for the result
-          const id = `result-${item.chapter_number}-${item.article_number || ''}-${item.clause_number || ''}-${item.sub_clause_letter || ''}`;
+          const id = `result-${item.chapter_number}-${item.part_number || ''}-${item.article_number || ''}-${item.clause_number || ''}-${item.sub_clause_letter || ''}`;
           
           // Create the result object
           return {
             id,
             type,
-            title: item.article_title || item.chapter_title || '',
+            title: item.part_title || item.article_title || item.chapter_title || '',
             chapter: {
               number: String(item.chapter_number),
               title: item.chapter_title
             },
+            part: item.part_number ? {
+              number: String(item.part_number),
+              title: item.part_title
+            } : undefined,
             article: item.article_number ? {
               number: String(item.article_number),
               title: item.article_title
@@ -220,8 +235,8 @@ export function useSearchPage(options: UseSearchPageOptions = {}) {
           const typeFilters = activeFilters.filter(f => ['chapters', 'rights', 'scenarios'].includes(f));
           if (typeFilters.length > 0) {
             filteredResults = filteredResults.filter((result: SearchResult) => {
-              if (typeFilters.includes('chapters') && result.type === 'chapter') return true;
-              if (typeFilters.includes('rights') && (result.type === 'article' || result.type === 'clause' || result.type === 'sub_clause')) return true;
+              if (typeFilters.includes('chapters') && (result.type === 'chapter' || result.type === 'part' || result.type === 'preamble')) return true;
+              if (typeFilters.includes('rights') && (result.type === 'article' || result.type === 'article_title' || result.type === 'clause' || result.type === 'sub_clause' || result.type === 'right')) return true;
               if (typeFilters.includes('scenarios') && result.type === 'scenario') return true;
               return false;
             });

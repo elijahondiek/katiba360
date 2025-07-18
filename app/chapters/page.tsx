@@ -314,50 +314,59 @@ export default function ChaptersPage() {
                 key={chapter.chapter_number}
                 className="border border-[#E5E7EB] hover:border-[#1EB53A] rounded-xl p-6 transition-all duration-200 hover:shadow-md flex flex-col h-full relative group"
               >
-                {/* Bookmark Button */}
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleToggleBookmark(
-                      chapter.chapter_number,
-                      chapter.chapter_title
-                    );
-                  }}
-                  className="absolute top-4 right-4 text-[#6B7280] hover:text-[#1EB53A] transition-all duration-200"
-                  aria-label={
-                    bookmarkedChapters.includes(String(chapter.chapter_number))
-                      ? "Remove bookmark"
-                      : "Save for later"
-                  }
-                >
-                  {bookmarkedChapters.includes(
-                    String(chapter.chapter_number)
-                  ) ? (
-                    <BookmarkCheck className="h-5 w-5 transform transition-transform duration-300 scale-110" />
-                  ) : (
-                    <Bookmark className="h-5 w-5 transform transition-transform duration-300 group-hover:scale-110" />
-                  )}
-                </button>
-
-                {/* Popular Tag */}
-                {chapter.popular && (
-                  <div className="absolute top-4 left-4 bg-[#CE1126] text-white text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3" />
-                    <span>Popular</span>
+                {/* Top Row: Popular tag, Chapter Number Badge, and Bookmark */}
+                <div className="flex items-start justify-between mb-4">
+                  {/* Left side: Popular tag or Chapter number */}
+                  <div className="flex items-center gap-2">
+                    {chapter.popular && (
+                      <div className="bg-[#CE1126] text-white text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1">
+                        <TrendingUp className="h-3 w-3" />
+                        <span>Popular</span>
+                      </div>
+                    )}
+                    <div className="bg-[#1EB53A] text-white font-bold text-lg px-3 py-1 rounded-lg shadow-sm">
+                      {chapter.chapter_number}
+                    </div>
                   </div>
-                )}
+
+                  {/* Right side: Bookmark button */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleToggleBookmark(
+                        chapter.chapter_number,
+                        chapter.chapter_title
+                      );
+                    }}
+                    className="text-[#6B7280] hover:text-[#1EB53A] transition-all duration-200 z-10"
+                    aria-label={
+                      bookmarkedChapters.includes(String(chapter.chapter_number))
+                        ? "Remove bookmark"
+                        : "Save for later"
+                    }
+                  >
+                    {bookmarkedChapters.includes(
+                      String(chapter.chapter_number)
+                    ) ? (
+                      <BookmarkCheck className="h-5 w-5 transform transition-transform duration-300 scale-110" />
+                    ) : (
+                      <Bookmark className="h-5 w-5 transform transition-transform duration-300 group-hover:scale-110" />
+                    )}
+                  </button>
+                </div>
 
                 <Link
                   href={`/chapters/${chapter.chapter_number}`}
                   className="flex flex-col h-full"
                 >
+                  {/* Chapter Icon */}
                   <div className="bg-[#1EB53A]/10 p-3 rounded-full w-fit mb-4">
                     {chapterIconMap[chapter.chapter_number]}
                   </div>
 
                   <h2 className="text-xl font-bold mb-2 text-[#0A7B24]">
-                    {chapter.chapter_title}
+                    Chapter {chapter.chapter_number}: {chapter.chapter_title}
                   </h2>
 
                   <div className="mt-auto">

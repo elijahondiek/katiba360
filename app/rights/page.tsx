@@ -35,7 +35,9 @@ export default function RightsPage() {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(article => 
         article.article_title.toLowerCase().includes(query) ||
-        article.clauses.some(clause => clause.content.toLowerCase().includes(query))
+        (article.clauses && article.clauses.some(clause => 
+          clause.content && clause.content.toLowerCase().includes(query)
+        ))
       );
     }
 
@@ -180,7 +182,7 @@ export default function RightsPage() {
                           </span>
                         </div>
                         <p className="text-[#4B5563] mb-2">
-                          {article.clauses[0]?.content || "No description available."}
+                          {article.clauses && article.clauses[0]?.content || "No description available."}
                         </p>
                         <span className="text-xs font-medium text-[#6B7280]">
                           {getArticleCategory(article.article_number)}

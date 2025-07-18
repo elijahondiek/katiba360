@@ -141,8 +141,22 @@ export async function getChapters(limit: number = 10, offset: number = 0): Promi
  * Get a chapter by its number
  * @param chapterNumber Chapter number
  */
-export async function getChapterByNumber(chapterNumber: number): Promise<any> {
-  return fetchAPI(`/api/v1/constitution/chapters/${chapterNumber}`);
+export async function getChapterByNumber(chapterNumber: number, options?: { force_reload?: boolean }): Promise<any> {
+  const params = new URLSearchParams();
+  if (options?.force_reload) {
+    params.append('force_reload', 'true');
+  }
+  const url = `/api/v1/constitution/chapters/${chapterNumber}${params.toString() ? `?${params.toString()}` : ''}`;
+  return fetchAPI(url);
+}
+
+/**
+ * Force reload constitution data from the backend (clears cache)
+ */
+export async function reloadConstitutionData(): Promise<any> {
+  return fetchAPI('/api/v1/constitution/reload', {
+    method: 'POST',
+  });
 }
 
 /**

@@ -2,34 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Highlight effect for sections when navigated to via anchor links */
+/* Enhanced highlight effect for sections when navigated to via anchor links */
 .highlight-section {
-  animation: highlight-pulse 5s ease-in-out;
+  animation: enhanced-highlight 2.5s ease-in-out, attention-pulse 0.4s ease-in-out 2 2.5s;
   scroll-margin-top: 100px; /* Ensures the element isn't hidden behind fixed headers */
-  background-color: rgba(30, 181, 58, 0.15); /* Maintain a subtle background even after animation */
-  border-radius: 4px;
-  padding: 8px 12px; /* Add padding around the content */
-  margin: 0 -12px; /* Negative margin to offset padding and maintain alignment */
+  background-color: rgba(30, 181, 58, 0.06); /* Subtle persistent background */
+  border-radius: 6px;
+  padding: 8px 12px; /* Contained padding */
+  margin: 2px 0; /* Small margin to avoid affecting layout */
+  border-left: 3px solid rgba(30, 181, 58, 0.7); /* Contained left border */
+  border: 1px solid rgba(30, 181, 58, 0.2); /* Subtle full border */
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden; /* Contain any effects within the element */
 }
 
-@keyframes highlight-pulse {
+/* Remove effects after animation */
+.highlight-section.fade-out {
+  background-color: rgba(30, 181, 58, 0.03);
+  border-left-color: rgba(30, 181, 58, 0.4);
+  border-color: rgba(30, 181, 58, 0.1);
+}
+
+@keyframes enhanced-highlight {
   0% {
-    background-color: rgba(30, 181, 58, 0.3); /* Light green matching Kenyan flag */
-    box-shadow: 0 0 0 4px rgba(30, 181, 58, 0.3);
+    background-color: rgba(30, 181, 58, 0.18); /* Contained initial highlight */
+    border-left-color: rgba(30, 181, 58, 0.9);
+    border-color: rgba(30, 181, 58, 0.3);
   }
-  40% {
-    background-color: rgba(30, 181, 58, 0.4);
-    box-shadow: 0 0 0 4px rgba(30, 181, 58, 0.4);
+  30% {
+    background-color: rgba(30, 181, 58, 0.22);
+    border-left-color: rgba(30, 181, 58, 1);
+    border-color: rgba(30, 181, 58, 0.4);
   }
-  80% {
-    background-color: rgba(30, 181, 58, 0.25);
-    box-shadow: 0 0 0 4px rgba(30, 181, 58, 0.25);
+  70% {
+    background-color: rgba(30, 181, 58, 0.12);
+    border-left-color: rgba(30, 181, 58, 0.8);
+    border-color: rgba(30, 181, 58, 0.25);
   }
   100% {
-    background-color: rgba(30, 181, 58, 0.15);
-    box-shadow: none;
+    background-color: rgba(30, 181, 58, 0.06);
+    border-left-color: rgba(30, 181, 58, 0.7);
+    border-color: rgba(30, 181, 58, 0.2);
   }
 }
+
+/* Subtle attention pulse without glow */
+@keyframes attention-pulse {
+  0%, 100% {
+    background-color: rgba(30, 181, 58, 0.06);
+    border-left-color: rgba(30, 181, 58, 0.7);
+  }
+  50% {
+    background-color: rgba(30, 181, 58, 0.1);
+    border-left-color: rgba(30, 181, 58, 0.8);
+  }
+}
+
 
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -131,26 +160,14 @@ body {
   }
 }
 
-/* Search result highlight effects */
-@keyframes highlight-pulse {
-  0% {
-    background-color: rgba(30, 181, 58, 0.1);
-    box-shadow: 0 0 0 2px rgba(30, 181, 58, 0.2);
-  }
-  50% {
-    background-color: rgba(30, 181, 58, 0.2);
-    box-shadow: 0 0 0 4px rgba(30, 181, 58, 0.3);
-  }
-  100% {
-    background-color: rgba(30, 181, 58, 0.1);
-    box-shadow: 0 0 0 2px rgba(30, 181, 58, 0.2);
-  }
-}
-
-.highlight-section {
-  animation: highlight-pulse 2s ease-in-out;
-  border-radius: 0.25rem;
-  transition: all 0.3s ease;
+/* Enhanced search result highlighting */
+.search-highlight-text {
+  background: linear-gradient(120deg, rgba(30, 181, 58, 0.2) 0%, rgba(30, 181, 58, 0.3) 50%, rgba(30, 181, 58, 0.2) 100%);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: rgba(10, 123, 36, 1);
+  box-shadow: 0 1px 2px rgba(30, 181, 58, 0.1);
 }
 
 /* Style for highlighted text in search results */

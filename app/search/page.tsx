@@ -159,8 +159,12 @@ export default function SearchPage() {
   const getResultIcon = (type: string) => {
     switch (type) {
       case "chapter":
+      case "part":
       case "article":
+      case "article_title":
       case "clause":
+      case "sub_clause":
+      case "preamble":
       case "right":
         return <Shield className="h-5 w-5 text-[#1EB53A]" />
       case "scenario":
@@ -265,6 +269,11 @@ export default function SearchPage() {
                             {result.chapter && (
                               <p className="text-sm text-[#6B7280]">
                                 Chapter {result.chapter.number}: {result.chapter.title}
+                                {result.part && (
+                                  <span className="ml-2">
+                                    → Part {result.part.number}: {result.part.title}
+                                  </span>
+                                )}
                               </p>
                             )}
                             {result.highlight && (

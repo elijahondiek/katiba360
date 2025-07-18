@@ -55,7 +55,7 @@ export function useScrollToSection() {
           behavior: 'smooth'
         });
         
-        // Add a highlight effect to make it easier to spot
+        // Add enhanced highlight effect
         element.classList.add('highlight-section');
         
         // After scrolling to the element, try to find the specific clause again
@@ -64,20 +64,27 @@ export function useScrollToSection() {
           setTimeout(() => {
             const specificElement = document.getElementById(elementId);
             if (specificElement) {
-              // Add highlight to the specific clause
+              // Remove highlight from parent and add to specific element
+              element.classList.remove('highlight-section');
               specificElement.classList.add('highlight-section');
               
-              // Remove the highlight effect after 8 seconds
+              // Enhanced removal with fade-out class
               setTimeout(() => {
-                specificElement.classList.remove('highlight-section');
-              }, 8000);
+                specificElement.classList.add('fade-out');
+                setTimeout(() => {
+                  specificElement.classList.remove('highlight-section', 'fade-out');
+                }, 800);
+              }, 4000);
             }
           }, 500); // Give the DOM a moment to update
         } else {
-          // Remove the highlight effect after 8 seconds
+          // Enhanced removal with fade-out class for main element
           setTimeout(() => {
-            element.classList.remove('highlight-section');
-          }, 8000);
+            element.classList.add('fade-out');
+            setTimeout(() => {
+              element.classList.remove('highlight-section', 'fade-out');
+            }, 800);
+          }, 4000);
         }
         
         // Reset navigation state
