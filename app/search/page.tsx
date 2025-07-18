@@ -289,7 +289,12 @@ export default function SearchPage() {
                       {expandedResults.includes(result.id) && (
                         <div className="p-4 pt-0 border-t border-[#E5E7EB] animate-in slide-in-from-top duration-300">
                           <div className="prose prose-sm max-w-none mb-4">
-                            <p className="text-[#374151]">{result.content}</p>
+                            <div 
+                              className="text-[#374151]"
+                              dangerouslySetInnerHTML={{ 
+                                __html: result.content.replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-[#0A7B24]">$1</span>') 
+                              }} 
+                            />
                           </div>
                           <div className="flex justify-end">
                             <Link href={result.url}>
