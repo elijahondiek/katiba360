@@ -23,6 +23,13 @@ export default withPWA({
   sw: 'sw.js',
   customWorkerDir: 'public',
   importScripts: ['/sw-custom.js'],
+  additionalManifestEntries: [
+    { url: '/', revision: '1' },
+    { url: '/manifest.json', revision: '1' },
+    { url: '/logo.png', revision: '1' },
+    { url: '/logo-192x192.png', revision: '1' },
+    { url: '/logo-512x512.png', revision: '1' }
+  ],
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
