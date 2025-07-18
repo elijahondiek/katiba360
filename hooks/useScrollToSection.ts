@@ -128,8 +128,16 @@ export function useScrollToSection() {
     }, initialDelay);
   }, [isNavigating]);
 
-  // Handle hash changes and initial load
+  // Handle hash changes and initial load - only for specific pages
   useEffect(() => {
+    // Only activate scroll behavior on pages that need it
+    const allowedPaths = ['/chapters/', '/search', '/scenarios'];
+    const shouldActivate = allowedPaths.some(path => pathname.startsWith(path));
+    
+    if (!shouldActivate) {
+      return;
+    }
+
     // Function to handle hash changes
     const handleHashChange = () => {
       const hash = window.location.hash;
@@ -167,31 +175,9 @@ export function useScrollToSection() {
     // Set navigating state to true to use longer timeout for cross-page navigation
     setIsNavigating(true);
     
-    // Extract the hash from the URL
-    const hashIndex = url.indexOf('#');
-    let elementId = '';
-    
-    if (hashIndex !== -1) {
-      elementId = url.substring(hashIndex + 1);
-    }
-    
-    // Check if we're navigating to a new page or just changing the hash
-    const urlPath = hashIndex !== -1 ? url.substring(0, hashIndex) : url;
-    const currentPath = window.location.pathname;
-    
-    if (urlPath !== currentPath) {
-      // If navigating to a new page, use router.push and handle scrolling after navigation
-      router.push(url);
-      // The scrolling will be handled by the useEffect that watches pathname
-    } else {
-      // If just changing the hash on the same page, scroll directly
-      if (elementId) {
-        // Update the URL hash without a full navigation
-        window.history.pushState(null, '', `#${elementId}`);
-        scrollToElement(elementId);
-      }
-    }
-  }, [router, scrollToElement]);
+    // Use router.push for all navigation to ensure proper Next.js handling
+    router.push(url);
+  }, [router]);
 
   return { navigateToSection, scrollToElement };
 }
