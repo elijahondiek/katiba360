@@ -131,7 +131,7 @@ export function useScrollToSection() {
   // Handle hash changes and initial load - only for specific pages
   useEffect(() => {
     // Only activate scroll behavior on pages that need it
-    const allowedPaths = ['/chapters/', '/search', '/scenarios'];
+    const allowedPaths = ['/chapters', '/search', '/scenarios'];
     const shouldActivate = allowedPaths.some(path => pathname.startsWith(path));
     
     if (!shouldActivate) {
