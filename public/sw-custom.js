@@ -45,13 +45,27 @@ self.addEventListener('fetch', (event) => {
   // Skip other non-GET requests
   if (request.method !== 'GET') return;
 
+  // Handle Vercel Analytics gracefully when offline
+  if (url.pathname.includes('/_vercel/') || url.pathname.includes('/vitals')) {
+    event.respondWith(
+      fetch(request).catch(() => {
+        // Return empty response for analytics when offline
+        return new Response('', { status: 204 });
+      })
+    );
+    return;
+  }
+
   // Handle backend API requests dynamically using config
   const apiUrl = self.SW_CONFIG?.API_URL || 'http://localhost:8000';
   const apiUrlObj = new URL(apiUrl);
   
+  // Check if it's a backend API request (including production URLs)
   const isBackendAPI = url.href.includes('/api/v1/') || 
                        (url.hostname === apiUrlObj.hostname && url.port === apiUrlObj.port) ||
-                       url.href.startsWith(apiUrl);
+                       url.href.startsWith(apiUrl) ||
+                       url.hostname.includes('katiba360-backend') ||
+                       url.hostname.includes('onrender.com');
   
   if (isBackendAPI) {
     event.respondWith(
