@@ -28,11 +28,12 @@ We're actively seeking developers to help improve Katiba360° and make Kenya's c
    - Enable Next.js image optimization
    - Add virtualization for long lists
 
-4. **📱 PWA Capabilities**
-   - Implement service worker for offline functionality
-   - Add background sync capabilities
-   - Implement push notifications
-   - Add app manifest for installability
+4. **📱 PWA Capabilities** ✅ **Recently Implemented!**
+   - ✅ Service worker for offline functionality
+   - ✅ App manifest for installability
+   - ✅ Offline caching strategies
+   - ⏳ Background sync capabilities (coming soon)
+   - ⏳ Push notifications (planned)
 
 5. **🔍 Advanced Search Features**
    - Implement search result highlighting
@@ -66,11 +67,14 @@ We're actively seeking developers to help improve Katiba360° and make Kenya's c
 - **Full-text Search:** Quickly find articles, chapters, and rights
 - **Smart Reading Progress:** Content-aware completion tracking with realistic thresholds
 
-### 📱 **Offline Functionality**
+### 📱 **Offline Functionality & PWA**
+- **Progressive Web App:** Full PWA support with installability
+- **Service Worker:** Offline caching for static assets and API responses
 - **Comprehensive Offline Support:** IndexedDB-based content storage
 - **Chapter Downloads:** Download individual chapters for offline reading
 - **Offline Sync:** Automatic synchronization when back online
 - **Offline Status Indicators:** Clear indicators for offline/online status
+- **Install to Home Screen:** Works as a native app on mobile devices
 
 ### 🎨 **User Experience**
 - **Responsive Design:** Seamless experience on desktop and mobile
@@ -81,13 +85,15 @@ We're actively seeking developers to help improve Katiba360° and make Kenya's c
 
 ## 🛠 Tech Stack
 
-- **Frontend:** Next.js 14, React, TypeScript
+- **Frontend:** Next.js 15, React 19, TypeScript
 - **Styling:** Tailwind CSS, Radix UI
 - **State Management:** React Context
-- **Authentication:** NextAuth.js with Google OAuth
+- **Authentication:** Custom OAuth with Google
 - **Icons:** Lucide React
+- **PWA:** next-pwa with Workbox
 - **Backend API:** FastAPI (Python)
 - **Database:** PostgreSQL
+- **Offline Storage:** IndexedDB
 
 ## 🚀 Quick Start
 
