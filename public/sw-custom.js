@@ -1,8 +1,12 @@
 // Custom service worker additions for better offline support
 
+// Import configuration
+self.importScripts('/sw-config.js');
+
 // Skip waiting and claim clients immediately
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing custom service worker');
+  console.log('[SW] API URL:', self.SW_CONFIG?.API_URL);
   self.skipWaiting();
 });
 
@@ -19,8 +23,15 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (request.method !== 'GET') return;
 
-  // Handle localhost:8000 API requests (backend API)
-  if (url.hostname === 'localhost' && url.port === '8000') {
+  // Handle backend API requests dynamically using config
+  const apiUrl = self.SW_CONFIG?.API_URL || 'http://localhost:8000';
+  const apiUrlObj = new URL(apiUrl);
+  
+  const isBackendAPI = url.href.includes('/api/v1/') || 
+                       (url.hostname === apiUrlObj.hostname && url.port === apiUrlObj.port) ||
+                       url.href.startsWith(apiUrl);
+  
+  if (isBackendAPI) {
     event.respondWith(
       fetch(request)
         .then(response => {
