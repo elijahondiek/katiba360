@@ -20,7 +20,7 @@ import { FloatingOfflineMenu } from "@/components/chapters/floating-offline-menu
 import { ChapterNavigation } from "@/components/chapters/ChapterNavigation"
 
 // Import custom hooks
-import { useChapter } from "@/hooks/chapters/useChapter"
+import { useChapter, type Chapter, type Part } from "@/hooks/chapters/useChapter"
 import { useBookmark } from "@/hooks/chapters/useBookmark"
 import { useAudioSynthesis } from "@/hooks/chapters/useAudioSynthesis"
 import { useScrollHandling } from "@/hooks/chapters/useScrollHandling"
@@ -392,6 +392,7 @@ export default function ChapterDetailPage() {
           <div className="order-2 md:order-1">
             <ChapterSidebar 
               articles={articles}
+              parts={chapter.parts}
               activeSection={scrollHandling.activeSection}
               isBookmarked={isBookmarked}
               isSimplified={isSimplified}
@@ -427,18 +428,52 @@ export default function ChapterDetailPage() {
 
             {/* Article Content (visible) */}
             <div className="space-y-8">
-              {articles.map((article) => (
-                <div key={article.article_number} id={`article-${article.article_number}`} className="article-section">
-                  <ArticleContent 
-                    articles={[article]}
-                    processContent={processContent}
-                    chapterNumber={chapterNumber}
-                    bookmarkedArticles={articleBookmarks}
-                    loadingArticles={loadingArticleBookmarks}
-                    onToggleBookmark={toggleArticleBookmark}
-                  />
-                </div>
-              ))}
+              {chapter.parts && chapter.parts.length > 0 ? (
+                // Render parts structure with part headers
+                chapter.parts.map((part) => (
+                  <div key={part.part_number} className="space-y-6">
+                    {/* Part Header */}
+                    <div className="border-l-4 border-[#1EB53A] pl-4 py-2 bg-[#F9FAFB]">
+                      <h2 className="text-xl font-bold text-[#0A7B24] mb-1">
+                        Part {part.part_number}: {part.part_title}
+                      </h2>
+                      <div className="text-sm text-[#6B7280]">
+                        {part.articles?.length || 0} articles
+                      </div>
+                    </div>
+                    
+                    {/* Articles in this part */}
+                    <div className="space-y-6 ml-4">
+                      {part.articles?.map((article) => (
+                        <div key={article.article_number} id={`article-${article.article_number}`} className="article-section">
+                          <ArticleContent 
+                            articles={[article]}
+                            processContent={processContent}
+                            chapterNumber={chapterNumber}
+                            bookmarkedArticles={articleBookmarks}
+                            loadingArticles={loadingArticleBookmarks}
+                            onToggleBookmark={toggleArticleBookmark}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                // Render direct articles structure (existing chapters)
+                articles.map((article) => (
+                  <div key={article.article_number} id={`article-${article.article_number}`} className="article-section">
+                    <ArticleContent 
+                      articles={[article]}
+                      processContent={processContent}
+                      chapterNumber={chapterNumber}
+                      bookmarkedArticles={articleBookmarks}
+                      loadingArticles={loadingArticleBookmarks}
+                      onToggleBookmark={toggleArticleBookmark}
+                    />
+                  </div>
+                ))
+              )}
             </div>
             {/* Hidden container for audio synthesis (whole chapter) */}
             <div ref={contentRef} style={{ display: 'none' }}>

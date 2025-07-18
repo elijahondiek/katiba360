@@ -12,8 +12,15 @@ interface Article {
   article_title: string;
 }
 
+interface Part {
+  part_number: number;
+  part_title: string;
+  articles: Article[];
+}
+
 interface ChapterSidebarProps {
   articles: Article[];
+  parts?: Part[];
   activeSection: string | null;
   isBookmarked: boolean;
   isSimplified: boolean;
@@ -26,6 +33,7 @@ interface ChapterSidebarProps {
 
 export function ChapterSidebar({
   articles,
+  parts,
   activeSection,
   isBookmarked,
   isSimplified,
@@ -50,24 +58,56 @@ export function ChapterSidebar({
         <h3 className="font-bold text-lg">In This Chapter</h3>
       </div>
 
-      <ul className="space-y-2 mb-6">
-        {articles.map((article) => (
-          <li key={article.article_number}>
-            <button
-              onClick={() => onArticleClick(article.article_number)}
-              data-article-id={`article-${article.article_number}`}
-              className={cn(
-                "block w-full text-left p-2 rounded text-[#4B5563] hover:text-[#0A7B24] transition-colors",
-                activeSection === `article-${article.article_number}` || activeSection === article.article_number.toString()
-                  ? "bg-[#E5E7EB] text-[#0A7B24] font-medium"
-                  : "hover:bg-[#E5E7EB]",
-              )}
-            >
-              Article {article.article_number}: {article.article_title ?? ""}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className="space-y-3 mb-6">
+        {parts && parts.length > 0 ? (
+          // Render parts structure
+          parts.map((part) => (
+            <div key={part.part_number} className="space-y-2">
+              <h4 className="text-sm font-semibold text-[#0A7B24] px-2 py-1 bg-[#F0F9FF] rounded">
+                Part {part.part_number}: {part.part_title}
+              </h4>
+              <ul className="space-y-1 ml-2">
+                {part.articles?.map((article) => (
+                  <li key={article.article_number}>
+                    <button
+                      onClick={() => onArticleClick(article.article_number)}
+                      data-article-id={`article-${article.article_number}`}
+                      className={cn(
+                        "block w-full text-left p-2 rounded text-sm text-[#4B5563] hover:text-[#0A7B24] transition-colors",
+                        activeSection === `article-${article.article_number}` || activeSection === article.article_number.toString()
+                          ? "bg-[#E5E7EB] text-[#0A7B24] font-medium"
+                          : "hover:bg-[#E5E7EB]",
+                      )}
+                    >
+                      Article {article.article_number}: {article.article_title ?? ""}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        ) : (
+          // Render direct articles structure
+          <ul className="space-y-2">
+            {articles.map((article) => (
+              <li key={article.article_number}>
+                <button
+                  onClick={() => onArticleClick(article.article_number)}
+                  data-article-id={`article-${article.article_number}`}
+                  className={cn(
+                    "block w-full text-left p-2 rounded text-[#4B5563] hover:text-[#0A7B24] transition-colors",
+                    activeSection === `article-${article.article_number}` || activeSection === article.article_number.toString()
+                      ? "bg-[#E5E7EB] text-[#0A7B24] font-medium"
+                      : "hover:bg-[#E5E7EB]",
+                  )}
+                >
+                  Article {article.article_number}: {article.article_title ?? ""}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <div className="mt-6 pt-6 border-t border-[#E5E7EB]">
         <h3 className="font-bold text-lg mb-4">Tools</h3>
