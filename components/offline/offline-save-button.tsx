@@ -39,7 +39,7 @@ export function OfflineSaveButton({
   // Check if content is available offline
   useEffect(() => {
     checkOfflineStatus()
-  }, [contentId, contentType])
+  }, [contentId, contentType, authState?.user?.id])
 
   const checkOfflineStatus = async () => {
     if (!authState?.user?.id) {
@@ -62,6 +62,7 @@ export function OfflineSaveButton({
       }
     } catch (error) {
       console.error('Error checking offline status:', error)
+      setIsOfflineAvailable(false)
     } finally {
       setIsCheckingStatus(false)
     }
@@ -93,6 +94,8 @@ export function OfflineSaveButton({
       
       setIsOfflineAvailable(true)
       onSaveSuccess?.()
+      // Re-check status to ensure UI is in sync
+      setTimeout(() => checkOfflineStatus(), 1000)
     } catch (error) {
       console.error('Error saving offline:', error)
       ToastService.offlineContentError("save")

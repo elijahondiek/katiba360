@@ -18,6 +18,11 @@ export default withPWA({
   disable: process.env.NODE_ENV === 'development',
   register: true,
   skipWaiting: true,
+  buildExcludes: [/middleware-manifest\.json$/],
+  scope: '/',
+  sw: 'sw.js',
+  customWorkerDir: 'public',
+  importScripts: ['/sw-custom.js'],
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -102,10 +107,27 @@ export default withPWA({
       options: {
         cacheName: 'api-cache',
         expiration: {
-          maxEntries: 16,
-          maxAgeSeconds: 24 * 60 * 60 // 24 hours
+          maxEntries: 32,
+          maxAgeSeconds: 7 * 24 * 60 * 60 // 7 days
         },
-        networkTimeoutSeconds: 10
+        networkTimeoutSeconds: 5,
+        cacheableResponse: {
+          statuses: [0, 200]
+        }
+      }
+    },
+    {
+      urlPattern: ({ url }) => {
+        const isSameOrigin = self.origin === url.origin
+        return !isSameOrigin && !url.pathname.includes('/api/')
+      },
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'external-resources',
+        networkTimeoutSeconds: 3,
+        cacheableResponse: {
+          statuses: [0, 200]
+        }
       }
     }
   ]
