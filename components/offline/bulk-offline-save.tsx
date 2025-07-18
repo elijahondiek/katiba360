@@ -77,6 +77,9 @@ export function BulkOfflineSave({ onSaveComplete, className }: BulkOfflineSavePr
   const estimateChapterSize = (articleCount: number): string => {
     // Rough estimation: ~3KB per article
     const estimatedKB = articleCount * 3
+    if (isNaN(estimatedKB) || !isFinite(estimatedKB) || articleCount === undefined || articleCount === null) {
+      return "Size unknown"
+    }
     if (estimatedKB < 1024) {
       return `~${estimatedKB}KB`
     }
@@ -171,10 +174,15 @@ export function BulkOfflineSave({ onSaveComplete, className }: BulkOfflineSavePr
   )
 
   const totalEstimatedSize = () => {
-    return Array.from(selectedChapters).reduce((total, chapterNumber) => {
+    const totalKB = Array.from(selectedChapters).reduce((total, chapterNumber) => {
       const chapter = chapters.find(c => c.chapter_number === chapterNumber)
       return total + (chapter?.articles_count || 0) * 3 // 3KB per article estimate
     }, 0)
+    
+    if (totalKB < 1024) {
+      return `${totalKB}KB`
+    }
+    return `${(totalKB / 1024).toFixed(1)}MB`
   }
 
   if (isLoadingChapters) {
@@ -248,7 +256,7 @@ export function BulkOfflineSave({ onSaveComplete, className }: BulkOfflineSavePr
             
             {selectedChapters.size > 0 && (
               <div className="text-sm text-[#6B7280]">
-                Selected: {selectedChapters.size} chapters (~{totalEstimatedSize()}KB)
+                Selected: {selectedChapters.size} chapters (~{totalEstimatedSize()})
               </div>
             )}
           </div>
