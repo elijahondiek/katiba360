@@ -1,90 +1,95 @@
-import { Shield } from "lucide-react";
+import { Shield, Sparkles, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { getRightOfTheDay, Article } from "@/lib/rightOfDay";
-import { useChapter4 } from "@/hooks/useChapter4";
+import { useBillOfRights } from "@/hooks/useBillOfRights";
 import { useLanguage } from "@/contexts/language-context";
 import { ShareDialog } from "@/components/ui/share-dialog";
 import { useScrollToSection } from "@/hooks/useScrollToSection";
 
 export function RightOfDaySection() {
-  const { articles, isLoading, error } = useChapter4();
-  const [right, setRight] = useState<Article | null>(null);
+  const { currentRight, getCategoryIcon, getCategoryColor } = useBillOfRights();
   const { t } = useLanguage();
   const { navigateToSection } = useScrollToSection();
 
-  // Force update at midnight and when articles change
-  useEffect(() => {
-    // Function to update the right of the day
-    const updateRightOfDay = () => {
-      if (articles && articles.length > 0) {
-        // Create a new Date object each time to get the current date
-        const currentDate = new Date();
-        setRight(getRightOfTheDay(articles, currentDate));
-      }
-    };
-    
-    // Update immediately
-    updateRightOfDay();
-    
-    // Calculate time until next midnight
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    const timeUntilMidnight = tomorrow.getTime() - now.getTime();
-    
-    // Set a timeout to update at midnight
-    const midnightTimeout = setTimeout(updateRightOfDay, timeUntilMidnight);
-    
-    // Clean up timeout on unmount
-    return () => clearTimeout(midnightTimeout);
-  }, [articles]);
-
   // Show loading state or error
-  if (isLoading) return <div className="py-12 bg-[#F3F4F6] text-center">Loading rights...</div>;
-  if (!right) return null;
+  if (!currentRight) return null;
 
   return (
     <section className="py-12 bg-[#F3F4F6]">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">{t("home.rightOfDay")}</h2>
-        <div className="max-w-3xl mx-auto bg-white rounded-xl p-6 md:p-8 shadow-sm border border-[#E5E7EB]">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="bg-[#CE1126]/10 p-3 rounded-full">
-              <Shield className="h-6 w-6 text-[#CE1126]" />
-            </div>
-            <h3 className="text-xl font-bold">Article {right.article_number}: {right.article_title}</h3>
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <h2 className="text-2xl md:text-3xl font-bold">{t("home.rightOfDay")}</h2>
           </div>
-          <div className="mb-4">
-            {right.clauses.map((clause) => (
-              <p className="text-[#374151] mb-2" key={clause.clause_number}>{clause.content}</p>
-            ))}
-          </div>
-          {right.clauses.length > 0 && right.clauses[0].content && (
-            <div className="bg-[#F3F4F6] rounded-lg p-4 mb-6">
-              <p className="text-[#4B5563] italic">
-                "{right.clauses[0].content}"
-              </p>
-              <p className="text-[#6B7280] text-sm mt-2">
-                — Article {right.article_number}, Constitution of Kenya
-              </p>
+          <p className="text-[#6B7280] text-sm">Discover your constitutional rights, one day at a time</p>
+        </div>
+        <div className="max-w-4xl mx-auto bg-white rounded-xl p-6 md:p-8 shadow-sm border border-[#E5E7EB]">
+          {/* Constitutional Hierarchy Header */}
+          <div className="mb-6">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="bg-[#CE1126]/10 p-3 rounded-full flex-shrink-0">
+                <Shield className="h-6 w-6 text-[#CE1126]" />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm text-[#6B7280] font-medium mb-1">
+                  Chapter Four - The Bill of Rights
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="text-xl md:text-2xl font-bold text-[#0A7B24]">
+                    {currentRight.article}: {currentRight.title}
+                  </h3>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getCategoryColor(currentRight.category)}`}>
+                    <span className="mr-1">{getCategoryIcon(currentRight.category)}</span>
+                    {currentRight.category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </span>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
+          
+          {/* Description */}
+          <div className="mb-6">
+            <p className="text-[#374151] text-lg leading-relaxed">
+              {currentRight.description}
+            </p>
+          </div>
+
+          {/* Key Provisions */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <BookOpen className="h-5 w-5 text-[#0A7B24]" />
+              <h4 className="text-lg font-semibold text-[#0A7B24]">Key Provisions</h4>
+            </div>
+            <div className="bg-[#F9FAFB] rounded-lg p-4 border border-[#E5E7EB]">
+              <ul className="space-y-2">
+                {currentRight.key_provisions.map((provision, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-[#0A7B24] text-sm mt-1">•</span>
+                    <span className="text-[#374151] text-sm">{provision}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+
+          {/* Action Buttons */}
           <div className="flex flex-wrap gap-4">
             <Button 
-              className="bg-[#1EB53A] hover:bg-[#0A7B24] text-white"
+              className="bg-[#1EB53A] hover:bg-[#0A7B24] text-white flex items-center gap-2"
               onClick={() => {
-                // Use the enhanced navigateToSection with the full URL
-                navigateToSection(`/chapters/4#article-${right.article_number}`);
+                // Navigate to the chapter page
+                const articleNumber = currentRight.article.replace('Article ', '');
+                const url = `/chapters/4#article-${articleNumber}`;
+                navigateToSection(url);
               }}
             >
+              <BookOpen className="h-4 w-4" />
               {t("home.readFullArticle")}
             </Button>
             <ShareDialog 
-              title={`Article ${right.article_number}: ${right.article_title} - Katiba360`}
-              description={`Learn about your right to ${right.article_title.toLowerCase()} in the Kenyan Constitution`}
-              url={`${typeof window !== 'undefined' ? window.location.origin : ''}/chapters/4#article-${right.article_number}`}
+              title={`${currentRight.article}: ${currentRight.title} - Katiba360`}
+              description={`Learn about ${currentRight.title.toLowerCase()} in the Kenyan Constitution - ${currentRight.description}`}
+              url={`${typeof window !== 'undefined' ? window.location.origin : ''}/chapters/4#article-${currentRight.article.replace('Article ', '')}`}
             />
           </div>
         </div>

@@ -1,0 +1,450 @@
+{
+    "chapter": "Chapter Four - The Bill of Rights",
+    "source": "Constitution of Kenya",
+    "rights": [
+      {
+        "id": 1,
+        "article": "Article 26",
+        "title": "Right to Life",
+        "description": "Every person has the right to life. The life of a person begins at conception.",
+        "key_provisions": [
+          "Right to life for every person",
+          "Life begins at conception",
+          "No intentional deprivation of life except as authorized by Constitution",
+          "Abortion permitted only for emergency treatment or when mother's life/health is in danger"
+        ],
+        "category": "fundamental_rights"
+      },
+      {
+        "id": 2,
+        "article": "Article 27",
+        "title": "Equality and Freedom from Discrimination",
+        "description": "Every person is equal before the law and has the right to equal protection and benefit of the law.",
+        "key_provisions": [
+          "Equal treatment before the law",
+          "Equal opportunities for men and women",
+          "No discrimination based on race, sex, pregnancy, marital status, health, ethnic origin, color, age, disability, religion, culture, dress, language or birth",
+          "State must take affirmative action to address past discrimination",
+          "Not more than two-thirds of elective/appointive bodies shall be of same gender"
+        ],
+        "category": "equality_rights"
+      },
+      {
+        "id": 3,
+        "article": "Article 28",
+        "title": "Human Dignity",
+        "description": "Every person has inherent dignity and the right to have that dignity respected and protected.",
+        "key_provisions": [
+          "Inherent dignity for every person",
+          "Right to respect and protection of dignity"
+        ],
+        "category": "fundamental_rights"
+      },
+      {
+        "id": 4,
+        "article": "Article 29",
+        "title": "Freedom and Security of the Person",
+        "description": "Every person has the right to freedom and security, including protection from arbitrary detention, violence, torture, and cruel treatment.",
+        "key_provisions": [
+          "Right to freedom and security",
+          "No arbitrary deprivation of freedom",
+          "No detention without trial (except during emergency)",
+          "No violence from public or private sources",
+          "No torture, corporal punishment, or cruel treatment"
+        ],
+        "category": "liberty_rights"
+      },
+      {
+        "id": 5,
+        "article": "Article 30",
+        "title": "Freedom from Slavery, Servitude and Forced Labour",
+        "description": "No person shall be held in slavery or servitude, or required to perform forced labour.",
+        "key_provisions": [
+          "No slavery or servitude",
+          "No forced labour"
+        ],
+        "category": "liberty_rights"
+      },
+      {
+        "id": 6,
+        "article": "Article 31",
+        "title": "Right to Privacy",
+        "description": "Every person has the right to privacy, including protection of personal space, property, family affairs, and communications.",
+        "key_provisions": [
+          "Right to privacy",
+          "No unreasonable search of person, home, or property",
+          "No seizure of possessions without justification",
+          "Protection of family and private affairs",
+          "Privacy of communications"
+        ],
+        "category": "privacy_rights"
+      },
+      {
+        "id": 7,
+        "article": "Article 32",
+        "title": "Freedom of Conscience, Religion, Belief and Opinion",
+        "description": "Every person has the right to freedom of conscience, religion, thought, belief and opinion.",
+        "key_provisions": [
+          "Freedom of conscience, religion, thought, belief and opinion",
+          "Right to manifest religion through worship, practice, teaching",
+          "No denial of access to institutions due to belief or religion",
+          "No compulsion to act against one's belief or religion"
+        ],
+        "category": "expression_rights"
+      },
+      {
+        "id": 8,
+        "article": "Article 33",
+        "title": "Freedom of Expression",
+        "description": "Every person has the right to freedom of expression, including seeking, receiving and imparting information, artistic creativity, and academic freedom.",
+        "key_provisions": [
+          "Freedom to seek, receive, and impart information",
+          "Freedom of artistic creativity",
+          "Academic freedom and scientific research",
+          "Excludes propaganda for war, incitement to violence, hate speech"
+        ],
+        "category": "expression_rights"
+      },
+      {
+        "id": 9,
+        "article": "Article 34",
+        "title": "Freedom of the Media",
+        "description": "Freedom and independence of electronic, print and all other types of media is guaranteed.",
+        "key_provisions": [
+          "Freedom and independence of all media",
+          "No state control or interference with media",
+          "No penalization for opinions, views, or content",
+          "Freedom of media establishment subject to licensing",
+          "State-owned media must be impartial and independent"
+        ],
+        "category": "expression_rights"
+      },
+      {
+        "id": 10,
+        "article": "Article 35",
+        "title": "Access to Information",
+        "description": "Every citizen has the right to access information held by the State and other persons for protection of rights.",
+        "key_provisions": [
+          "Right to access information held by the State",
+          "Right to access information from others for rights protection",
+          "Right to correction of untrue or misleading information",
+          "State must publish important national information"
+        ],
+        "category": "expression_rights"
+      },
+      {
+        "id": 11,
+        "article": "Article 36",
+        "title": "Freedom of Association",
+        "description": "Every person has the right to form, join, or participate in associations of any kind.",
+        "key_provisions": [
+          "Right to form, join, or participate in associations",
+          "No compulsion to join associations",
+          "Fair registration processes for associations",
+          "Right to fair hearing before registration cancellation"
+        ],
+        "category": "association_rights"
+      },
+      {
+        "id": 12,
+        "article": "Article 37",
+        "title": "Assembly, Demonstration, Picketing and Petition",
+        "description": "Every person has the right to peaceably and unarmed assemble, demonstrate, picket, and petition public authorities.",
+        "key_provisions": [
+          "Right to peaceful and unarmed assembly",
+          "Right to demonstrate",
+          "Right to picket",
+          "Right to petition public authorities"
+        ],
+        "category": "association_rights"
+      },
+      {
+        "id": 13,
+        "article": "Article 38",
+        "title": "Political Rights",
+        "description": "Every citizen has the right to make political choices, participate in elections, and hold public office.",
+        "key_provisions": [
+          "Right to form and participate in political parties",
+          "Right to campaign for political causes",
+          "Right to free, fair and regular elections",
+          "Right to vote by secret ballot",
+          "Right to be registered as voter",
+          "Right to be candidate for public office"
+        ],
+        "category": "political_rights"
+      },
+      {
+        "id": 14,
+        "article": "Article 39",
+        "title": "Freedom of Movement and Residence",
+        "description": "Every person has the right to freedom of movement, and every citizen has the right to enter, remain in, and reside anywhere in Kenya.",
+        "key_provisions": [
+          "Right to freedom of movement",
+          "Right to leave Kenya",
+          "Right for citizens to enter, remain, and reside anywhere in Kenya"
+        ],
+        "category": "liberty_rights"
+      },
+      {
+        "id": 15,
+        "article": "Article 40",
+        "title": "Protection of Right to Property",
+        "description": "Every person has the right to acquire and own property, with protection against arbitrary deprivation.",
+        "key_provisions": [
+          "Right to acquire and own property anywhere in Kenya",
+          "No arbitrary deprivation of property",
+          "Compensation required for public acquisition of property",
+          "Protection of intellectual property rights",
+          "Rights don't extend to unlawfully acquired property"
+        ],
+        "category": "property_rights"
+      },
+      {
+        "id": 16,
+        "article": "Article 41",
+        "title": "Labour Relations",
+        "description": "Every person has the right to fair labour practices, including fair remuneration, reasonable working conditions, and the right to strike.",
+        "key_provisions": [
+          "Right to fair labour practices",
+          "Right to fair remuneration",
+          "Right to reasonable working conditions",
+          "Right to form and join trade unions",
+          "Right to strike",
+          "Right to collective bargaining"
+        ],
+        "category": "economic_rights"
+      },
+      {
+        "id": 17,
+        "article": "Article 42",
+        "title": "Right to Environment",
+        "description": "Every person has the right to a clean and healthy environment for present and future generations.",
+        "key_provisions": [
+          "Right to clean and healthy environment",
+          "Environmental protection for present and future generations",
+          "Legislative and other protective measures required"
+        ],
+        "category": "environmental_rights"
+      },
+      {
+        "id": 18,
+        "article": "Article 43",
+        "title": "Economic and Social Rights",
+        "description": "Every person has the right to healthcare, housing, food, water, social security, and education.",
+        "key_provisions": [
+          "Right to highest attainable standard of health",
+          "Right to accessible and adequate housing",
+          "Right to be free from hunger and have adequate food",
+          "Right to clean and safe water",
+          "Right to social security",
+          "Right to education",
+          "Right to emergency medical treatment"
+        ],
+        "category": "economic_rights"
+      },
+      {
+        "id": 19,
+        "article": "Article 44",
+        "title": "Language and Culture",
+        "description": "Every person has the right to use their language and participate in cultural life of their choice.",
+        "key_provisions": [
+          "Right to use one's language",
+          "Right to participate in cultural life of choice",
+          "Right to form cultural and linguistic associations",
+          "No compulsion to perform cultural practices against one's will"
+        ],
+        "category": "cultural_rights"
+      },
+      {
+        "id": 20,
+        "article": "Article 45",
+        "title": "Family Rights",
+        "description": "The family is the fundamental unit of society with rights to marriage, equality in marriage, and state protection.",
+        "key_provisions": [
+          "Family as fundamental unit of society",
+          "Right to marry person of opposite sex based on free consent",
+          "Equal rights in marriage and at dissolution",
+          "Recognition of traditional and religious marriages",
+          "State protection of family"
+        ],
+        "category": "family_rights"
+      },
+      {
+        "id": 21,
+        "article": "Article 46",
+        "title": "Consumer Rights",
+        "description": "Consumers have rights to quality goods and services, information, protection, and compensation.",
+        "key_provisions": [
+          "Right to goods and services of reasonable quality",
+          "Right to necessary information about goods and services",
+          "Right to protection of health, safety, and economic interests",
+          "Right to compensation for defective goods or services"
+        ],
+        "category": "consumer_rights"
+      },
+      {
+        "id": 22,
+        "article": "Article 47",
+        "title": "Fair Administrative Action",
+        "description": "Every person has the right to administrative action that is expeditious, efficient, lawful, reasonable and procedurally fair.",
+        "key_provisions": [
+          "Right to expeditious, efficient, lawful, reasonable and fair administrative action",
+          "Right to written reasons for administrative action",
+          "Right to review of administrative action by courts or tribunals"
+        ],
+        "category": "administrative_rights"
+      },
+      {
+        "id": 23,
+        "article": "Article 48",
+        "title": "Access to Justice",
+        "description": "The State shall ensure access to justice for all persons with reasonable fees that don't impede access.",
+        "key_provisions": [
+          "Right to access to justice for all persons",
+          "Reasonable fees that don't impede access to justice"
+        ],
+        "category": "justice_rights"
+      },
+      {
+        "id": 24,
+        "article": "Article 49",
+        "title": "Rights of Arrested Persons",
+        "description": "Arrested persons have rights including to be informed of charges, remain silent, legal representation, and timely court appearance.",
+        "key_provisions": [
+          "Right to be informed of reason for arrest",
+          "Right to remain silent",
+          "Right to communicate with advocate",
+          "Right not to be compelled to confess",
+          "Right to be brought before court within 24 hours",
+          "Right to be released on bail unless compelling reasons exist"
+        ],
+        "category": "justice_rights"
+      },
+      {
+        "id": 25,
+        "article": "Article 50",
+        "title": "Fair Hearing",
+        "description": "Every person has the right to fair and public hearing, and accused persons have extensive rights to fair trial.",
+        "key_provisions": [
+          "Right to fair and public hearing",
+          "Right to be presumed innocent until proven guilty",
+          "Right to be informed of charges with sufficient detail",
+          "Right to adequate time and facilities for defense",
+          "Right to public trial",
+          "Right to legal representation",
+          "Right to remain silent",
+          "Right to challenge evidence",
+          "Right to interpreter if needed",
+          "Right to appeal"
+        ],
+        "category": "justice_rights"
+      },
+      {
+        "id": 26,
+        "article": "Article 51",
+        "title": "Rights of Detained Persons",
+        "description": "Detained persons retain all rights except those incompatible with detention, and have right to humane treatment.",
+        "key_provisions": [
+          "Retention of all rights except those incompatible with detention",
+          "Right to petition for habeas corpus",
+          "Right to humane treatment",
+          "Legislative protection required"
+        ],
+        "category": "justice_rights"
+      },
+      {
+        "id": 27,
+        "article": "Article 53",
+        "title": "Rights of Children",
+        "description": "Every child has rights to name, nationality, education, nutrition, healthcare, protection from abuse, and parental care.",
+        "key_provisions": [
+          "Right to name and nationality from birth",
+          "Right to free and compulsory basic education",
+          "Right to basic nutrition, shelter and healthcare",
+          "Right to protection from abuse, neglect, harmful practices, and violence",
+          "Right to parental care and protection",
+          "Best interests of child are paramount"
+        ],
+        "category": "children_rights"
+      },
+      {
+        "id": 28,
+        "article": "Article 54",
+        "title": "Rights of Persons with Disabilities",
+        "description": "Persons with disabilities have rights to dignity, access to education, public facilities, communication aids, and representation.",
+        "key_provisions": [
+          "Right to dignity and respect",
+          "Right to access educational institutions",
+          "Right to reasonable access to places, transport, and information",
+          "Right to use sign language, braille, or other communication means",
+          "Right to assistive materials and devices",
+          "At least 5% representation in public bodies"
+        ],
+        "category": "special_groups_rights"
+      },
+      {
+        "id": 29,
+        "article": "Article 55",
+        "title": "Rights of Youth",
+        "description": "The State shall ensure youth access to education, training, opportunities for participation, employment, and protection from exploitation.",
+        "key_provisions": [
+          "Right to relevant education and training",
+          "Right to opportunities for participation in all spheres of life",
+          "Right to access employment",
+          "Right to protection from harmful practices and exploitation"
+        ],
+        "category": "special_groups_rights"
+      },
+      {
+        "id": 30,
+        "article": "Article 56",
+        "title": "Rights of Minorities and Marginalised Groups",
+        "description": "The State shall ensure minorities and marginalised groups participate in governance and have special opportunities in education and employment.",
+        "key_provisions": [
+          "Right to participate and be represented in governance",
+          "Right to special opportunities in education and economic fields",
+          "Right to special employment opportunities",
+          "Right to develop cultural values, languages, and practices",
+          "Right to reasonable access to water, health services, and infrastructure"
+        ],
+        "category": "special_groups_rights"
+      },
+      {
+        "id": 31,
+        "article": "Article 57",
+        "title": "Rights of Older Persons",
+        "description": "The State shall ensure older persons can participate in society, pursue development, live in dignity, and receive care.",
+        "key_provisions": [
+          "Right to fully participate in society",
+          "Right to pursue personal development",
+          "Right to live in dignity and be free from abuse",
+          "Right to receive reasonable care from family and State"
+        ],
+        "category": "special_groups_rights"
+      }
+    ],
+    "usage_instructions": {
+      "rotation_logic": "Use the 'id' field to cycle through rights. You can use: currentRightId = (dayOfYear % totalRights) + 1",
+      "display_format": "Show the title, description, and key_provisions for each right",
+      "categories": [
+        "fundamental_rights",
+        "equality_rights",
+        "liberty_rights",
+        "privacy_rights",
+        "expression_rights",
+        "association_rights",
+        "political_rights",
+        "property_rights",
+        "economic_rights",
+        "environmental_rights",
+        "cultural_rights",
+        "family_rights",
+        "consumer_rights",
+        "administrative_rights",
+        "justice_rights",
+        "children_rights",
+        "special_groups_rights"
+      ]
+    },
+    "total_rights": 31
+  }
