@@ -3,12 +3,11 @@ import { Button } from "@/components/ui/button";
 import { useBillOfRights } from "@/hooks/useBillOfRights";
 import { useLanguage } from "@/contexts/language-context";
 import { ShareDialog } from "@/components/ui/share-dialog";
-import { useScrollToSection } from "@/hooks/useScrollToSection";
+import Link from "next/link";
 
 export function RightOfDaySection() {
   const { currentRight, getCategoryIcon, getCategoryColor } = useBillOfRights();
   const { t } = useLanguage();
-  const { navigateToSection } = useScrollToSection();
 
   // Show loading state or error
   if (!currentRight) return null;
@@ -74,18 +73,13 @@ export function RightOfDaySection() {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-4">
-            <Button 
-              className="bg-[#1EB53A] hover:bg-[#0A7B24] text-white flex items-center gap-2"
-              onClick={() => {
-                // Navigate to the chapter page
-                const articleNumber = currentRight.article.replace('Article ', '');
-                const url = `/chapters/4#article-${articleNumber}`;
-                navigateToSection(url);
-              }}
+            <Link 
+              href={`/chapters/4#article-${currentRight.article.replace('Article ', '')}`}
+              className="bg-[#1EB53A] hover:bg-[#0A7B24] text-white flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-colors"
             >
               <BookOpen className="h-4 w-4" />
               {t("home.readFullArticle")}
-            </Button>
+            </Link>
             <ShareDialog 
               title={`${currentRight.article}: ${currentRight.title} - Katiba360`}
               description={`Learn about ${currentRight.title.toLowerCase()} in the Kenyan Constitution - ${currentRight.description}`}

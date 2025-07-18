@@ -128,16 +128,8 @@ export function useScrollToSection() {
     }, initialDelay);
   }, [isNavigating]);
 
-  // Handle hash changes and initial load - only for specific pages
+  // Handle hash changes and initial load
   useEffect(() => {
-    // Only activate scroll behavior on pages that need it
-    const allowedPaths = ['/chapters', '/search', '/scenarios'];
-    const shouldActivate = allowedPaths.some(path => pathname.startsWith(path));
-    
-    if (!shouldActivate) {
-      return;
-    }
-
     // Function to handle hash changes
     const handleHashChange = () => {
       const hash = window.location.hash;
