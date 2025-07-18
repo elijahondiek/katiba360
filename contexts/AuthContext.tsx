@@ -221,6 +221,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       const response = await (async () => {
         try {
+          console.log('Sending auth request with:', { code: code?.substring(0, 10) + '...', redirectUri, state });
+          
           const data = await fetchAPI('/api/v1/auth/google', {
             method: 'POST',
             body: JSON.stringify({
@@ -232,6 +234,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           });
           
           clearTimeout(timeoutId);
+          
+          console.log('Backend auth response:', data);
           
           if (!data) {
             throw new Error('Invalid response from authentication server');
