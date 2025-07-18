@@ -40,8 +40,7 @@ export async function fetchAPI(
   };
 
   // Enhanced logging for debugging
-  const isAuthEndpoint = endpoint.includes('/auth/google');
-  if (DEBUG_MODE || isAuthEndpoint) {
+  if (DEBUG_MODE) {
     console.log('--- API Request ---');
     console.log(`Endpoint: ${endpoint}`);
     console.log(`URL: ${url}`);
@@ -58,18 +57,7 @@ export async function fetchAPI(
     console.error('Failed to parse response as JSON:', e);
     console.error('Response status:', response.status);
     console.error('Response headers:', response.headers);
-    if (isAuthEndpoint) {
-      console.error('Raw response text:', await response.clone().text());
-    }
     throw new Error('Invalid JSON response from server');
-  }
-
-  if (isAuthEndpoint) {
-    console.log('--- API Response ---');
-    console.log('Status:', response.status);
-    console.log('Headers:', Object.fromEntries(response.headers.entries()));
-    console.log('Data:', data);
-    console.log('-------------------');
   }
 
   if (!response.ok) {

@@ -221,8 +221,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       const response = await (async () => {
         try {
-          console.log('Sending auth request with:', { code: code?.substring(0, 10) + '...', redirectUri, state });
-          
           const data = await fetchAPI('/api/v1/auth/google', {
             method: 'POST',
             body: JSON.stringify({
@@ -235,16 +233,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           
           clearTimeout(timeoutId);
           
-          console.log('Backend auth response:', data);
-          
           if (!data) {
             throw new Error('Invalid response from authentication server');
-          }
-          
-          // Check if backend returned null body
-          if (data.body === null) {
-            console.error('Backend returned null body. Full response:', data);
-            throw new Error('Backend authentication error - null response body');
           }
           
           // The data already has the correct structure from generate_response
