@@ -21,6 +21,7 @@ export const metadata: Metadata = {
   title: "Katiba360",
   description: "Kenya's Constitution at your fingertips",
   generator: 'WebShrewd',
+  manifest: '/manifest.json',
   openGraph: {
     title: "Katiba360",
     description: "Kenya's Constitution at your fingertips",
@@ -48,6 +49,11 @@ export const metadata: Metadata = {
     icon: "/logo.png",
     shortcut: "/logo.png",
     apple: "/logo.png"
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Katiba360"
   }
 }
 
@@ -58,6 +64,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#1f2937" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Katiba360" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/logo-192x192.png" />
+      </head>
       <body className={inter.className + " min-h-screen flex flex-col"}>
         <AccessibilityProvider>
           <LanguageProvider>

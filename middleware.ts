@@ -34,8 +34,11 @@ const isPublicPath = (path: string): boolean => {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow requests for static files (e.g., .png, .jpg, .jpeg, .svg, .gif, .ico, .webp, .css, .js, .txt, .woff, .woff2, .ttf)
-  if (pathname.match(/\.(?:png|jpg|jpeg|svg|gif|ico|webp|css|js|txt|woff2?|ttf)$/i)) {
+  // Allow requests for static files and PWA files
+  if (pathname.match(/\.(?:png|jpg|jpeg|svg|gif|ico|webp|css|js|txt|woff2?|ttf|json)$/i) || 
+      pathname === '/manifest.json' || 
+      pathname === '/sw.js' ||
+      pathname.startsWith('/workbox-')) {
     return NextResponse.next();
   }
 
