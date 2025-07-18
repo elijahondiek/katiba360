@@ -241,6 +241,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
             throw new Error('Invalid response from authentication server');
           }
           
+          // Check if backend returned null body
+          if (data.body === null) {
+            console.error('Backend returned null body. Full response:', data);
+            throw new Error('Backend authentication error - null response body');
+          }
+          
           // The data already has the correct structure from generate_response
           return data;
         } catch (error) {
