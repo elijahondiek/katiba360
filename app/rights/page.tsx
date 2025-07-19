@@ -4,29 +4,30 @@ import { Search, Filter, Shield, X } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useLanguage } from "@/contexts/language-context"
 import { useChapter4 } from "@/hooks/useChapter4"
 import { Article } from "@/lib/rightOfDay"
 import Loading from "./loading"
+
+// Define categories outside component to prevent recreation
+const RIGHTS_CATEGORIES = [
+  { id: "civil", name: "Civil and Political", articles: [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42] },
+  { id: "economic", name: "Economic and Social", articles: [43, 44, 45, 46, 47, 48, 49, 50, 51] },
+  { id: "cultural", name: "Cultural", articles: [44, 52, 53, 54, 55, 56, 57] }
+];
 
 export default function RightsPage() {
   const { language, t } = useLanguage();
   const { articles, isLoading, error } = useChapter4();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
-
-  // Define categories based on article content
-  const categories = [
-    { id: "civil", name: "Civil and Political", articles: [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42] },
-    { id: "economic", name: "Economic and Social", articles: [43, 44, 45, 46, 47, 48, 49, 50, 51] },
-    { id: "cultural", name: "Cultural", articles: [44, 52, 53, 54, 55, 56, 57] }
-  ];
 
   // Filter articles based on search query and selected category
-  useEffect(() => {
-    if (!articles || articles.length === 0) return;
+  const filteredArticles = useMemo(() => {
+    if (!articles || articles.length === 0) {
+      return [];
+    }
 
     let filtered = [...articles];
 
@@ -43,11 +44,11 @@ export default function RightsPage() {
 
     // Filter by category
     if (selectedCategory) {
-      const categoryArticles = categories.find(cat => cat.id === selectedCategory)?.articles || [];
+      const categoryArticles = RIGHTS_CATEGORIES.find(cat => cat.id === selectedCategory)?.articles || [];
       filtered = filtered.filter(article => categoryArticles.includes(article.article_number));
     }
 
-    setFilteredArticles(filtered);
+    return filtered;
   }, [articles, searchQuery, selectedCategory]);
 
   // Handle category selection
@@ -57,7 +58,7 @@ export default function RightsPage() {
 
   // Get category name for an article
   const getArticleCategory = (articleNumber: number): string => {
-    for (const category of categories) {
+    for (const category of RIGHTS_CATEGORIES) {
       if (category.articles.includes(articleNumber)) {
         return category.name;
       }
@@ -144,7 +145,7 @@ export default function RightsPage() {
             >
               All Rights
             </Button>
-            {categories.map(category => (
+            {RIGHTS_CATEGORIES.map(category => (
               <Button 
                 key={category.id}
                 variant={selectedCategory === category.id ? "default" : "outline"} 

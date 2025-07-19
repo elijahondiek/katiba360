@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { getChapterByNumber, reloadConstitutionData } from '@/lib/api';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 /**
  * Custom hook to fetch Chapter 4 (Bill of Rights) from the backend using SWR.
@@ -38,7 +38,7 @@ export function useChapter4() {
   );
 
   // Extract articles from parts structure with proper error handling
-  const articles = (() => {
+  const articles = useMemo(() => {
     const chapter = data?.body?.chapter;
     if (!chapter) return [];
 
@@ -98,7 +98,7 @@ export function useChapter4() {
     }
 
     return [];
-  })();
+  }, [data]);
 
   return {
     articles,

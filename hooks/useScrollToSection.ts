@@ -130,6 +130,14 @@ export function useScrollToSection() {
 
   // Handle hash changes and initial load
   useEffect(() => {
+    // Only apply scroll behavior on specific pages
+    const allowedPaths = ['/chapters', '/rights', '/search'];
+    const shouldApplyScrollBehavior = allowedPaths.some(path => pathname.startsWith(path));
+    
+    if (!shouldApplyScrollBehavior) {
+      return;
+    }
+
     // Function to handle hash changes
     const handleHashChange = () => {
       const hash = window.location.hash;
@@ -164,12 +172,22 @@ export function useScrollToSection() {
 
   // Function to navigate to a specific section
   const navigateToSection = useCallback((url: string) => {
+    // Only apply custom navigation for hash URLs on allowed paths
+    const allowedPaths = ['/chapters', '/rights', '/search'];
+    const shouldUseCustomNavigation = allowedPaths.some(path => pathname.startsWith(path)) && url.includes('#');
+    
+    if (!shouldUseCustomNavigation) {
+      // For regular navigation, just use router.push without any special handling
+      router.push(url);
+      return;
+    }
+    
     // Set navigating state to true to use longer timeout for cross-page navigation
     setIsNavigating(true);
     
     // Use router.push for all navigation to ensure proper Next.js handling
     router.push(url);
-  }, [router]);
+  }, [router, pathname]);
 
   return { navigateToSection, scrollToElement };
 }

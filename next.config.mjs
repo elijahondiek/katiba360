@@ -15,7 +15,7 @@ const nextConfig = {
 
 export default withPWA({
   dest: 'public',
-  disable: false, // Enable in development for testing
+  disable: process.env.NODE_ENV === 'development', // Disable in development to avoid warnings
   register: true,
   skipWaiting: true,
   buildExcludes: [/middleware-manifest\.json$/],
